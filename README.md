@@ -1,3 +1,9 @@
 # devops-netology
-first line
-second line
+Файлы исключенные из системы контроля версий Git (gitignore):  
+- Директории .terraform  
+- Файлы .tfstate  
+- Лог файлы crash.log  
+- Файлы с переменными, которые могут содержать пароли, .tfvars  
+- Файлы с переопределёнными настройками override.tf  
+- Файлы c конфигурацией терминала (CLI) .terraformrc  
+
