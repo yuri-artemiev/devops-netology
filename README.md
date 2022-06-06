@@ -80,3 +80,19 @@ dd01a3507 Update CHANGELOG.md
 7. Кто автор функции synchronizedWriters?  
 Автор `Martin Atkins <mart@degeneration.co.uk>`  
 Команда `git log -S 'func synchronizedWriters('`  
+
+# Домашнее задание к занятию «3.1. Работа в терминале, лекция 1»  
+5. Какие ресурсы выделены по-умолчанию?  
+Выделено 2 CPU, 1024 MB RAM, 64 GB disk  
+6. Как добавить оперативной памяти или ресурсов процессора виртуальной машине?  
+Отредактировать файл Vagrantfile в директории, где хранятся файлы конфигурации  
+```
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 4128
+    v.cpus = 4
+  end
+```
+Проверить корректность Vagrantfile файла можно командой `vagrant validate`  
+Перезапустить виртуальную машину можно командой `vagrant reload`  
+
