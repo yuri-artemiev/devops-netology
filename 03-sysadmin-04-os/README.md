@@ -1,6 +1,17 @@
 # Домашнее задание к занятию "3.4. Операционные системы, лекция 2"
 
 1. Создайте самостоятельно простой systemd unit-файл для `node_exporter`:  
+
+Для начала установим node_exporter из архива:  
+   ```
+   wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+   tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+   cd node_exporter-1.3.1.linux-amd64
+   ./node_exporter
+   ```
+Создадим unit-файл и поместим туда созедржание  
+   ```
+   ```
 ...  
     * поместите его в автозагрузку,  
     ...  
@@ -10,7 +21,20 @@
     ...  
 
 1. Приведите несколько опций в /metrics, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.  
-...  
+Проверим вывод митрик с помощью команды `curl http://localhost:9100/metrics`
+```
+# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+# TYPE go_gc_duration_seconds summary
+go_gc_duration_seconds{quantile="0"} 0
+go_gc_duration_seconds{quantile="0.25"} 0
+go_gc_duration_seconds{quantile="0.5"} 0
+go_gc_duration_seconds{quantile="0.75"} 0
+go_gc_duration_seconds{quantile="1"} 0
+go_gc_duration_seconds_sum 0
+go_gc_duration_seconds_count 0
+...
+```
+
 3. Установите в свою виртуальную машину `Netdata`  
 ...  
     * В браузере на своей машине зайдите на `localhost:19999`. Какие метрики по умолчанию собираются Netdata?  
