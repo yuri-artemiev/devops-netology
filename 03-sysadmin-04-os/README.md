@@ -2,38 +2,64 @@
 
 1. Создайте самостоятельно простой systemd unit-файл для `node_exporter`:  
 
-Для начала установим node_exporter из архива:  
-   ```
-   wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
-   tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
-   cd node_exporter-1.3.1.linux-amd64
-   ./node_exporter
-   ```
-Создадим unit-файл и поместим туда созедржание  
-   ```
-   ```
-...  
+    Для начала установим node_exporter из архива:  
+    ```
+    wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+    tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+    cd node_exporter-1.3.1.linux-amd64
+    cp node_exporter /usr/local/bin
+    ```
+    
+    Создадим unit-файл `/etc/systemd/system/node_exporter.service` и поместим туда созедржание  
+    ```
+    [Unit]
+    Description=Node Exporter
+    Wants=network-online.target
+    After=network.target
+
+    [Service]
+    User=node_exporter
+    Group=node_exporter
+    Type=simple
+    EnvironmentFile=/etc/default/node_exporter
+    ExecStart=/usr/local/bin/node_exporter $OPTIONS
+
+    [Install]
+    WantedBy=multi-user.target
+    ```    
+    Создадим `node_exporter` пользователя командой `useradd --no-create-home --shell /bin/false node_exporter`  
+    Назначим права на исполняемый файл командой `chown -R node_exporter:node_exporter /usr/local/bin/node_exporter`  
+    Пересканируем созаднный сервис командой `sudo systemctl daemon-reload`   
     * поместите его в автозагрузку,  
-    ...  
+    Включим сервис во время загрузки командой `systemctl enable node_exporter`  
     * предусмотрите возможность добавления опций к запускаемому процессу через внешний файл    
-    ...  
+    Добавление опций (параметров) для запускаемого файла можно использовать переменные окружения  
+    В unit-файле мы указали переменную `$OPTIONS` и файл с переменными в `EnvironmentFile`  
+    Создадим файл `/etc/default/node_exporter` с переменными окружения для процесса node_exporter
+        ```
+        OPTIONS="--collector.disable-defaults --collector.cpu --collector.meminfo --collector.filesystem --collector.netdev"
+        ```
+        Проверим что переменная `OPTIONS` передаётся процессу командой `strings /proc/PID/environ`  
     * удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.  
-    ...  
+    Запустим сервис комндой `systemctl status node_exporter`  
+    Проверим статус сервиса командой `systemctl status node_exporter`  
+    Посмотрим логи сериса командой `journalctl -f --unit node_exporter`  
+    Перезагрузим машину командой `systemctl reboot` и убедимся что сервис запущен  
 
 1. Приведите несколько опций в /metrics, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.  
 Проверим вывод митрик с помощью команды `curl http://localhost:9100/metrics`
-```
-# HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
-# TYPE go_gc_duration_seconds summary
-go_gc_duration_seconds{quantile="0"} 0
-go_gc_duration_seconds{quantile="0.25"} 0
-go_gc_duration_seconds{quantile="0.5"} 0
-go_gc_duration_seconds{quantile="0.75"} 0
-go_gc_duration_seconds{quantile="1"} 0
-go_gc_duration_seconds_sum 0
-go_gc_duration_seconds_count 0
-...
-```
+    ```
+    # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
+    # TYPE go_gc_duration_seconds summary
+    go_gc_duration_seconds{quantile="0"} 0
+    go_gc_duration_seconds{quantile="0.25"} 0
+    go_gc_duration_seconds{quantile="0.5"} 0
+    go_gc_duration_seconds{quantile="0.75"} 0
+    go_gc_duration_seconds{quantile="1"} 0
+    go_gc_duration_seconds_sum 0
+    go_gc_duration_seconds_count 0
+    ...
+    ```
 
 3. Установите в свою виртуальную машину `Netdata`  
 ...  
