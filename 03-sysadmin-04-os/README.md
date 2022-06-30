@@ -10,7 +10,7 @@
     cp node_exporter /usr/local/bin
     ```
     
-    Создадим unit-файл `/etc/systemd/system/node_exporter.service` и поместим туда созедржание  
+    Создадим unit-файл `/etc/systemd/system/node_exporter.service` и поместим туда содержание  
     ```
     [Unit]
     Description=Node Exporter
@@ -33,7 +33,7 @@
     * поместите его в автозагрузку,  
     Включим сервис во время загрузки командой `systemctl enable node_exporter`  
     * предусмотрите возможность добавления опций к запускаемому процессу через внешний файл    
-    Добавление опций (параметров) для запускаемого файла можно использовать переменные окружения  
+    Добавление опций (параметров) для запускаемого файла можно через переменные окружения  
     В unit-файле мы указали переменную `$OPTIONS` и файл с переменными в `EnvironmentFile`  
     Создадим файл `/etc/default/node_exporter` с переменными окружения для процесса node_exporter
         ```
@@ -47,7 +47,7 @@
     Перезагрузим машину командой `systemctl reboot` и убедимся что сервис запущен  
 
 1. Приведите несколько опций в /metrics, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.  
-Проверим вывод митрик с помощью команды `curl http://localhost:9100/metrics`
+Проверим вывод метрик с помощью команды `curl http://localhost:9100/metrics`
     ```
     # HELP go_gc_duration_seconds A summary of the pause duration of garbage collection cycles.
     # TYPE go_gc_duration_seconds summary
@@ -103,24 +103,42 @@
   
 1. Можно ли по выводу `dmesg` понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?  
 Да, можно запустить команду `dmesg | grep -i virt`  
-```
-[    0.000000] DMI: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
-[    0.002806] CPU MTRRs all blank - virtualized system.
-[    0.101141] Booting paravirtualized kernel on KVM
-[    7.628466] systemd[1]: Detected virtualization oracle.
-```
+    ```
+    [0.000000] DMI: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+    [0.002806] CPU MTRRs all blank - virtualized system.
+    [0.101141] Booting paravirtualized kernel on KVM
+    [7.628466] systemd[1]: Detected virtualization oracle.
+    ```
 
 3. Как настроен sysctl `fs.nr_open` на системе по-умолчанию?  
 Запустим команду `sysctl -n fs.nr_open` и получим максимальное количество файловых дескрипторов, которые может выделить процесс. Оно ровно `1048576`  
     * Какой другой существующий лимит не позволит достичь такого числа?  
     Другой механизм, который обеспечивает контроль над ресурсами, доступными оболочке и запущенным ею процессам `ulimit -n`. Он равен `1024`  
 4. Запустите любой долгоживущий процесс в отдельном неймспейсе процессов  
-...  
+Запустим команду `unshare --fork --pid --mount-proc sleep 1h`. Выведем PID процесса командной `lsns | grep sleep`  
+    ```
+    4026532183 pid         1  2616 root            sleep 1h
+    ```
     * покажите, что ваш процесс работает под PID 1 через `nsenter`  
-    ...  
+    Используем команду `nsenter --target 2616 --pid --mount` чтобы зайти в неймспейс процесса  
+    Запустим команду `ps aux` внутри неймспейса чтобы проверить PID  
+        ```
+        USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+        root           1  0.0  0.0   5476   596 tty1     S+   11:20   0:00 sleep 1h
+        root           2  0.0  0.1   7236  4128 pts/0    S    11:24   0:00 -bash
+        root          13  0.0  0.0   8892  3332 pts/0    R+   11:25   0:00 ps aux
+        ```
+        Выйдим из неймспейса командой `exit`  
+        Также из документации можно запустить команду, которая покажет собственный PID = 1 в неймспейсе `unshare --fork --pid --mount-proc readlink /proc/self`  
 5. Найдите информацию о том, что такое `:(){ :|:& };:`  
-...  
+Это команда называется форк бомбой (fork bomb).  Это рекурсивная функция, которая вызывает саму себя бесконечное количество раз.
     * Какой механизм помог автоматической стабилизации, показан в `dmesg`  
-    ...  
+    Механизм контроля ресурсов systemd. Он использует понятие слайсов (slice)  
+    `cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-7.scope`  
     * Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?  
-    ...  
+    В настройке слайса пользователя `/usr/lib/systemd/system/user-.slice.d/10-defaults.conf` можно увидеть ограничение для всех пользователей по умолчанию  
+    `TasksMax=33%`  
+    Это устанавливает ограничение в 33% от сконфигурированного максимального количества задач в системе. 
+    Мксимальное количество процессов можно посмотреть командой `systemctl show --property DefaultTasksMax`  
+    Количество одновременно запущенных процесов также можно ограничить командой  `ulimit -u` 
+    
