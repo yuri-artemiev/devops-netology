@@ -60,52 +60,60 @@
     go_gc_duration_seconds_count 0
     ...
     ```
-    Примеры метрик для мониторинга
-        * CPU  
-            ```
-            # HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.
-            node_cpu_seconds_total{cpu="*",mode="*"}
-            # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
-            process_cpu_seconds_total
-            ```
-        * память  
-            ```
-            # HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes.
-            node_memory_MemFree_bytes
-            # HELP node_memory_SwapFree_bytes Memory information field SwapFree_bytes.
-            node_memory_SwapFree_bytes
-            # HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
-            process_virtual_memory_max_bytes
-            ```
-        * диск  
-            ```
-            # HELP node_filesystem_files_free Filesystem total free file nodes.
-            node_filesystem_files_free{device="*",fstype="*",mountpoint="*"}
-            # HELP node_filesystem_free_bytes Filesystem free space in bytes.
-            node_filesystem_free_bytes{device="*",fstype="*",mountpoint="*"}
-            ```
-        * сеть  
-            ```
-            # HELP node_network_receive_drop_total Network device statistic receive_drop.
-            node_network_receive_drop_total{device="*"}
-            # HELP node_network_receive_errs_total Network device statistic receive_errs.
-            node_network_receive_errs_total{device="*"}
-            # HELP node_network_transmit_drop_total Network device statistic transmit_drop.
-            node_network_transmit_drop_total{device="*"}
-            # HELP node_network_transmit_errs_total Network device statistic transmit_errs.
-            node_network_transmit_errs_total{device="*"}
-            ```
+    
+    Примеры метрик для мониторинга   
+    * CPU  
+        ```
+        # HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.
+        node_cpu_seconds_total{cpu="*",mode="*"}
+        # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+        process_cpu_seconds_total
+        ```
+    * память  
+        ```
+        # HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes.
+        node_memory_MemFree_bytes
+        # HELP node_memory_SwapFree_bytes Memory information field SwapFree_bytes.
+        node_memory_SwapFree_bytes
+        # HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+        process_virtual_memory_max_bytes
+        ```
+    * диск  
+        ```
+        # HELP node_filesystem_files_free Filesystem total free file nodes.
+        node_filesystem_files_free{device="*",fstype="*",mountpoint="*"}
+        # HELP node_filesystem_free_bytes Filesystem free space in bytes.
+        node_filesystem_free_bytes{device="*",fstype="*",mountpoint="*"}
+        ```
+    * сеть  
+        ```
+        # HELP node_network_receive_drop_total Network device statistic receive_drop.
+        node_network_receive_drop_total{device="*"}
+        # HELP node_network_receive_errs_total Network device statistic receive_errs.
+        node_network_receive_errs_total{device="*"}
+        # HELP node_network_transmit_drop_total Network device statistic transmit_drop.
+        node_network_transmit_drop_total{device="*"}
+        # HELP node_network_transmit_errs_total Network device statistic transmit_errs.
+        node_network_transmit_errs_total{device="*"}
+        ```
 
-3. Установите в свою виртуальную машину `Netdata`  
-...  
+3. Установите в свою виртуальную машину `Netdata`    
     * В браузере на своей машине зайдите на `localhost:19999`. Какие метрики по умолчанию собираются Netdata?  
-...  
+    В начале выдаются общая загрузка по CPU, памяти, диску и сети. И затем ниже выдаётся подробные метрики. Например `softirq`.
+  
 1. Можно ли по выводу `dmesg` понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?  
-...  
+Да, можно запустить команду `dmesg | grep -i virt`  
+```
+[    0.000000] DMI: innotek GmbH VirtualBox/VirtualBox, BIOS VirtualBox 12/01/2006
+[    0.002806] CPU MTRRs all blank - virtualized system.
+[    0.101141] Booting paravirtualized kernel on KVM
+[    7.628466] systemd[1]: Detected virtualization oracle.
+```
+
 3. Как настроен sysctl `fs.nr_open` на системе по-умолчанию?  
-...   
+Запустим команду `sysctl -n fs.nr_open` и получим максимальное количество файловых дескрипторов, которые может выделить процесс. Оно ровно `1048576`  
     * Какой другой существующий лимит не позволит достичь такого числа?  
-    ...  
+    Другой механизм, который обеспечивает контроль над ресурсами, доступными оболочке и запущенным ею процессам `ulimit -n`. Он равен `1024`  
 4. Запустите любой долгоживущий процесс в отдельном неймспейсе процессов  
 ...  
     * покажите, что ваш процесс работает под PID 1 через `nsenter`  
