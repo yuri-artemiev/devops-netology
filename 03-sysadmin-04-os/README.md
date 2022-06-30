@@ -60,6 +60,41 @@
     go_gc_duration_seconds_count 0
     ...
     ```
+    Примеры метрик для мониторинга
+        * CPU  
+            ```
+            # HELP node_cpu_seconds_total Seconds the CPUs spent in each mode.
+            node_cpu_seconds_total{cpu="*",mode="*"}
+            # HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+            process_cpu_seconds_total
+            ```
+        * память  
+            ```
+            # HELP node_memory_MemAvailable_bytes Memory information field MemAvailable_bytes.
+            node_memory_MemFree_bytes
+            # HELP node_memory_SwapFree_bytes Memory information field SwapFree_bytes.
+            node_memory_SwapFree_bytes
+            # HELP process_virtual_memory_max_bytes Maximum amount of virtual memory available in bytes.
+            process_virtual_memory_max_bytes
+            ```
+        * диск  
+            ```
+            # HELP node_filesystem_files_free Filesystem total free file nodes.
+            node_filesystem_files_free{device="*",fstype="*",mountpoint="*"}
+            # HELP node_filesystem_free_bytes Filesystem free space in bytes.
+            node_filesystem_free_bytes{device="*",fstype="*",mountpoint="*"}
+            ```
+        * сеть  
+            ```
+            # HELP node_network_receive_drop_total Network device statistic receive_drop.
+            node_network_receive_drop_total{device="*"}
+            # HELP node_network_receive_errs_total Network device statistic receive_errs.
+            node_network_receive_errs_total{device="*"}
+            # HELP node_network_transmit_drop_total Network device statistic transmit_drop.
+            node_network_transmit_drop_total{device="*"}
+            # HELP node_network_transmit_errs_total Network device statistic transmit_errs.
+            node_network_transmit_errs_total{device="*"}
+            ```
 
 3. Установите в свою виртуальную машину `Netdata`  
 ...  
