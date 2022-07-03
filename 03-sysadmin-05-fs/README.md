@@ -64,9 +64,10 @@
 1. Создайте LV размером 100 Мб, указав его расположение на PV с RAID0.  
     Запустим команду `lvcreate --size 100M --name lv0 vg0 /dev/md1`  
     где:  
-        * `lv0` - имя logical volume  
-        * `vg0` - имя volume group  
-        * `/dev/md1` - physical volume на RAID0 на малых разелах 
+    * `lv0` - имя logical volume  
+    * `vg0` - имя volume group  
+    * `/dev/md1` - physical volume на RAID0 на малых разелах  
+    
     Проверим что LV созадлась командой `lvs` 
     ```
     LV        VG        Attr       LSize
@@ -106,13 +107,34 @@
         └─vg0-lv0             253:1    0  100M  0 lvm   /tmp/new  
     ```
 1. Протестируйте целостность файла  
-...  
-1. Используя pvmove, переместите содержимое PV с RAID0 на RAID1.  
-    `/dev/md0` - RAID1 на больших разелах  
+    ```
+    gzip -t /tmp/new/test.gz
+    echo $?
+    0
+    ```
+1. Используя pvmove, переместите содержимое PV с RAID0 на RAID1. 
+    Воспользуемся командой `pvmove /dev/md1 /dev/md0`  
+    где:  
+    * `/dev/md1` - physical volume на RAID0 на малых разелах 
+    * `/dev/md0` - physical volume на RAID1 на больших разелах  
 1. Сделайте `--fail` на устройство в вашем RAID1 md.  
-...  
+    Запустим команду `mdadm /dev/md0 --fail /dev/sdc1` что "выведет" из строя второй диск  
+    Проверим статус `md0` командой `cat /proc/mdstat`  
+    ```
+    md0 : active raid1 sdc1[1](F) sdb1[0]
+    2094080 blocks super 1.2 [2/1] [U_]
+    ```
 1. Подтвердите выводом `dmesg`, что RAID1 работает в деградированном состоянии.  
-...  
+    ```
+    [6760.291961] md/raid1:md0: Disk failure on sdc1, disabling device.
+                  md/raid1:md0: Operation continuing on 1 devices.
+    ```
 1. Протестируйте целостность файла, несмотря на "сбойный" диск он должен продолжать быть доступен:  
-...  
+    ```
+    gzip -t /tmp/new/test.gz
+    echo $?
+    0
+    ```
+  
+
   
