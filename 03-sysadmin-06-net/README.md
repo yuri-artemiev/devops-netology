@@ -2,9 +2,11 @@
 
 1. Подключитесь утилитой телнет к сайту stackoverflow.com. укажите полученный HTTP код.  
     ```
-    
+    HTTP/1.1 301 Moved Permanently
+    location: https://stackoverflow.com/questions
+    Date: Sat, 09 Jul 2022 11:06:42 GMT
     ```
-
+    `301 Moved Permanently` запрошенный ресурс был окончательно перемещён в URL, указанный в заголовке Location. Браузер в случае такого ответа перенаправляется на эту страницу. Ресурс перемещён по адресу `https://stackoverflow.com/questions`  
 2. Подключитесь к сайту  stackoverflow.com в браузере. укажите в ответе полученный HTTP код.  
     ```
     
@@ -14,10 +16,7 @@
     
     ```
     приложите скриншот консоли браузера.  
-    ```
-    
-    ```
-    
+    ![03-sysadmin-06-net-01.png](03-sysadmin-06-net-01.png)  
 3. Какой IP адрес у вас в интернете?  
     ```
     
