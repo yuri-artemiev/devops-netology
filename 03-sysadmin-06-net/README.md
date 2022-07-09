@@ -9,12 +9,15 @@
     `301 Moved Permanently` запрошенный ресурс был окончательно перемещён в URL, указанный в заголовке Location. Браузер в случае такого ответа перенаправляется на эту страницу. Ресурс перемещён по адресу `https://stackoverflow.com/questions`  
 2. Подключитесь к сайту  stackoverflow.com в браузере. укажите в ответе полученный HTTP код.  
     ```
-    
+    HTTP/1.1 301 Moved Permanently
+    location: https://stackoverflow.com/
+    Date: Sat, 09 Jul 2022 11:17:43 GMT
     ```
     какой запрос обрабатывался дольше всего.  
     ```
-    
+    https://cdn.sstatic.net/Js/third-party/npm/@stackoverflow/stacks/dist/js/stacks.min.js
     ```
+    JavaScript 23438 байта выполнялся 253 мс.  
     приложите скриншот консоли браузера.  
     ![03-sysadmin-06-net-01.png](03-sysadmin-06-net-01.png)  
 3. Какой IP адрес у вас в интернете?  
