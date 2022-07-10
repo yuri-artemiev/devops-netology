@@ -51,17 +51,29 @@
     Используется технология `VLAN` - виртуальных частных сетей. Для изоляции широковещательных доменов.  
 
     Какой пакет и команды есть в Linux для этого? Приведите пример конфига.
-    Восопользуетмся командой `ip`  
+    Используется утилита `ip` из пакета `iproute2`  
     ```
     ip link add link eth0 name eth0.10 type vlan id 10
     ip -d link show eth0.10
-    ip addr add 192.168.1.200/24 brd 192.168.1.255 dev eth0.10
+        3: eth0.10@eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+            link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
+    ip addr add 10.0.10.15/24 brd 10.0.10.255 dev eth0.10
     ip link set dev eth0.10 up
+    ip -d addr show eth0.10
+        3: eth0.10@eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+        link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 0 maxmtu 65535
+        vlan protocol 802.1Q id 10 <REORDER_HDR> numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535
+        inet 10.0.10.15/24 brd 10.0.10.255 scope global eth0.10
+            valid_lft forever preferred_lft forever    
+    
     ip link set dev eth0.10 down
     ip link delete eth0.10
     
     ip link add link enp1s0 name enp1s0.100 type vlan id 100
     ip addr add 192.168.100.2/24 dev enp1s0.100
+    ```
+    Команда `ip` не сохраняет конфигурацию после перезагрузки. Для использование постоянной конфигурации используем систему `netplan`  
+    ```
     nano /etc/netplan/01-network-manager-all.yaml
     network:
     ethernets:
