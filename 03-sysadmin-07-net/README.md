@@ -37,12 +37,49 @@
         Основной шлюз . . . . . . . . . . :
     ```
 
-2. Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?
+2. Какой протокол используется для распознавания соседа по сетевому интерфейсу?
+    Используется протокол `LLDP`. Также `ARP` используется для разерешения IP адреса в MAC адрес.  
+    Какой пакет и команды есть в Linux для этого?  
+    Используется пакет `lldpd`
     ```
+    apt info lldpd
+    ...
+    This implementation provides LLDP sending and reception, supports VLAN and includes an SNMP subagent that can interface to an SNMP agent through AgentX protocol.
+    ...
+    ```    
+3. Какая технология используется для разделения L2 коммутатора на несколько виртуальных сетей?  
+    Используется технология `VLAN` - виртуальных частных сетей. Для изоляции широковещательных доменов.  
+
+    Какой пакет и команды есть в Linux для этого? Приведите пример конфига.
+    Восопользуетмся командой `ip`  
+    ```
+    ip link add link eth0 name eth0.10 type vlan id 10
+    ip -d link show eth0.10
+    ip addr add 192.168.1.200/24 brd 192.168.1.255 dev eth0.10
+    ip link set dev eth0.10 up
+    ip link set dev eth0.10 down
+    ip link delete eth0.10
     
-    ```
-3. Какая технология используется для разделения L2 коммутатора на несколько виртуальных сетей? Какой пакет и команды есть в Linux для этого? Приведите пример конфига.
-    ```
+    ip link add link enp1s0 name enp1s0.100 type vlan id 100
+    ip addr add 192.168.100.2/24 dev enp1s0.100
+    nano /etc/netplan/01-network-manager-all.yaml
+    network:
+    ethernets:
+    enp1s0:
+      dhcp4: false
+      addresses:
+        - 192.168.122.201/24
+      gateway4: 192.168.122.1
+      nameservers:
+          addresses: [8.8.8.8, 1.1.1.1]
+
+    vlans:
+        enp1s0.100:
+            id: 100
+            link: enp1s0
+            addresses: [192.168.100.2/24]
+    netplan apply        
+    
     
     ```
 4. Какие типы агрегации интерфейсов есть в Linux? Какие опции есть для балансировки нагрузки? Приведите пример конфига.
