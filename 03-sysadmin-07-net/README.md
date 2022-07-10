@@ -1,8 +1,40 @@
 # Домашнее задание к занятию "3.7. Компьютерные сети, лекция 2"
 
 1. Проверьте список доступных сетевых интерфейсов на вашем компьютере. Какие команды есть для этого в Linux и в Windows?
+    На Linux запустим команду `ip`  
     ```
-    
+    ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+        inet6 ::1/128 scope host
+    2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+        link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
+        inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic eth0
+        inet6 fe80::a00:27ff:feb1:285d/64 scope link
+    ```
+    или  
+    ```
+    ip link show
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+        link/ether 08:00:27:b1:28:5d brd ff:ff:ff:ff:ff:ff
+    ```
+    На Windows запустим команду `ipconfig`  
+    ```
+    Адаптер Ethernet Ethernet:
+        DNS-суффикс подключения . . . . . : rt-ac66u
+        Локальный IPv6-адрес канала . . . : fe80::dd14:7483:ff91:78dd%17
+        IPv4-адрес. . . . . . . . . . . . : 192.168.1.10
+        Маска подсети . . . . . . . . . . : 255.255.255.0
+        Основной шлюз . . . . . . . . . . : 192.168.1.1
+    Адаптер Ethernet VirtualBox Host-Only Network:
+        DNS-суффикс подключения . . . . . :
+        Локальный IPv6-адрес канала . . . : fe80::a5bd:4b43:db9c:e579%16
+        IPv4-адрес. . . . . . . . . . . . : 192.168.56.1
+        Маска подсети . . . . . . . . . . : 255.255.255.0
+        Основной шлюз . . . . . . . . . . :
     ```
 
 2. Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?
