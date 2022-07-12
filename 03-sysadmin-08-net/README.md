@@ -68,11 +68,11 @@
     Для просмотр открытых TCP портов воспользуемся утилитой `ss`  
     ```
     ss -netpa
-    State           Recv-Q          Send-Q                   Local Address:Port                   Peer Address:Port         Process
-    LISTEN          0               4096                     127.0.0.53%lo:53                          0.0.0.0:*             users:(("systemd-resolve",pid=658,fd=13)) uid:101 ino:20769 sk:3d <->
-    LISTEN          0               128                            0.0.0.0:22                          0.0.0.0:*             users:(("sshd",pid=739,fd=3)) ino:21320 sk:3e <->
-    ESTAB           0               0                            10.0.2.15:22                         10.0.2.2:2630          users:(("sshd",pid=1986,fd=4),("sshd",pid=1930,fd=4)) timer:(keepalive,95min,0) ino:27172 sk:3c <->
-    LISTEN          0               128                               [::]:22                             [::]:*             users:(("sshd",pid=739,fd=4)) ino:21322 sk:3f v6only:1 <->
+    State   Recv-Q  Send-Q  Local Address:Port  Peer Address:Port  Process
+    LISTEN  0       4096    127.0.0.53%lo:53    0.0.0.0:*          users:(("systemd-resolve",pid=658,fd=13)) uid:101 ino:20769 sk:3d <->
+    LISTEN  0       128     0.0.0.0:22          0.0.0.0:*          users:(("sshd",pid=739,fd=3)) ino:21320 sk:3e <->
+    ESTAB   0         0     10.0.2.15:22        10.0.2.2:2630      users:(("sshd",pid=1986,fd=4),("sshd",pid=1930,fd=4)) timer:(keepalive,95min,0) ino:27172 sk:3c <->
+    LISTEN  0       128     [::]:22             [::]:*             users:(("sshd",pid=739,fd=4)) ino:21322 sk:3f v6only:1 <->
     ```
     * `53` - DNS, `systemd-resolve` - имя процесса, `LISTEN` - состояние порта (прослушивается)  
     * `22` - SSH, `sshd` - демон SSH, `ESTAB` - соединение установлено (подключен клиент 10.0.2.2)  
@@ -80,9 +80,9 @@
 4. Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?
     ```
     ss -neupa
-    State          Recv-Q          Send-Q                    Local Address:Port                   Peer Address:Port         Process
-    UNCONN         0               0                         127.0.0.53%lo:53                          0.0.0.0:*             users:(("systemd-resolve",pid=658,fd=12)) uid:101 ino:20768 sk:40 <->
-    UNCONN         0               0                        10.0.2.15%eth0:68                          0.0.0.0:*             users:(("systemd-network",pid=655,fd=17)) uid:100 ino:20301 sk:41 <->
+    State   Recv-Q  Send-Q  Local Address:Port  Peer Address:Port  Process
+    UNCONN  0       0       127.0.0.53%lo:53    0.0.0.0:*          users:(("systemd-resolve",pid=658,fd=12)) uid:101 ino:20768 sk:40 <->
+    UNCONN  0       0       10.0.2.15%eth0:68   0.0.0.0:*          users:(("systemd-network",pid=655,fd=17)) uid:100 ino:20301 sk:41 <->
     ```
     * `53` - DNS использует как TCP так и UDP, `systemd-resolve` - демон systemd, `UNCONN` - UDP не использует процесс создания соединения  
     * `68` - DHCP, `systemd-network` - DHCP клиент, `UNCONN` - получает информацию от DHCP сервера  
