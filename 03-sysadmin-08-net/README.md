@@ -1,11 +1,10 @@
 # Домашнее задание к занятию "3.8. Компьютерные сети, лекция 3"
 
 1. Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP
-    xxx
     ```
     telnet route-server.ip.tdc.net
     
-    show route 93.165.158.150
+    show route 93.165.158.x
     inet.0: 882857 destinations, 15008409 routes (882857 active, 0 holddown, 1 hidden)
     + = Active Route, - = Last Active, * = Both
     93.160.0.0/13      *[BGP/170] 6w3d 05:23:27, localpref 100, from 83.88.48.163
@@ -44,16 +43,26 @@
                         
     ```
 2. Создайте dummy0 интерфейс в Ubuntu.  
-    xxx
     ```
     ip link add dummy0 type dummy
     ip addr add 10.0.99.15/24 dev dummy0
     ip link set dummy0 up
-    ip a show type dummy
+    ip -d address show dummy0
+        4: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+            link/ether 4a:cc:f7:75:eb:78 brd ff:ff:ff:ff:ff:ff promiscuity 0 minmtu 0 maxmtu 0
+            dummy numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535
+            inet 10.0.99.15/24 scope global dummy0
+                valid_lft forever preferred_lft forever
+            inet6 fe80::48cc:f7ff:fe75:eb78/64 scope link
+                valid_lft forever preferred_lft forever
     ```
     Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации.  
     ```
-    
+    ip route add 192.168.1.0/24 via 10.0.99.15
+    ip route add 192.168.2.0/24 dev dummy0
+    ip route show | grep 192.168
+        192.168.1.0/24 via 10.0.99.15 dev dummy0
+        192.168.2.0/24 dev dummy0 scope link
     ```
 3. Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров.
     xxx
