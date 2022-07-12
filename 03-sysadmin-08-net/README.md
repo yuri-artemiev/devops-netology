@@ -85,6 +85,7 @@
     UNCONN         0               0                        10.0.2.15%eth0:68                          0.0.0.0:*             users:(("systemd-network",pid=655,fd=17)) uid:100 ino:20301 sk:41 <->
     ```
     * `53` - DNS использует как TCP так и UDP, `systemd-resolve` - демон systemd, `UNCONN` - UDP не использует процесс создания соединения  
+    * `68` - DHCP, `systemd-network` - DHCP клиент, `UNCONN` - получает информацию от DHCP сервера  
 5. Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали. 
     ![03-sysadmin-08-net-01.png](03-sysadmin-08-net-01.png)  
 
