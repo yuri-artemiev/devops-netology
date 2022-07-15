@@ -145,19 +145,22 @@
     LUCKY13 (CVE-2013-0169), experimental     potentially VULNERABLE, uses cipher block chaining (CBC) ciphers with TLS. Check patches
     RC4 (CVE-2013-2566, CVE-2015-2808)        no RC4 ciphers detected (OK)
     ```
-5. Установите на Ubuntu ssh сервер
+5. Установите на Ubuntu ssh сервер  
     ```
-    apt install sshd
+    apt install openssh-server
     ```
-    , сгенерируйте новый приватный ключ. 
+    Сгенерируйте новый приватный ключ   
     ```
-    
+    ssh-keygen
     ```
-    Скопируйте свой публичный ключ на другой сервер
+    Скопируйте свой публичный ключ на другой сервер  
     ```
-    
+    ssh-copy-id username@remote_host
     ```
-    . Подключитесь к серверу по SSH-ключу.
+    Подключитесь к серверу по SSH-ключу  
+    ```
+    ssh username@remote_host
+    ```
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
     xxx
     ```
