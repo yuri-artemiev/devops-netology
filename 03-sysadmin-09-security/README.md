@@ -1,20 +1,46 @@
 # Домашнее задание к занятию "3.9. Элементы безопасности информационных систем"
 
 1. Установите Bitwarden плагин для браузера. Зарегестрируйтесь и сохраните несколько паролей.
-    xxx
-    ```
-    
-    ```
+    Не использую менеджеры паролей в браузере.
 
 2. Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP.
-    xxx
-    ```
+    Не использую аутентификаторы в телефоне.
     
-    ```
 3. Установите apache2, сгенерируйте самоподписанный сертификат, настройте тестовый сайт для работы по HTTPS.
-    xxx
+    Установим apache
     ```
-    
+    apt install apache
+    ```
+    Включим ssl модуль
+    ```
+    a2enmod ssl
+    systemctl restart apache2
+    ```
+    Сгенерируем самоподписанный сертификат
+    ```
+    openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/ssl/private/private-selfsigned.key -out /etc/ssl/certs/certificated-selfsigned.crt -days 36160  -subj -sha256 -subj "/C=RU/O=Company/OU=DevOps/CN=www.example.com" -addext "subjectAltName=DNS:example.com,DNS:www.example.com" -addext "keyUsage = digitalSignature, keyEncipherment, dataEncipherment, cRLSign, keyCertSign" -addext "extendedKeyUsage = serverAuth, clientAuth" 
+    ```
+    Создадим конфигурацию нового сайта
+    ```
+    nano /etc/apache2/sites-available/example.com.conf
+        <VirtualHost *:443>
+        ServerName example.com
+        DocumentRoot /var/www/example.com
+        SSLEngine on
+        SSLCertificateFile /etc/ssl/certs/certificated-selfsigned.crt
+        SSLCertificateKeyFile /etc/ssl/private/private-selfsigned.key
+        </VirtualHost>
+    ```
+    Cоздадим директорию нового сайта
+    ```
+    mkdir /var/www/example.com
+    nano /var/www/example.com/index.html
+        Hello world!
+    ```
+    Включим новый сайт
+    ```
+    a2ensite example.com.conf
+    systemctl reload apache2
     ```
 4. Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК ... и тому подобное).
     xxx
