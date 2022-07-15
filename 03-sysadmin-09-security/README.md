@@ -223,5 +223,5 @@
     Запустим утилиту `tcpdump` на прослушку icmp пакетов на интерфейсе eth0  
     ```
     tcpdump -w icmp-to-server.pcap -c 100 -nni eth0  icmp
-        
     ```
+    ![03-sysadmin-09-security-02.png](03-sysadmin-09-security-02.png) 
