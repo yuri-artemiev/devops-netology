@@ -219,8 +219,9 @@
             debug1: Authentication succeeded (publickey).
             Authenticated to 192.168.1.35 ([192.168.1.35]:22)
         ```
-7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
-    xxx
+7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.  
+    Запустим утилиту `tcpdump` на прослушку icmp пакетов на интерфейсе eth0  
     ```
-    
+    tcpdump -w icmp-to-server.pcap -c 100 -nni eth0  icmp
+        
     ```
