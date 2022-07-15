@@ -152,14 +152,48 @@
     Сгенерируйте новый приватный ключ   
     ```
     ssh-keygen
+        Generating public/private rsa key pair.
+        Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+        Enter passphrase (empty for no passphrase):
+        Enter same passphrase again:
+        Your identification has been saved in /home/vagrant/.ssh/id_rsa
+        Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub
+        The key fingerprint is:
+        SHA256:WRal+I7ncgnQFzEjNS6BpOTLf9iIIUQQVDZ+cYQ7aes vagrant@ssh-server
+        The key's randomart image is:
+        +---[RSA 3072]----+
+        |++o+.o++o.Bo.    |
+        | .oo.o+  =.*     |
+        |  ..o.o.o =.     |
+        | . ..*. .*.      |
+        |  . = o.S..      |
+        |   . = +.o       |
+        |    o + +.o.     |
+        |     E ..oo      |
+        |         o.      |
+        +----[SHA256]-----+
     ```
-    Скопируйте свой публичный ключ на другой сервер  
+    Скопируйте свой публичный ключ на другой сервер. воспользуемся командой `ssh-copy-id`. Эта команда скопирует публичный ключ пользователя на локаьлной машине (`.ssh/id_rsa.pub`) в авторизованные ключи пользователя на удалённой машине (`.ssh/authorized_keys`)  
     ```
-    ssh-copy-id username@remote_host
+    ssh-copy-id vagrant@192.168.1.36
+        /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/vagrant/.ssh/id_rsa.pub"
+        The authenticity of host '192.168.1.36 (192.168.1.36)' can't be established.
+        ECDSA key fingerprint is SHA256:RztZ38lZsUpiN3mQrXHa6qtsUgsttBXWJibL2nAiwdQ.
+        Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+        /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+        /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+        vagrant@192.168.1.36's password:
+        Number of key(s) added: 1
+        Now try logging into the machine, with:   "ssh 'vagrant@192.168.1.36'"
+        and check to make sure that only the key(s) you wanted were added.
     ```
     Подключитесь к серверу по SSH-ключу  
     ```
-    ssh username@remote_host
+    ssh vagrant@192.168.1.36
+        Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+        ...
+    ip -br address list dev eth0
+        eth0  UP  192.168.1.36/24 fe80::a00:27ff:feb1:285f/64
     ```
 6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
     xxx
