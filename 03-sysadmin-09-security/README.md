@@ -195,10 +195,41 @@
     ip -br address list dev eth0
         eth0  UP  192.168.1.36/24 fe80::a00:27ff:feb1:285f/64
     ```
-6. Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.
-    xxx
+6. Переименуйте файлы ключей из задания 5  
     ```
-    
+    mv /home/vagrant/.ssh/id_rsa /home/vagrant/.ssh/ssh-client_rsa    
+    ```
+    Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.  
+    ```
+    touch ~/.ssh/config && chmod 600 ~/.ssh/config
+    nano .ssh/config
+        Host ssh-server
+        HostName 192.168.1.35
+        User vagrant
+        IdentityFile ~/.ssh/ssh-client_rsa
+        IdentitiesOnly yes
+
+    ```
+    Проверим вход по SSH на сервер `ssh-server`  
+    ```
+    ssh -v ssh-server
+        debug1: Reading configuration data /home/vagrant/.ssh/config
+        debug1: /home/vagrant/.ssh/config line 1: Applying options for ssh-server
+        ...
+        debug1: Connecting to 192.168.1.35 [192.168.1.35] port 22.
+        debug1: Connection established.
+        debug1: identity file /home/vagrant/.ssh/ssh-client_rsa type -1
+        ...
+        debug1: Authenticating to 192.168.1.35:22 as 'vagrant'
+        ...
+        debug1: Host '192.168.1.35' is known and matches the ECDSA host key.
+        debug1: Found key in /home/vagrant/.ssh/known_hosts:1
+        ...
+        debug1: Will attempt key: /home/vagrant/.ssh/ssh-client_rsa  explicit
+        ...
+        debug1: Trying private key: /home/vagrant/.ssh/ssh-client_rsa
+        debug1: Authentication succeeded (publickey).
+        Authenticated to 192.168.1.35 ([192.168.1.35]:22)
     ```
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
     xxx
