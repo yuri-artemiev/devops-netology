@@ -73,9 +73,7 @@
         >
         * TLSv1.2 (IN), TLS header, Supplemental data (23):
         * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-        * TLSv1.2 (IN), TLS header, Supplemental data (23):
-        * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
-        * old SSL session ID is stale, removing
+        ...
         * TLSv1.2 (IN), TLS header, Supplemental data (23):
         * Mark bundle as not supporting multiuse
         < HTTP/1.1 200 OK
@@ -95,6 +93,7 @@
     wget -O testssl.tar.gz https://codeload.github.com/drwetter/testssl.sh/tar.gz/3.0.4
     mkdir testssl
     tar xf testssl.tar.gz --strip-components=1 -C testssl
+    cd testssl
     ```
     Запустим сканирование TLS у сайта  
     ```
@@ -137,88 +136,89 @@
     ```
     apt install openssh-server
     ```
-    Сгенерируйте новый приватный ключ   
-    ```
-    ssh-keygen
-        Generating public/private rsa key pair.
-        Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
-        Enter passphrase (empty for no passphrase):
-        Enter same passphrase again:
-        Your identification has been saved in /home/vagrant/.ssh/id_rsa
-        Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub
-        The key fingerprint is:
-        SHA256:WRal+I7ncgnQFzEjNS6BpOTLf9iIIUQQVDZ+cYQ7aes vagrant@ssh-server
-        The key's randomart image is:
-        +---[RSA 3072]----+
-        |++o+.o++o.Bo.    |
-        | .oo.o+  =.*     |
-        |  ..o.o.o =.     |
-        | . ..*. .*.      |
-        |  . = o.S..      |
-        |   . = +.o       |
-        |    o + +.o.     |
-        |     E ..oo      |
-        |         o.      |
-        +----[SHA256]-----+
-    ```
-    Скопируйте свой публичный ключ на другой сервер. воспользуемся командой `ssh-copy-id`. Эта команда скопирует публичный ключ пользователя на локаьлной машине (`.ssh/id_rsa.pub`) в авторизованные ключи пользователя на удалённой машине (`.ssh/authorized_keys`)  
-    ```
-    ssh-copy-id vagrant@192.168.1.36
-        /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/vagrant/.ssh/id_rsa.pub"
-        The authenticity of host '192.168.1.36 (192.168.1.36)' can't be established.
-        ECDSA key fingerprint is SHA256:RztZ38lZsUpiN3mQrXHa6qtsUgsttBXWJibL2nAiwdQ.
-        Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
-        /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
-        /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
-        vagrant@192.168.1.36's password:
-        Number of key(s) added: 1
-        Now try logging into the machine, with:   "ssh 'vagrant@192.168.1.36'"
-        and check to make sure that only the key(s) you wanted were added.
-    ```
-    Подключитесь к серверу по SSH-ключу  
-    ```
-    ssh vagrant@192.168.1.36
-        Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
-        ...
-    ip -br address list dev eth0
-        eth0  UP  192.168.1.36/24 fe80::a00:27ff:feb1:285f/64
-    ```
+    * Сгенерируйте новый приватный ключ   
+        ```
+        ssh-keygen
+            Generating public/private rsa key pair.
+            Enter file in which to save the key (/home/vagrant/.ssh/id_rsa):
+            Enter passphrase (empty for no passphrase):
+            Enter same passphrase again:
+            Your identification has been saved in /home/vagrant/.ssh/id_rsa
+            Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub
+            The key fingerprint is:
+            SHA256:WRal+I7ncgnQFzEjNS6BpOTLf9iIIUQQVDZ+cYQ7aes vagrant@ssh-server
+            The key's randomart image is:
+            +---[RSA 3072]----+
+            |++o+.o++o.Bo.    |
+            | .oo.o+  =.*     |
+            |  ..o.o.o =.     |
+            | . ..*. .*.      |
+            |  . = o.S..      |
+            |   . = +.o       |
+            |    o + +.o.     |
+            |     E ..oo      |
+            |         o.      |
+            +----[SHA256]-----+
+        ```
+    * Скопируйте свой публичный ключ на другой сервер.  
+        Воспользуемся командой `ssh-copy-id`. Эта команда скопирует публичный ключ пользователя на локаьлной машине (`.ssh/id_rsa.pub`) в авторизованные ключи пользователя на удалённой машине (`.ssh/authorized_keys`)  
+        ```
+        ssh-copy-id vagrant@192.168.1.36
+            /usr/bin/ssh-copy-id: INFO: Source of key(s) to be installed: "/home/vagrant/.ssh/id_rsa.pub"
+            The authenticity of host '192.168.1.36 (192.168.1.36)' can't be established.
+            ECDSA key fingerprint is SHA256:RztZ38lZsUpiN3mQrXHa6qtsUgsttBXWJibL2nAiwdQ.
+            Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+            /usr/bin/ssh-copy-id: INFO: attempting to log in with the new key(s), to filter out any that are already installed
+            /usr/bin/ssh-copy-id: INFO: 1 key(s) remain to be installed -- if you are prompted now it is to install the new keys
+            vagrant@192.168.1.36's password:
+            Number of key(s) added: 1
+            Now try logging into the machine, with:   "ssh 'vagrant@192.168.1.36'"
+            and check to make sure that only the key(s) you wanted were added.
+        ```
+    * Подключитесь к серверу по SSH-ключу  
+        ```
+        ssh vagrant@192.168.1.36
+            Welcome to Ubuntu 20.04.3 LTS (GNU/Linux 5.4.0-91-generic x86_64)
+            ...
+        ip -br address list dev eth0
+            eth0  UP  192.168.1.36/24 fe80::a00:27ff:feb1:285f/64
+        ```
 6. Переименуйте файлы ключей из задания 5  
     ```
     mv /home/vagrant/.ssh/id_rsa /home/vagrant/.ssh/ssh-client_rsa    
     ```
-    Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.  
-    ```
-    touch ~/.ssh/config && chmod 600 ~/.ssh/config
-    nano .ssh/config
-        Host ssh-server
-        HostName 192.168.1.35
-        User vagrant
-        IdentityFile ~/.ssh/ssh-client_rsa
-        IdentitiesOnly yes
+    * Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера.  
+        ```
+        touch ~/.ssh/config && chmod 600 ~/.ssh/config
+        nano .ssh/config
+            Host ssh-server
+            HostName 192.168.1.35
+            User vagrant
+            IdentityFile ~/.ssh/ssh-client_rsa
+            IdentitiesOnly yes
 
-    ```
-    Проверим вход по SSH на сервер `ssh-server`  
-    ```
-    ssh -v ssh-server
-        debug1: Reading configuration data /home/vagrant/.ssh/config
-        debug1: /home/vagrant/.ssh/config line 1: Applying options for ssh-server
-        ...
-        debug1: Connecting to 192.168.1.35 [192.168.1.35] port 22.
-        debug1: Connection established.
-        debug1: identity file /home/vagrant/.ssh/ssh-client_rsa type -1
-        ...
-        debug1: Authenticating to 192.168.1.35:22 as 'vagrant'
-        ...
-        debug1: Host '192.168.1.35' is known and matches the ECDSA host key.
-        debug1: Found key in /home/vagrant/.ssh/known_hosts:1
-        ...
-        debug1: Will attempt key: /home/vagrant/.ssh/ssh-client_rsa  explicit
-        ...
-        debug1: Trying private key: /home/vagrant/.ssh/ssh-client_rsa
-        debug1: Authentication succeeded (publickey).
-        Authenticated to 192.168.1.35 ([192.168.1.35]:22)
-    ```
+        ```
+        Проверим вход по SSH на сервер `ssh-server`  
+        ```
+        ssh -v ssh-server
+            debug1: Reading configuration data /home/vagrant/.ssh/config
+            debug1: /home/vagrant/.ssh/config line 1: Applying options for ssh-server
+            ...
+            debug1: Connecting to 192.168.1.35 [192.168.1.35] port 22.
+            debug1: Connection established.
+            debug1: identity file /home/vagrant/.ssh/ssh-client_rsa type -1
+            ...
+            debug1: Authenticating to 192.168.1.35:22 as 'vagrant'
+            ...
+            debug1: Host '192.168.1.35' is known and matches the ECDSA host key.
+            debug1: Found key in /home/vagrant/.ssh/known_hosts:1
+            ...
+            debug1: Will attempt key: /home/vagrant/.ssh/ssh-client_rsa  explicit
+            ...
+            debug1: Trying private key: /home/vagrant/.ssh/ssh-client_rsa
+            debug1: Authentication succeeded (publickey).
+            Authenticated to 192.168.1.35 ([192.168.1.35]:22)
+        ```
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.
     xxx
     ```
