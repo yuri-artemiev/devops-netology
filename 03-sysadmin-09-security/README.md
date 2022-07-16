@@ -18,7 +18,7 @@
     ```
     Сгенерируем самоподписанный сертификат утилитой `openssl`  
     ```
-    openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/ssl/private/private-selfsigned.key -out /etc/ssl/certs/certificated-selfsigned.crt -days 36160   -sha256 -subj "/C=RU/O=Company/OU=DevOps/CN=www.example.com" -addext "subjectAltName=DNS:example.com,DNS:www.example.com" -addext "keyUsage = digitalSignature, keyEncipherment, dataEncipherment, cRLSign, keyCertSign" -addext "extendedKeyUsage = serverAuth, clientAuth" 
+    openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/ssl/private/private-selfsigned.key -out /etc/ssl/certs/certificated-selfsigned.crt -days 36160  -sha256 -subj "/C=RU/O=Company/OU=DevOps/CN=www.example.com" -addext "subjectAltName=DNS:example.com,DNS:www.example.com" -addext "keyUsage = digitalSignature, keyEncipherment, dataEncipherment, cRLSign, keyCertSign" -addext "extendedKeyUsage = serverAuth, clientAuth" 
     ```
     Создадим конфигурацию нового сайта в Apache  
     ```
@@ -196,7 +196,6 @@
             User vagrant
             IdentityFile ~/.ssh/ssh-client_rsa
             IdentitiesOnly yes
-
         ```
         Проверим вход по SSH на сервер `ssh-server`  
         ```
@@ -222,6 +221,6 @@
 7. Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark.  
     Запустим утилиту `tcpdump` на прослушку icmp пакетов на интерфейсе eth0  
     ```
-    tcpdump -w icmp-to-server.pcap -c 100 -nni eth0  icmp
+    tcpdump -w icmp-to-server.pcap -c 100 -nni eth0 icmp
     ```
     ![03-sysadmin-09-security-02.png](03-sysadmin-09-security-02.png) 
