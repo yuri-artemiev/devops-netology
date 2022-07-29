@@ -55,7 +55,22 @@ done
 
 ### Ваш скрипт:
 ```bash
-???
+#!/usr/bin/env bash
+ips=(192.168.0.1 173.194.222.113 87.250.250.242)
+for ip in ${ips[@]}
+do
+    for i in {1..5}
+    do
+        curl -s --connect-timeout 2 $ip:80 > /dev/null 2>&1
+        if (($? != 0))
+        then
+            echo "TCP port 80 is closed on IP: ${ip}. Iteration: ${i}" >> access-$(date +"%Y-%m-%d").log
+        else
+            echo "TCP port 80 is open on IP: ${ip}. Iteration: ${i}" >> access-$(date +"%Y-%m-%d").log
+        fi
+        sleep 1
+    done
+done
 ```
 
 ## Обязательная задача 4
