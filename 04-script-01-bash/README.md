@@ -44,7 +44,7 @@ do
 	then
 		date >> curl.log
 	else
-		break
+		exit
 	fi
 done
 ```
@@ -78,5 +78,19 @@ done
 
 ### Ваш скрипт:
 ```bash
-???
+#!/usr/bin/env bash
+ips=(192.168.0.1 173.194.222.113 87.250.250.242)
+while :
+do
+    for ip in ${ips[@]}
+    do
+        curl -s --connect-timeout 2 $ip:80 > /dev/null 2>&1
+        if (($? != 0))
+        then
+            echo "${ip}" >> error.log
+            exit
+        fi
+        sleep 1
+    done
+done
 ```
