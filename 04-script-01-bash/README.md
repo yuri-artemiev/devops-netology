@@ -25,11 +25,11 @@ e=$(($a+$b))
 ```bash
 while ((1==1)
 do
-	curl https://localhost:4757
-	if (($? != 0))
-	then
-		date >> curl.log
-	fi
+    curl https://localhost:4757
+    if (($? != 0))
+    then
+        date >> curl.log
+    fi
 done
 ```
 Исправленная версия включает условие завершения. Без него скрипт зациклен на постоянное выполнение `while ((1==1))`  
@@ -39,13 +39,13 @@ done
 ```bash
 while ((1==1))
 do
-	curl https://localhost:4757
-	if (($? != 0))
-	then
-		date >> curl.log
-	else
-		exit
-	fi
+    curl https://localhost:4757
+    if (($? != 0))
+    then
+        date >> curl.log
+    else
+        exit
+    fi
 done
 ```
 
