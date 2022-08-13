@@ -83,6 +83,7 @@ if not os.path.isabs(dir):
 if not os.path.isdir(dir):
     print ("Please provide path to existing folder")
     sys.exit()
+# Команда возвращает true если директория часть репозитория
 git_status_check = os.popen(f"cd {dir} ; git rev-parse --is-inside-work-tree 2> /dev/null").read()
 git_status = git_status_check.split('\n')[0]
 if git_status != "true":
@@ -110,10 +111,40 @@ Directory is not inside repository
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import socket
+import time
+
+# Список сервисов
+services = ["drive.google.com", "mail.google.com", "google.com"]
+
+# Словарь с изначальными IP адресами
+initial_ip = {}
+for item in services:
+    print("Getting initial service address "+item)
+    service_addr = socket.gethostbyname(item)
+    initial_ip[item] = service_addr
+
+# Цикл на проверку IP адреса каждый 5 секунд
+while True:
+    for item in services:
+        print("Checking service address "+item)
+        service_addr = socket.gethostbyname(item)
+        initial_service_addr = initial_ip[item]
+        if service_addr != initial_service_addr:
+            print("[ERROR] "+item+" IP mismatch: "+initial_service_addr + " " + service_addr)
+    time.sleep(5)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+Getting initial service address drive.google.com
+Getting initial service address mail.google.com
+Getting initial service address google.com
+Checking service address drive.google.com
+Checking service address mail.google.com
+Checking service address google.com
+...
+[ERROR] drive.google.com IP mismatch: 10.99.99.99 173.194.73.194
 ```
