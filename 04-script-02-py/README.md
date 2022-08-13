@@ -67,12 +67,42 @@ for result in result_os.split('\n'):
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import os
+import sys
+
+try:
+    dir = sys.argv[1]
+except:
+    print("Please enter folder path as parameter")
+    sys.exit()
+if not os.path.isabs(dir):
+    print ("Please provide absolute path to the folder")
+    sys.exit()
+if not os.path.isdir(dir):
+    print ("Please provide path to existing folder")
+    sys.exit()
+git_status_check = os.popen(f"cd {dir} ; git rev-parse --is-inside-work-tree 2> /dev/null").read()
+git_status = git_status_check.split('\n')[0]
+if git_status != "true":
+    print ("Directory is not inside repository")
+    sys.exit()
+bash_command = [f"cd {dir}", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\tmodified:   ', '')
+        filepath = f"{dir}{prepare_result}"
+        print(filepath)
+        continue
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+./script-pygit2.py ~/netology/
+Directory is not inside repository
 ```
 
 ## Обязательная задача 4
