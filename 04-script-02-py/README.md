@@ -37,12 +37,29 @@ for result in result_os.split('\n'):
 
 ### Ваш скрипт:
 ```python
-???
+#!/usr/bin/env python3
+
+import os
+
+# Переменная каталога для репозитория
+dir = "~/netology/sysadm-homeworks/"
+bash_command = [f"cd {dir}", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\tmodified:   ', '')
+        # переменная для каталога + файла
+        filepath = f"{dir}{prepare_result}"
+        print(filepath)
+        # продолжить цикл
+        continue
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+~/netology/sysadm-homeworks/test-file3.txt
+~/netology/sysadm-homeworks/test-folder/test-file5.txt
 ```
 
 ## Обязательная задача 3
