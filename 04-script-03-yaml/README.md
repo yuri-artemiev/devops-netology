@@ -37,7 +37,7 @@
 ## Обязательная задача 2
 В прошлый рабочий день мы создавали скрипт, позволяющий опрашивать веб-сервисы и получать их IP. К уже реализованному функционалу нам нужно добавить возможность записи JSON и YAML файлов, описывающих наши сервисы. Формат записи JSON по одному сервису: `{ "имя сервиса" : "его IP"}`. Формат записи YAML по одному сервису: `- имя сервиса: его IP`. Если в момент исполнения скрипта меняется IP у сервиса - он должен так же поменяться в yml и json файле.
 
-### Ваш скрипт:
+### Ваш скрипт для JSON:
 ```python
 #!/usr/bin/env python3
 
@@ -75,7 +75,7 @@ while True:
 
 ```
 
-### Вывод скрипта при запуске при тестировании:
+### Вывод скрипта для JSON при запуске при тестировании:
 ```
 Getting initial service address drive.google.com
 Getting initial service address mail.google.com
@@ -103,7 +103,34 @@ writing to file
 {"drive.google.com": "10.10.10.10", "mail.google.com": "173.194.222.17", "google.com": "74.125.131.102"}
 ```
 
+
+
+### Ваш скрипт для YAML:
+```python
+
+
+```
+
+### Вывод скрипта для YAML при запуске при тестировании:
+```
+..Getting initial service address drive.google.com
+..Getting initial service address mail.google.com
+..Getting initial service address google.com
+Writing to file
+...
+
+```
+
+
+
+
 ### yml-файл(ы), который(е) записал ваш скрипт:
 ```yaml
-???
+drive.google.com: 173.194.73.194
+google.com: 74.125.131.101
+mail.google.com: 173.194.222.83
+```
+### yml-файл, после изменения ip адреса:
+```yaml
+
 ```
