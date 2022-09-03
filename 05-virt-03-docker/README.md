@@ -50,7 +50,7 @@ Hey, Netology
     ```
     docker images
     REPOSITORY           TAG             IMAGE ID       CREATED          SIZE
-    yuriartemiev/nginx   local           403cfd64c1cf   37 seconds ago   23.5MB
+    yuriartemiev/nginx   local           bcc91249bceb   37 seconds ago   23.5MB
     nginx                stable-alpine   075b447b534f   3 weeks ago      23.5MB
     ```
 - Запустим контейнер чтобы проверить, что веб-страница доступна. Название контейнера: `nginx`, опубликовать порт `80`.
@@ -63,8 +63,22 @@ Hey, Netology
     CONTAINER ID IMAGE                    COMMAND                CREATED       STATUS       PORTS                             NAMES
     4005e55336e7 yuriartemiev/nginx:local "/docker-entrypoint.…" 7 seconds ago Up 6 seconds 0.0.0.0:80->80/tcp, :::80->80/tcp nginx
     ```
-- Проверим страницу в браузере
+- Проверим страницу в браузере  
     ![05-virt-03-docker-01.png](05-virt-03-docker-01.png)  
+- Назначим тег образу
+    ```
+    docker tag bcc91249bceb yuriartemiev/nginx:netology
+    ```
+- Подключаемся к Docker Hub
+    ```
+    docker login -u yuriartemiev
+    ```
+- Отправим образ в репозиторий
+    ```
+    docker push yuriartemiev/nginx:netology
+    ```
+[https://hub.docker.com/yuriartemiev/nginx](https://hub.docker.com/r/yuriartemiev/nginx)
+
 
 ## Задача 2
 
