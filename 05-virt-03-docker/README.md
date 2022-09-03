@@ -20,6 +20,50 @@ Hey, Netology
 ```
 Опубликуйте созданный форк в своем репозитории и предоставьте ответ в виде ссылки на https://hub.docker.com/username_repo.
 
+- Убедимся что текущей папке существуют два файла
+    - 'Dockerfile`
+    ```
+    FROM nginx:stable-alpine
+    COPY ./index.html /usr/share/nginx/html
+    ```
+    - `index.html`
+    ```
+    <html>
+    <head>
+    Hey, Netology
+    </head>
+    <body>
+    <h1>I’m DevOps Engineer!</h1>
+    </body>
+    </html>
+    ```
+  
+    ```
+    ~/docker/nginx# ls
+    Dockerfile  index.html
+    ```
+- Запустим сборку обаза с тегом `yuriartemiev/nginx:local` в текущей директории `.`  
+    ```
+    docker build -t yuriartemiev/nginx:local .
+    ```
+- Проверим что обаз создался
+    ```
+    docker images
+    REPOSITORY           TAG             IMAGE ID       CREATED          SIZE
+    yuriartemiev/nginx   local           403cfd64c1cf   37 seconds ago   23.5MB
+    nginx                stable-alpine   075b447b534f   3 weeks ago      23.5MB
+    ```
+- Запустим контейнер чтобы проверить, что веб-страница доступна. Название контейнера: `nginx`, опубликовать порт `80`.
+    ```
+    docker run -itd -p 80:80 --name nginx yuriartemiev/nginx:local
+    ```
+- Посмотрим что контейнер запустился
+    ```
+    docker ps
+    CONTAINER ID IMAGE                    COMMAND                CREATED       STATUS       PORTS                             NAMES
+    4005e55336e7 yuriartemiev/nginx:local "/docker-entrypoint.…" 7 seconds ago Up 6 seconds 0.0.0.0:80->80/tcp, :::80->80/tcp nginx
+    ```
+
 ## Задача 2
 
 Посмотрите на сценарий ниже и ответьте на вопрос:
