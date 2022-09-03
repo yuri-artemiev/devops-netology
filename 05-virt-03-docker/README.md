@@ -77,7 +77,7 @@ Hey, Netology
     ```
     docker push yuriartemiev/nginx:netology
     ```
-[https://hub.docker.com/yuriartemiev/nginx](https://hub.docker.com/r/yuriartemiev/nginx)
+https://hub.docker.com/r/yuriartemiev/nginx
 
 
 ## Задача 2
