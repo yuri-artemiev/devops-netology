@@ -21,7 +21,7 @@ Hey, Netology
 Опубликуйте созданный форк в своем репозитории и предоставьте ответ в виде ссылки на https://hub.docker.com/username_repo.
 
 - Убедимся что текущей папке существуют два файла
-    - 'Dockerfile`
+    - `Dockerfile`
     ```
     FROM nginx:stable-alpine
     COPY ./index.html /usr/share/nginx/html
@@ -63,6 +63,8 @@ Hey, Netology
     CONTAINER ID IMAGE                    COMMAND                CREATED       STATUS       PORTS                             NAMES
     4005e55336e7 yuriartemiev/nginx:local "/docker-entrypoint.…" 7 seconds ago Up 6 seconds 0.0.0.0:80->80/tcp, :::80->80/tcp nginx
     ```
+- Проверим страницу в браузере
+    ![05-virt-03-docker-01.png](05-virt-03-docker-01.png)  
 
 ## Задача 2
 
