@@ -246,8 +246,15 @@
 
 
 
-Удалить использованные ресурсы
-    terraform destroy
-    yc delete
+- Удалить использованные ресурсы
+    - `cd terraform/`
+    - `terraform destroy --auto-approve`
+        ```
+        Changes to Outputs:
+        - external_ip_address_node01_yandex_cloud = "51.250.67.74" -> null
+        - internal_ip_address_node01_yandex_cloud = "192.168.101.29" -> null
+        Destroy complete! Resources: 3 destroyed.
+        ```
+    - `yc compute image delete --id fd8a2pfcnlee71u1g12c`
     
 Залить conf файлы в репозиторий
