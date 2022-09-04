@@ -79,8 +79,16 @@
         ==> Builds finished. The artifacts of successful builds are:
         --> yandex: A disk image was created: centos-7-base (id: fd8a2pfcnlee71u1g12c) with family name centos
         ```
-    - ``
-    - ``
+- Проверим, что образ виртуальной машины в Яндекс Облаке создался с помощью утилиты `yc`  
+    - `yc compute image list`
+        ```
+        +----------------------+---------------+--------+----------------------+--------+
+        |          ID          |     NAME      | FAMILY |     PRODUCT IDS      | STATUS |
+        +----------------------+---------------+--------+----------------------+--------+
+        | fd8a2pfcnlee71u1g12c | centos-7-base | centos | f2euv1kekdgvc0jrpaet | READY  |
+        +----------------------+---------------+--------+----------------------+--------+
+        ```
+![05-virt-04-docker-compose-01.png](05-virt-04-docker-compose-01)  
     - ``
     - ``
     - ``
@@ -107,3 +115,5 @@
 Удалить использованные ресурсы
     terraform destroy
     yc delete
+    
+Залить conf файлы в репозиторий
