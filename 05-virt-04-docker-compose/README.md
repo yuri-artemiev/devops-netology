@@ -151,17 +151,25 @@
             + external_ip_address_node01_yandex_cloud = (known after apply)
             + internal_ip_address_node01_yandex_cloud = (known after apply)
             ```
-    - Проверим созданные настройки  
-        - ``  
-    - Проверим созданные настройки  
-        - ``  
-    - Проверим созданные настройки  
-        - ``  
-    - Проверим созданные настройки  
-        - ``  
+    - Применим конфигурацию Terraform   
+        - `terraform apply --auto-approve`  
+            ```
+            Apply complete! Resources: 3 added, 0 changed, 0 destroyed.
+            Outputs:
+            external_ip_address_node01_yandex_cloud = "51.250.67.74"
+            internal_ip_address_node01_yandex_cloud = "192.168.101.29"
+            ```
+ - Проверим, что виртуальная машина в Яндекс Облаке создалась с помощью утилиты `yc`  
+    - `yc compute instance list`   
+        ```
+        +----------------------+--------+---------------+---------+--------------+----------------+
+        |          ID          |  NAME  |    ZONE ID    | STATUS  | EXTERNAL IP  |  INTERNAL IP   |
+        +----------------------+--------+---------------+---------+--------------+----------------+
+        | fhmfshit3ouqomhthasn | node01 | ru-central1-a | RUNNING | 51.250.67.74 | 192.168.101.29 |
+        +----------------------+--------+---------------+---------+--------------+----------------+
+        ```
 
-
-
+![05-virt-04-docker-compose-02.png](05-virt-04-docker-compose-02.png)  
 
 
 
