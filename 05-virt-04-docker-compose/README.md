@@ -194,6 +194,22 @@
     apt update
     apt install ansible
     ```
+- Редактируем инвентарий Ansible в файле `inventory`  
+    - Изменяем IP адрес машины в Яндекс Облаке  
+        ```
+        [manager]
+        node01.netology.cloud ansible_host=51.250.67.74
+        ```
+- Запустить утилиту `ansible`  
+    - `cd ansible/`  
+    - Применим конфигурацию Ansible  
+        - `ansible-playbook provision.yml`  
+            ```
+            PLAY RECAP *******************************************************************************************************
+            node01.netology.cloud      : ok=12   changed=10   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+            ```
+
+
 
 
 Удалить использованные ресурсы
