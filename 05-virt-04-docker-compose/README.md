@@ -88,10 +88,10 @@
         | fd8a2pfcnlee71u1g12c | centos-7-base | centos | f2euv1kekdgvc0jrpaet | READY  |
         +----------------------+---------------+--------+----------------------+--------+
         ```
-![05-virt-04-docker-compose-01.png](05-virt-04-docker-compose-01)  
-    - ``
-    - ``
-    - ``
+
+![05-virt-04-docker-compose-01.png](05-virt-04-docker-compose-01.png)  
+
+
 
 
 
