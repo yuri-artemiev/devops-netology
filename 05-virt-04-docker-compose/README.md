@@ -56,7 +56,7 @@
     - Создаем IAM токет в Яндекс Облаке  
         - `yc iam create-token`  
             ```
-            t1.9euelZqSyouZzZWTysuUl5yaxsqJle3rnpWax8yRlImYyYuVnc2Yzomcko7l8_c9KC1n-e8rR1k-_d3z931WKmf57ytHWT79.N59R7kutQGew2fR2QJsMm_f8JLQOMbS7AakqrevpRNmsyqDWzdORwElcQ5vwWTqxKHVX4w9bzgV1ccQfYDWzAA
+            t1.9eu...
             ```
 - Скачать и установить утилиту `packer`  
     - `curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -`  
