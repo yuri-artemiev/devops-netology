@@ -130,7 +130,7 @@
         default = "fd8a2pfcnlee71u1g12c"
         }
         ```
-Редактируем провайдера Terraform в файле `provider.tf`  
+- Редактируем провайдера Terraform в файле `provider.tf`  
     - Изменяем токен Яндекс Облака   
         ```
         provider "yandex" {
@@ -185,6 +185,15 @@
 
 Для получения зачета, вам необходимо предоставить:
 - Скриншот работающего веб-интерфейса Grafana с текущими метриками, как на примере ниже
+
+Шаги:
+- Установить утилиту `ansible`  
+    ```
+    apt install software-properties-common
+    apt-add-repository ppa:ansible/ansible
+    apt update
+    apt install ansible
+    ```
 
 
 Удалить использованные ресурсы
