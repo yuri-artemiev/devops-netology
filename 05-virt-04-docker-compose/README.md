@@ -67,11 +67,18 @@
         - "folder_id": "b1gcthk9ak11bmpnbo7d"
     - Изменяем идентификатор подсети в Яндекс Облаке
         - "subnet_id": "e9bqg9e35b1s8430fk2i"
+    - Изменяем токен в Яндекс облаке
+        - "token": "t1.9euelZqKkMyWnp..."
 - Генерируем SSH ключи на локальной машине
     - `ssh-keygen -t rsa -b 2048`
 - Запускаем создание образа через Packet
     - `packer build centos-7-base.json`
-    - ``
+        ```
+        yandex: Detected instance IP: 130.193.39.47
+        ...
+        ==> Builds finished. The artifacts of successful builds are:
+        --> yandex: A disk image was created: centos-7-base (id: fd8a2pfcnlee71u1g12c) with family name centos
+        ```
     - ``
     - ``
     - ``
