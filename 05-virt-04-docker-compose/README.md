@@ -12,7 +12,7 @@
 - Создать платёжный аккаунт с промо-кодом  
 - Скачать и установить утилиту `yc`  
     - `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
-- Запустить первый запуск `yc`  
+- Запустить утилиту `yc`  
     - `cd src/`  
     - `yc init`  
     - Получить OAuth токен по адресу в браузере `https://oauth.yandex.ru/authorize?response_type=token&client_id=1a6990aa636648e9b2ef855fa7bec2fb`  
@@ -29,7 +29,7 @@
             folder-id: b1gcthk9ak11bmpnbo7d
             compute-default-zone: ru-central1-a
             ```
-    - Создаём сеть в Яндекс облаке    
+    - Создаём сеть в Яндекс Облаке    
         - `yc vpc network create --name net --labels my-label=netology --description "my first network via yc"`  
             ```
             id: enp7b44svg1838v53jrp
@@ -40,10 +40,34 @@
             labels:
             my-label: netology
             ```
-    - ``  
-    - ``  
-    - ``  
-    - ``  
+    - Создаём подсеть в Яндекс Облаке  
+        - `yc vpc subnet create --name my-subnet-a --zone ru-central1-a --range 10.1.2.0/24 --network-name net --description "my first subnet via yc"`  
+            ```
+            id: e9bqg9e35b1s8430fk2i
+            folder_id: b1gcthk9ak11bmpnbo7d
+            created_at: "2022-09-04T13:15:45Z"
+            name: my-subnet-a
+            description: my first subnet via yc
+            network_id: enp7b44svg1838v53jrp
+            zone_id: ru-central1-a
+            v4_cidr_blocks:
+            - 10.1.2.0/24
+            ```
+- Скачать и установить утилиту `yc`  
+    - `curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -`  
+    - `apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`  
+    - `apt-get update && apt-get install packer`  
+ - Запустить утилиту `packer`  
+    - `cd src/packer`  
+    - `` 
+    - ``
+    - ``
+    - ``
+    - ``
+    - ``
+    - ``
+    - ``
+
 
 
 
