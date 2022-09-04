@@ -211,16 +211,34 @@
 
 - Посмотрим список запущенных контейнеров на виртуальной машине в Яндекс Облаке  
     - `docker ps`
-```
-CONTAINER ID IMAGE                                     COMMAND                CREATED        STATUS                  PORTS                                                                               NAMES
-ab48dbc01cc3 prom/pushgateway:v1.2.0                   "/bin/pushgateway"     19 minutes ago Up 19 minutes           9091/tcp                                                                           pushgateway
-b4ef412473e7 prom/prometheus:v2.17.1                   "/bin/prometheus --c…" 19 minutes ago Up 19 minutes           9090/tcp                                                                           prometheus
-25b387179a8c gcr.io/google-containers/cadvisor:v0.34.0 "/usr/bin/cadvisor -…" 19 minutes ago Up 19 minutes (healthy) 8080/tcp                                                                           cadvisor
-b0a0b43f2cf6 prom/alertmanager:v0.20.0                 "/bin/alertmanager -…" 19 minutes ago Up 19 minutes           9093/tcp                                                                           alertmanager
-3a93ee333c69 prom/node-exporter:v0.18.1                "/bin/node_exporter …" 19 minutes ago Up 19 minutes           9100/tcp                                                                           nodeexporter
-ec9830ea8a19 stefanprodan/caddy                        "/sbin/tini -- caddy…" 19 minutes ago Up 19 minutes           0.0.0.0:3000->3000/tcp, 0.0.0.0:9090-9091->9090-9091/tcp, 0.0.0.0:9093->9093/tcp   caddy
-bca7a28d2152 grafana/grafana:7.4.2                     "/run.sh"              19 minutes ago Up 19 minutes           3000/tcp                                                                           grafana
-```
+        ```
+        CONTAINER ID IMAGE                                     COMMAND                CREATED        STATUS                  PORTS                                                                              NAMES
+        ab48dbc01cc3 prom/pushgateway:v1.2.0                   "/bin/pushgateway"     19 minutes ago Up 19 minutes           9091/tcp                                                                           pushgateway
+        b4ef412473e7 prom/prometheus:v2.17.1                   "/bin/prometheus --c…" 19 minutes ago Up 19 minutes           9090/tcp                                                                           prometheus
+        25b387179a8c gcr.io/google-containers/cadvisor:v0.34.0 "/usr/bin/cadvisor -…" 19 minutes ago Up 19 minutes (healthy) 8080/tcp                                                                           cadvisor
+        b0a0b43f2cf6 prom/alertmanager:v0.20.0                 "/bin/alertmanager -…" 19 minutes ago Up 19 minutes           9093/tcp                                                                           alertmanager
+        3a93ee333c69 prom/node-exporter:v0.18.1                "/bin/node_exporter …" 19 minutes ago Up 19 minutes           9100/tcp                                                                           nodeexporter
+        ec9830ea8a19 stefanprodan/caddy                        "/sbin/tini -- caddy…" 19 minutes ago Up 19 minutes           0.0.0.0:3000->3000/tcp, 0.0.0.0:9090-9091->9090-9091/tcp, 0.0.0.0:9093->9093/tcp   caddy
+        bca7a28d2152 grafana/grafana:7.4.2                     "/run.sh"              19 minutes ago Up 19 minutes           3000/tcp                                                                           grafana
+        ```
+    - `cd /opt/stack/`
+    - `docker-compose ps`
+        ```
+            Name                  Command                  State                                 Ports
+        ------------------------------------------------------------------------------------------------------------------------
+        alertmanager   /bin/alertmanager --config ...   Up             9093/tcp
+        caddy          /sbin/tini -- caddy -agree ...   Up             0.0.0.0:3000->3000/tcp, 0.0.0.0:9090->9090/tcp,
+                                                                       0.0.0.0:9091->9091/tcp, 0.0.0.0:9093->9093/tcp
+        cadvisor       /usr/bin/cadvisor -logtostderr   Up (healthy)   8080/tcp
+        grafana        /run.sh                          Up             3000/tcp
+        nodeexporter   /bin/node_exporter --path. ...   Up             9100/tcp
+        prometheus     /bin/prometheus --config.f ...   Up             9090/tcp
+        pushgateway    /bin/pushgateway                 Up             9091/tcp
+        ```
+
+
+
+
 
 ![05-virt-04-docker-compose-03.png](05-virt-04-docker-compose-03.png) 
 
