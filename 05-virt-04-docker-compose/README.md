@@ -104,13 +104,14 @@
 - Скриншот страницы свойств созданной ВМ, как на примере  
 
 Шаги:
+- Удаляем сеть и подсеть в Яндекс Облаке перед тем как запускаем Terraform  
+    - `yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net`  
 - Скачать и установить утилиту `terraform`  
     - `apt-get update && apt-get install -y gnupg software-properties-common`  
     - `wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg`
     - `echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list`
     - `apt update && apt-get install terraform`  
-
- - Редактируем переменные Terraform в файле `variables.tf`  
+- Редактируем переменные Terraform в файле `variables.tf`  
     -  Изменяем идентификатор облака Яндекс Облака  
         ```
         variable "yandex_cloud_id" {
@@ -123,19 +124,45 @@
         default = "b1gcthk9ak11bmpnbo7d"
         }
         ```
-
-
     -  Изменяем идентификатор образа виртуальной машины Яндекс Облака  
         ```
         variable "centos-7-base" {
         default = "fd8a2pfcnlee71u1g12c"
         }
         ```
-
-
+Редактируем провайдера Terraform в файле `provider.tf`  
+    - Изменяем токен Яндекс Облака   
+        ```
+        provider "yandex" {
+        token = "t1.9eu..."
+        cloud_id  = "${var.yandex_cloud_id}"
+        folder_id = "${var.yandex_folder_id}"
+        zone = "ru-central1-a"
+        }
+        ```
 - Запустить утилиту `terraform`  
     - `cd terraform/`  
-    - ``  
+    - `terraform init`  
+    - Выведем план Terraform   
+        - `terraform plan`  
+            ```
+            Plan: 3 to add, 0 to change, 0 to destroy.
+            Changes to Outputs:
+            + external_ip_address_node01_yandex_cloud = (known after apply)
+            + internal_ip_address_node01_yandex_cloud = (known after apply)
+            ```
+    - Проверим созданные настройки  
+        - ``  
+    - Проверим созданные настройки  
+        - ``  
+    - Проверим созданные настройки  
+        - ``  
+    - Проверим созданные настройки  
+        - ``  
+
+
+
+
 
 
 
