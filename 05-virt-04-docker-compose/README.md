@@ -53,14 +53,24 @@
             v4_cidr_blocks:
             - 10.1.2.0/24
             ```
-- Скачать и установить утилиту `yc`  
+    - Создаем IAM токет в Яндекс Облаке  
+        - `yc iam create-token`  
+            ```
+            t1.9euelZqSyouZzZWTysuUl5yaxsqJle3rnpWax8yRlImYyYuVnc2Yzomcko7l8_c9KC1n-e8rR1k-_d3z931WKmf57ytHWT79.N59R7kutQGew2fR2QJsMm_f8JLQOMbS7AakqrevpRNmsyqDWzdORwElcQ5vwWTqxKHVX4w9bzgV1ccQfYDWzAA
+            ```
+- Скачать и установить утилиту `packer`  
     - `curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -`  
     - `apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`  
     - `apt-get update && apt-get install packer`  
- - Запустить утилиту `packer`  
-    - `cd src/packer`  
-    - `` 
-    - ``
+ - Редактируем манифест Packer в `файле centos-7-base.json`  
+    -  Изменяем идентификатор каталога Яндекс Облака
+        - "folder_id": "b1gcthk9ak11bmpnbo7d"
+    - Изменяем идентификатор подсети в Яндекс Облаке
+        - "subnet_id": "e9bqg9e35b1s8430fk2i"
+- Генерируем SSH ключи на локальной машине
+    - `ssh-keygen -t rsa -b 2048`
+- Запускаем создание образа через Packet
+    - `packer build centos-7-base.json`
     - ``
     - ``
     - ``
