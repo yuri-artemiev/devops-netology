@@ -62,7 +62,7 @@
     - `curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -`  
     - `apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`  
     - `apt-get update && apt-get install packer`  
- - Редактируем манифест Packer в `файле centos-7-base.json`  
+ - Редактируем манифест Packer в файле `centos-7-base.json`  
     -  Изменяем идентификатор каталога Яндекс Облака  
         - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
     - Изменяем идентификатор подсети в Яндекс Облаке  
@@ -71,7 +71,7 @@
         - `"token": "t1.9euelZqKkMyWnp..."`  
 - Генерируем SSH ключи на локальной машине  
     - `ssh-keygen -t rsa -b 2048`  
-- Запускаем создание образа через Packet  
+- Запускаем создание образа через `packet`  
     - `packer build centos-7-base.json`  
         ```
         yandex: Detected instance IP: 130.193.39.47
@@ -108,13 +108,34 @@
     - `apt-get update && apt-get install -y gnupg software-properties-common`  
     - `wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg`
     - `echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list`
-    - `apt update && apt-get install terraform`
+    - `apt update && apt-get install terraform`  
+
+ - Редактируем переменные Terraform в файле `variables.tf`  
+    -  Изменяем идентификатор облака Яндекс Облака  
+        ```
+        variable "yandex_cloud_id" {
+        default = "b1gjd8gta6ntpckrp97r"
+        }
+        ```
+    -  Изменяем идентификатор каталога Яндекс Облака  
+        ```
+        variable "yandex_folder_id" {
+        default = "b1gcthk9ak11bmpnbo7d"
+        }
+        ```
 
 
+    -  Изменяем идентификатор образа виртуальной машины Яндекс Облака  
+        ```
+        variable "centos-7-base" {
+        default = "fd8a2pfcnlee71u1g12c"
+        }
+        ```
 
-- Запустить утилиту `yc`  
-    - `cd src/`  
-    - `yc init`  
+
+- Запустить утилиту `terraform`  
+    - `cd terraform/`  
+    - ``  
 
 
 
