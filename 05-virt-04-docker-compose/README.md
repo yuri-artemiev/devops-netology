@@ -63,16 +63,16 @@
     - `apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`  
     - `apt-get update && apt-get install packer`  
  - Редактируем манифест Packer в `файле centos-7-base.json`  
-    -  Изменяем идентификатор каталога Яндекс Облака
-        - "folder_id": "b1gcthk9ak11bmpnbo7d"
-    - Изменяем идентификатор подсети в Яндекс Облаке
-        - "subnet_id": "e9bqg9e35b1s8430fk2i"
-    - Изменяем токен в Яндекс облаке
-        - "token": "t1.9euelZqKkMyWnp..."
-- Генерируем SSH ключи на локальной машине
-    - `ssh-keygen -t rsa -b 2048`
-- Запускаем создание образа через Packet
-    - `packer build centos-7-base.json`
+    -  Изменяем идентификатор каталога Яндекс Облака  
+        - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
+    - Изменяем идентификатор подсети в Яндекс Облаке  
+        - `"subnet_id": "e9bqg9e35b1s8430fk2i"`  
+    - Изменяем токен в Яндекс облаке  
+        - `"token": "t1.9euelZqKkMyWnp..."`  
+- Генерируем SSH ключи на локальной машине  
+    - `ssh-keygen -t rsa -b 2048`  
+- Запускаем создание образа через Packet  
+    - `packer build centos-7-base.json`  
         ```
         yandex: Detected instance IP: 130.193.39.47
         ...
@@ -80,7 +80,7 @@
         --> yandex: A disk image was created: centos-7-base (id: fd8a2pfcnlee71u1g12c) with family name centos
         ```
 - Проверим, что образ виртуальной машины в Яндекс Облаке создался с помощью утилиты `yc`  
-    - `yc compute image list`
+    - `yc compute image list`  
         ```
         +----------------------+---------------+--------+----------------------+--------+
         |          ID          |     NAME      | FAMILY |     PRODUCT IDS      | STATUS |
@@ -101,7 +101,26 @@
 Создать вашу первую виртуальную машину в Яндекс.Облаке.
 
 Для получения зачета, вам необходимо предоставить:
-- Скриншот страницы свойств созданной ВМ, как на примере ниже:
+- Скриншот страницы свойств созданной ВМ, как на примере  
+
+Шаги:
+- Скачать и установить утилиту `terraform`  
+    - `apt-get update && apt-get install -y gnupg software-properties-common`  
+    - `wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg`
+    - `echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list`
+    - `apt update && apt-get install terraform`
+
+
+
+- Запустить утилиту `yc`  
+    - `cd src/`  
+    - `yc init`  
+
+
+
+
+
+
 
 
 ## Задача 3
