@@ -8,7 +8,7 @@
 - Скриншот страницы, как на слайде из презентации (слайд 37).
 
 Шаги:  
-- Регистрация на Яндекс Облаке console.cloud.yandex.ru  
+- Регистрация на Яндекс Облаке по адресу console.cloud.yandex.ru  
 - Создать платёжный аккаунт с промо-кодом  
 - Скачать и установить утилиту `yc`  
     - `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
@@ -19,9 +19,9 @@
     - В утилите `yc`    
         - Вставить токен  
         - Выбрать папку в Яндекс Облаке  
-        - Выбрать создания Compute по-умолчанию  
+        - Выбрать создание Compute по-умолчанию  
         - Выбрать зону в Яндекс Облаке  
-    - Проверим созданные настройки  
+    - Проверим созданные настройки Яндекс Облака    
         - `yc config list`
             ```
             token: y0_A...
@@ -53,7 +53,7 @@
             v4_cidr_blocks:
             - 10.1.2.0/24
             ```
-    - Создаем IAM токет в Яндекс Облаке  
+    - Создаём IAM токет в Яндекс Облаке  
         - `yc iam create-token`  
             ```
             t1.9eu...
@@ -67,7 +67,7 @@
         - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
     - Изменяем идентификатор подсети в Яндекс Облаке  
         - `"subnet_id": "e9bqg9e35b1s8430fk2i"`  
-    - Изменяем токен в Яндекс облаке  
+    - Изменяем токен для авторизации в Яндекс Облаке  
         - `"token": "t1.9euelZqKkMyWnp..."`  
 - Генерируем SSH ключи на локальной машине  
     - `ssh-keygen -t rsa -b 2048`  
@@ -106,7 +106,7 @@
 Шаги:
 - Удаляем сеть и подсеть в Яндекс Облаке перед тем как запускаем Terraform  
     - `yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net`  
-- Скачать и установить утилиту `terraform`  
+- Скачиваем и установливаем утилиту `terraform`  
     - `apt-get update && apt-get install -y gnupg software-properties-common`  
     - `wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg`
     - `echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list`
@@ -140,7 +140,7 @@
         zone = "ru-central1-a"
         }
         ```
-- Запустить утилиту `terraform`  
+- Запускаем утилиту `terraform`  
     - `cd terraform/`  
     - `terraform init`  
     - Выведем план Terraform   
@@ -187,7 +187,7 @@
 - Скриншот работающего веб-интерфейса Grafana с текущими метриками, как на примере ниже
 
 Шаги:
-- Установить утилиту `ansible`  
+- Устанавливаем утилиту `ansible`  
     ```
     apt install software-properties-common
     apt-add-repository ppa:ansible/ansible
@@ -200,7 +200,7 @@
         [manager]
         node01.netology.cloud ansible_host=51.250.67.74
         ```
-- Запустить утилиту `ansible`  
+- Запускаем утилиту `ansible`  
     - `cd ansible/`  
     - Применим конфигурацию Ansible  
         - `ansible-playbook provision.yml`  
@@ -208,6 +208,22 @@
             PLAY RECAP *******************************************************************************************************
             node01.netology.cloud      : ok=12   changed=10   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
             ```
+
+- Посмотрим список запущенных контейнеров на виртуальной машине в Яндекс Облаке  
+    - `docker ps`
+```
+CONTAINER ID IMAGE                                     COMMAND                CREATED        STATUS                  PORTS                                                                               NAMES
+ab48dbc01cc3 prom/pushgateway:v1.2.0                   "/bin/pushgateway"     19 minutes ago Up 19 minutes           9091/tcp                                                                           pushgateway
+b4ef412473e7 prom/prometheus:v2.17.1                   "/bin/prometheus --c…" 19 minutes ago Up 19 minutes           9090/tcp                                                                           prometheus
+25b387179a8c gcr.io/google-containers/cadvisor:v0.34.0 "/usr/bin/cadvisor -…" 19 minutes ago Up 19 minutes (healthy) 8080/tcp                                                                           cadvisor
+b0a0b43f2cf6 prom/alertmanager:v0.20.0                 "/bin/alertmanager -…" 19 minutes ago Up 19 minutes           9093/tcp                                                                           alertmanager
+3a93ee333c69 prom/node-exporter:v0.18.1                "/bin/node_exporter …" 19 minutes ago Up 19 minutes           9100/tcp                                                                           nodeexporter
+ec9830ea8a19 stefanprodan/caddy                        "/sbin/tini -- caddy…" 19 minutes ago Up 19 minutes           0.0.0.0:3000->3000/tcp, 0.0.0.0:9090-9091->9090-9091/tcp, 0.0.0.0:9093->9093/tcp   caddy
+bca7a28d2152 grafana/grafana:7.4.2                     "/run.sh"              19 minutes ago Up 19 minutes           3000/tcp                                                                           grafana
+```
+
+![05-virt-04-docker-compose-03.png](05-virt-04-docker-compose-03.png) 
+
 
 
 
