@@ -257,4 +257,4 @@
         ```
     - `yc compute image delete --id fd8a2pfcnlee71u1g12c`
     
-Залить conf файлы в репозиторий
+
