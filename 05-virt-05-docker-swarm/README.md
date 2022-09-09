@@ -28,10 +28,12 @@ docker node ls
 ```
 
 Шаги:
+- Создаём IAM токет в Яндекс Облаке  
+    - `yc iam create-token`  
 - Создаём сеть в Яндекс Облаке    
     - `yc vpc network create --name net --labels my-label=netology --description "my first network via yc"`  
-- Создаём IAM токет в Яндекс Облаке  
-        - `yc iam create-token`  
+- Создаём подсеть в Яндекс Облаке  
+    - `yc vpc subnet create --name my-subnet-a --zone ru-central1-a --range 10.1.2.0/24 --network-name net --description "my first subnet via yc"`  
 - Редактируем манифест Packer в файле `centos-7-base.json`  
     -  Изменяем идентификатор каталога Яндекс Облака  
         - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
@@ -39,6 +41,22 @@ docker node ls
         - `"subnet_id": "e9bqg9e35b1s8430fk2i"`  
     - Изменяем токен для авторизации в Яндекс Облаке  
         - `"token": "t1.9euelZqKkMyWnp..."`
+- Запускаем создание образа через `packet`  
+    - `packer build centos-7-base.json`  
+- Удаляем сеть и подсеть в Яндекс Облаке перед тем как запускаем Terraform  
+    - `yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net`  
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Задача 3
