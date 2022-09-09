@@ -108,7 +108,7 @@ docker service ls
 
 
 
-![05-virt-05-docker-swarm-01.png](05-virt-05-docker-swarm-01.png)  
+![05-virt-05-docker-swarm-02.png](05-virt-05-docker-swarm-02.png)  
 
 
 
