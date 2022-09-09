@@ -42,6 +42,7 @@ docker node ls
     - Изменяем токен для авторизации в Яндекс Облаке  
         - `"token": "t1.9euelZqKkMyWnp..."`
 - Запускаем создание образа через `packet`  
+    - `cd packer/ 
     - `packer build centos-7-base.json`  
 - Удаляем сеть и подсеть в Яндекс Облаке перед тем как запускаем Terraform  
     - `yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net`  
@@ -61,7 +62,7 @@ docker node ls
     -  Изменяем идентификатор образа виртуальной машины Яндекс Облака  
         ```
         variable "centos-7-base" {
-        default = "e9b91vk0to1tc2f402h4"
+        default = "fd83quv4ee0j0vh5iipi"
         }
         ```
 - Редактируем провайдера Terraform в файле `provider.tf`  
@@ -74,6 +75,14 @@ docker node ls
         zone = "ru-central1-a"
         }
         ```
+- Запускаем утилиту `terraform`  
+    - `cd terraform/`  
+    - `terraform init`  
+    - Выведем план Terraform   
+        - `terraform plan`  
+    - Применим конфигурацию Terraform   
+        - `terraform apply --auto-approve`  
+
 
 
 
