@@ -8,6 +8,7 @@
 - Какой алгоритм выбора лидера используется в Docker Swarm кластере?
 - Что такое Overlay Network?
 
+
 - xxx
     - `xxx`
         ```
@@ -26,11 +27,18 @@
 docker node ls
 ```
 
-- xxx
-    - `xxx`
-        ```
-        xxx
-        ```
+Шаги:
+- Создаём сеть в Яндекс Облаке    
+    - `yc vpc network create --name net --labels my-label=netology --description "my first network via yc"`  
+- Создаём IAM токет в Яндекс Облаке  
+        - `yc iam create-token`  
+- Редактируем манифест Packer в файле `centos-7-base.json`  
+    -  Изменяем идентификатор каталога Яндекс Облака  
+        - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
+    - Изменяем идентификатор подсети в Яндекс Облаке  
+        - `"subnet_id": "e9bqg9e35b1s8430fk2i"`  
+    - Изменяем токен для авторизации в Яндекс Облаке  
+        - `"token": "t1.9euelZqKkMyWnp..."`
 
 
 ## Задача 3
