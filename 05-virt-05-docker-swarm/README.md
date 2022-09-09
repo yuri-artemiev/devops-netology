@@ -97,11 +97,6 @@ docker node ls
 
 
 
-
-
-
-
-
 ## Задача 3
 
 Создать ваш первый, готовый к боевой эксплуатации кластер мониторинга, состоящий из стека микросервисов.
@@ -111,8 +106,27 @@ docker node ls
 docker service ls
 ```
 
-- xxx
-    - `xxx`
+
+
+![05-virt-05-docker-swarm-01.png](05-virt-05-docker-swarm-01.png)  
+
+
+
+
+
+
+- Удалить использованные ресурсы
+    - `cd terraform/`
+    - `terraform destroy --auto-approve`
         ```
-        xxx
+        Changes to Outputs:
+        - external_ip_address_node01_yandex_cloud = "51.250.67.74" -> null
+        - internal_ip_address_node01_yandex_cloud = "192.168.101.29" -> null
+        Destroy complete! Resources: 3 destroyed.
         ```
+    - `yc compute image delete --id fd8a2pfcnlee71u1g12c`
+    
+
+
+
+
