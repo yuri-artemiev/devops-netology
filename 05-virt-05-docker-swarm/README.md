@@ -83,6 +83,12 @@ docker node ls
     - Применим конфигурацию Terraform   
         - `terraform apply --auto-approve`  
 
+- Посмотрим список запущенных контейнеров на виртуальной машине в Яндекс Облаке  
+    - `ssh centos@84.252.131.8`
+    - `docker node ls`
+
+
+![05-virt-05-docker-swarm-01.png](05-virt-05-docker-swarm-01.png)  
 
 
 
