@@ -45,7 +45,35 @@ docker node ls
     - `packer build centos-7-base.json`  
 - Удаляем сеть и подсеть в Яндекс Облаке перед тем как запускаем Terraform  
     - `yc vpc subnet delete --name my-subnet-a && yc vpc network delete --name net`  
-
+- Редактируем переменные Terraform в файле `variables.tf`  
+    -  Изменяем идентификатор облака Яндекс Облака  
+        ```
+        variable "yandex_cloud_id" {
+        default = "b1gjd8gta6ntpckrp97r"
+        }
+        ```
+    -  Изменяем идентификатор каталога Яндекс Облака  
+        ```
+        variable "yandex_folder_id" {
+        default = "b1gcthk9ak11bmpnbo7d"
+        }
+        ```
+    -  Изменяем идентификатор образа виртуальной машины Яндекс Облака  
+        ```
+        variable "centos-7-base" {
+        default = "e9b91vk0to1tc2f402h4"
+        }
+        ```
+- Редактируем провайдера Terraform в файле `provider.tf`  
+    - Изменяем токен Яндекс Облака   
+        ```
+        provider "yandex" {
+        token = "t1.9eu..."
+        cloud_id  = "${var.yandex_cloud_id}"
+        folder_id = "${var.yandex_folder_id}"
+        zone = "ru-central1-a"
+        }
+        ```
 
 
 
