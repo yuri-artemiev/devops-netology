@@ -17,7 +17,14 @@
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
     ```
 - Запустим образ PostgreSQL  
-`docker run --name postgres -e POSTGRES_PASSWORD=postgres -it --rm -v db-data:/var/lib/postgresql/data -v db-backup:/backup -p 5432:5432 postgres:12`
+    `docker run --name postgres -itd -v "${PWD}"/data:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
+    ```
+    docker exec -it postgres bash
+    psql -U postgres
+    \l
+    \q
+    ```
+    
 
 
 
