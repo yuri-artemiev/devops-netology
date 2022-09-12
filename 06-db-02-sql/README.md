@@ -18,12 +18,7 @@
     ```
 - Запустим образ PostgreSQL  
     `docker run --name postgres -itd -v "${PWD}"/data:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
-    ```
-    docker exec -it postgres bash
-    psql -U postgres
-    \l
-    \q
-    ```
+
     
 
 
@@ -32,6 +27,16 @@
 
 В БД из задачи 1: 
 - создайте пользователя test-admin-user и БД test_db
+    - Подключимся к контейнеру и Postgresql  
+        ```
+        docker exec -it postgres bash
+        psql -U postgres
+        \l
+        \q
+        ```
+    - Создадим пользователя `test-admin-user`  
+        - `CREATE USER "test-admin-user" WITH LOGIN;`
+        
 - в БД test_db создайте таблицу orders и clients (спeцификация таблиц ниже)
 - предоставьте привилегии на все операции пользователю test-admin-user на таблицы БД test_db
 - создайте пользователя test-simple-user  
