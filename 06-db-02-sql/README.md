@@ -34,7 +34,7 @@
         ```
     - Создадим пользователя `test-admin-user`  
         `CREATE USER "test-admin-user" WITH LOGIN;`
-    - Создадим базу данных `test_db`
+    - Создадим базу данных `test_db`  
         `CREATE DATABASE test_db;`  
 - в БД test_db создайте таблицу orders и clients (спeцификация таблиц ниже)  
     ```
