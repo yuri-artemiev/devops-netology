@@ -36,6 +36,10 @@
         `CREATE USER "test-admin-user" WITH LOGIN;`
     - Создадим базу данных `test_db`  
         `CREATE DATABASE test_db;`  
+- подлючемся к базе test_db
+    ```
+    \c test_db
+    ```
 - в БД test_db создайте таблицу orders и clients (спeцификация таблиц ниже)  
     ```
     CREATE TABLE orders (
@@ -247,17 +251,48 @@
 
 Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 
 (используя директиву EXPLAIN).
+    ```
+    EXPLAIN SELECT *
+    FROM clients
+    WHERE order_id IS NOT NULL;
+    ```
 
 Приведите получившийся результат и объясните что значат полученные значения.
+    ```
+                            QUERY PLAN
+    -----------------------------------------------------------
+     Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
+       Filter: (order_id IS NOT NULL)
+    ```
+- Использовать последовательное сканирование
+- Приблизительные затраты перед началом вывода (в условных единицах)
+- Приблизительная общие затраты (в условных единицах)
+- Приблизительное количество строк вывода
+- Приблизительная средняя ширина строки (в байтах)
+- Фильтр
+
 
 ## Задача 6
 
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
+    ```
+    pg_dump -U postgres -F t test_db -f /backup/test_db.backup.tar
+    ```
 
 Остановите контейнер с PostgreSQL (но не удаляйте volumes).
+    `docker stop postgres`
 
 Поднимите новый пустой контейнер с PostgreSQL.
+    `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
 
 Восстановите БД test_db в новом контейнере.
-
-Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
+    `pg_restore -U postgres --create --dbname postgres /backup/test_db.backup.tar`
+        - где:
+            - `postgres` - база данных к которой мы подключаемся чтобы восстанавливать резервную копию (это не база данных куда копия будет восстановлена)
+    OR
+    pg_restore --clean --dbname test_db /backup/test_db.backup.tar
+  
+  ```
+   \c test_db
+   
+   ```
