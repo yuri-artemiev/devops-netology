@@ -211,6 +211,21 @@
 
 Приведите SQL-запросы для выполнения данных операций.
 
+- Запрос SQL
+    ```
+    UPDATE clients
+    SET order_id = (SELECT id FROM orders WHERE name = 'Книга')
+    WHERE lastname = 'Иванов Иван Иванович';
+
+    UPDATE clients
+    SET order_id = (SELECT id FROM orders WHERE name = 'Монитор')
+    WHERE lastname = 'Петров Петр Петрович';
+
+    UPDATE clients
+    SET order_id = (SELECT id FROM orders WHERE name = 'Гитара')
+    WHERE lastname = 'Иоганн Себастьян Бах';
+    ```
+
 Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
  
 
