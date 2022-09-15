@@ -158,7 +158,7 @@
 |Монитор| 7000|
 |Гитара| 4000|
 
-- Запрос
+- Запрос SQL
     ```
     INSERT INTO orders (name, price) VALUES
     ('Шоколад', '10'),
@@ -253,20 +253,21 @@
 ## Задача 5
 
 Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 
-(используя директиву EXPLAIN).
+(используя директиву EXPLAIN).  
     ```
     EXPLAIN SELECT *
     FROM clients
     WHERE order_id IS NOT NULL;
     ```
 
-Приведите получившийся результат и объясните что значат полученные значения.
+Приведите получившийся результат и объясните что значат полученные значения.  
     ```
                             QUERY PLAN
     -----------------------------------------------------------
      Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
        Filter: (order_id IS NOT NULL)
     ```
+
 - Использовать последовательное сканирование
 - Приблизительные затраты перед началом вывода (в условных единицах)
 - Приблизительная общие затраты (в условных единицах)
@@ -277,49 +278,41 @@
 
 ## Задача 6
 
-Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
-    - Из консоли контейнера `postgres` запустим команду 
+Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).  
+    - Из консоли контейнера `postgres` запустим команду  
     ```
     pg_dump -U postgres -F t test_db -f /backup/test_db.backup.tar
     ```
 
-Остановите контейнер с PostgreSQL (но не удаляйте volumes).
+Остановите контейнер с PostgreSQL (но не удаляйте volumes).  
     `docker stop postgres`
 
-Поднимите новый пустой контейнер с PostgreSQL.
-    - Создадим папку для второго контейнера
+Поднимите новый пустой контейнер с PostgreSQL.  
+    - Создадим папку для второго контейнера  
     `mkdir data2`
-    - Запустим новый контейнер `postgres2`
+    - Запустим новый контейнер `postgres2`  
         `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
 
-    - Зайдём в консоль контейнера
-        ```
-        docker exec -it postgres2 bash
-        ```
+    - Зайдём в консоль контейнера  
+        `docker exec -it postgres2 bash`
 
-Восстановите БД test_db в новом контейнере.
-    `pg_restore -U postgres --create --dbname postgres /backup/test_db.backup.tar`
-        - где:
-            - `postgres` - база данных к которой мы подключаемся чтобы восстанавливать резервную копию (это не база данных куда копия будет восстановлена)
-    OR
-    pg_restore -U postgres --clean --dbname test_db /backup/test_db.backup.tar
-   
-    - Создадим пользователей (необходимо для назначения прав при восстановлении)
+Восстановите БД test_db в новом контейнере.  
+    - Создадим пользователей (необходимо для назначения прав при восстановлении)  
         ```
         createuser -U postgres test-admin-user
         createuser -U postgres test-simple-user
         ```
-    - Создадим пустую базу данных
+    - Создадим пустую базу данных  
         ```
         createdb -U postgres test_db
         ```
     - Восстановим базу  
         `pg_restore -U postgres --dbname test_db /backup/test_db.backup.tar`
-    - Зайдём в систему PostgreSQL
+    - Зайдём в систему PostgreSQL  
         `psql -U postgres`
-    - Подключимся к базе `test_db`
+    - Подключимся к базе `test_db`  
         `\c test_db`
-    - Проверим клиентов с заказами
+    - Проверим клиентов с заказами  
         ```
         SELECT *
         FROM clients
