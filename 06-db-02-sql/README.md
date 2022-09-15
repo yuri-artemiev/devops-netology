@@ -252,8 +252,7 @@
 
 ## Задача 5
 
-Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 
-(используя директиву EXPLAIN).  
+Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 (используя директиву EXPLAIN).  
     ```
     EXPLAIN SELECT *
     FROM clients
@@ -279,48 +278,45 @@
 ## Задача 6
 
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).  
-    - Из консоли контейнера `postgres` запустим команду  
+- Из консоли контейнера `postgres` запустим команду  
     ```
     pg_dump -U postgres -F t test_db -f /backup/test_db.backup.tar
     ```
 
 Остановите контейнер с PostgreSQL (но не удаляйте volumes).  
-    `docker stop postgres`
+- `docker stop postgres`
 
 Поднимите новый пустой контейнер с PostgreSQL.  
-    - Создадим папку для второго контейнера  
-    `mkdir data2`
-    - Запустим новый контейнер `postgres2`  
-        `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
-
-    - Зайдём в консоль контейнера  
-        `docker exec -it postgres2 bash`
+- Создадим папку для второго контейнера  
+    - `mkdir data2`
+- Запустим новый контейнер `postgres2`  
+    - `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
+- Зайдём в консоль контейнера  
+    - `docker exec -it postgres2 bash`
 
 Восстановите БД test_db в новом контейнере.  
-    - Создадим пользователей (необходимо для назначения прав при восстановлении)  
-        ```
-        createuser -U postgres test-admin-user
-        createuser -U postgres test-simple-user
-        ```
-    - Создадим пустую базу данных  
-        ```
-        createdb -U postgres test_db
-        ```
-    - Восстановим базу  
-        `pg_restore -U postgres --dbname test_db /backup/test_db.backup.tar`
-    - Зайдём в систему PostgreSQL  
-        `psql -U postgres`
-    - Подключимся к базе `test_db`  
-        `\c test_db`
-    - Проверим клиентов с заказами  
-        ```
-        SELECT *
-        FROM clients
-        WHERE order_id IS NOT NULL;
+- Создадим пользователей (необходимо для назначения прав при восстановлении)  
+     ```
+    createuser -U postgres test-admin-user
+    createuser -U postgres test-simple-user
+    ```
+- Создадим пустую базу данных  
+     - `createdb -U postgres test_db`
+- Восстановим базу  
+    - `pg_restore -U postgres --dbname test_db /backup/test_db.backup.tar`
+- Зайдём в систему PostgreSQL  
+    - `psql -U postgres`
+- Подключимся к базе `test_db`  
+    - `\c test_db`
+- Проверим клиентов с заказами  
+    ```
+    SELECT *
+    FROM clients
+    WHERE order_id IS NOT NULL;
 
-         id |       lastname       | country | order_id
-        ----+----------------------+---------+----------
-          1 | Иванов Иван Иванович | USA     |        3
-          2 | Петров Петр Петрович | Canada  |        4
-          3 | Иоганн Себастьян Бах | Japan   |        5
-        ```
+    id |       lastname       | country | order_id
+    ----+----------------------+---------+----------
+    1 | Иванов Иван Иванович | USA     |        3
+    2 | Петров Петр Петрович | Canada  |        4
+    3 | Иоганн Себастьян Бах | Japan   |        5
+    ```
