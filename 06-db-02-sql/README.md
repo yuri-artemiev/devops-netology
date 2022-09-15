@@ -16,6 +16,11 @@
     apt-get update
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
     ```
+- Создадим папки в текущей директории
+    ```
+    mkdir data
+    mkdir backup
+    ```
 - Запустим образ PostgreSQL  
     `docker run --name postgres -itd -v "${PWD}"/data:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
 
@@ -27,7 +32,7 @@
 
 В БД из задачи 1: 
 - создайте пользователя test-admin-user и БД test_db  
-    - Подключимся к контейнеру и Postgresql  
+    - Подключимся к контейнеру и системе PostgreSQL  
         ```
         docker exec -it postgres bash
         psql -U postgres
@@ -125,7 +130,7 @@
     SELECT table_name, array_agg(privilege_type), grantee
     FROM information_schema.table_privileges
     WHERE table_name = 'orders' OR table_name = 'clients'
-    GROUP BY table_name, grantee ;
+    GROUP BY table_name, grantee;
     ```
 - список пользователей с правами над таблицами test_db
     ```
@@ -160,8 +165,7 @@
     ('Принтер', '3000'),
     ('Книга', '500'),
     ('Монитор', '7000'),
-    ('Гитара', '4000')
-    ;
+    ('Гитара', '4000');
     ```
 
 Таблица clients
@@ -181,8 +185,7 @@
     ('Петров Петр Петрович', 'Canada'),
     ('Иоганн Себастьян Бах', 'Japan'),
     ('Ронни Джеймс Дио', 'Russia'),
-    ('Ritchie Blackmore', 'Russia')
-    ;
+    ('Ritchie Blackmore', 'Russia');
     ```
 
 Используя SQL синтаксис:
@@ -275,6 +278,7 @@
 ## Задача 6
 
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
+    - Из консоли контейнера `postgres` запустим команду 
     ```
     pg_dump -U postgres -F t test_db -f /backup/test_db.backup.tar
     ```
@@ -283,16 +287,47 @@
     `docker stop postgres`
 
 Поднимите новый пустой контейнер с PostgreSQL.
-    `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
+    - Создадим папку для второго контейнера
+    `mkdir data2`
+    - Запустим новый контейнер `postgres2`
+        `docker run --name postgres2 -itd -v "${PWD}"/data2:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:12`
+
+    - Зайдём в консоль контейнера
+        ```
+        docker exec -it postgres2 bash
+        ```
 
 Восстановите БД test_db в новом контейнере.
     `pg_restore -U postgres --create --dbname postgres /backup/test_db.backup.tar`
         - где:
             - `postgres` - база данных к которой мы подключаемся чтобы восстанавливать резервную копию (это не база данных куда копия будет восстановлена)
     OR
-    pg_restore --clean --dbname test_db /backup/test_db.backup.tar
-  
-  ```
-   \c test_db
+    pg_restore -U postgres --clean --dbname test_db /backup/test_db.backup.tar
    
-   ```
+    - Создадим пользователей (необходимо для назначения прав при восстановлении)
+        ```
+        createuser -U postgres test-admin-user
+        createuser -U postgres test-simple-user
+        ```
+    - Создадим пустую базу данных
+        ```
+        createdb -U postgres test_db
+        ```
+    - Восстановим базу  
+        `pg_restore -U postgres --dbname test_db /backup/test_db.backup.tar`
+    - Зайдём в систему PostgreSQL
+        `psql -U postgres`
+    - Подключимся к базе `test_db`
+        `\c test_db`
+    - Проверим клиентов с заказами
+        ```
+        SELECT *
+        FROM clients
+        WHERE order_id IS NOT NULL;
+
+         id |       lastname       | country | order_id
+        ----+----------------------+---------+----------
+          1 | Иванов Иван Иванович | USA     |        3
+          2 | Петров Петр Петрович | Canada  |        4
+          3 | Иоганн Себастьян Бах | Japan   |        5
+        ```
