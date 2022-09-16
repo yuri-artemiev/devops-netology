@@ -34,7 +34,7 @@
 - Подключимся к контейнеру и системе MySQL  
     `docker exec -it mysql bash`
 - Восстановим базу данных `test_db` из резервной копии  
-    `mysql -u mysql -p test_db < backup/test_dump.sql`
+    `mysql -u root -p test_db < backup/test_dump.sql`
     
 
 Перейдите в управляющую консоль `mysql` внутри контейнера.
