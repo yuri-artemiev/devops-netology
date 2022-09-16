@@ -3,12 +3,48 @@
 
 ## Задача 1
 
-Используя docker поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.
+Используя docker поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.  
+
+- Установим Docker  
+    ```
+    apt-get install ca-certificates curl gnupg lsb-release
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    ```
+- Создадим папки в текущей директории
+    ```
+    mkdir data
+    mkdir backup
+    ```
+- Запустим образ PostgreSQL  
+    `docker run --name mysql -itd -v "${PWD}"/data:/var/lib/mysql -v "${PWD}"/backup:/backup -p 3306:3306 -e MYSQL_ROOT_PASSWORD=mysql mysql:8`
+
+
+
+
+
+
 
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-03-mysql/test_data) и 
-восстановитесь из него.
+восстановитесь из него.  
+- Резервная копия содержит таблицу `orders` и заполняет её данными.  
+- Подключимся к контейнеру и системе MySQL  
+    `docker exec -it mysql bash`
+- Восстановим базу данных `test_db` из резервной копии  
+    `mysql -u mysql -p test_db < backup/test_dump.sql`
+    
 
 Перейдите в управляющую консоль `mysql` внутри контейнера.
+
+
+
+
+
+
+
 
 Используя команду `\h` получите список управляющих команд.
 
