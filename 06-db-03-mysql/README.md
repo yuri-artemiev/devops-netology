@@ -124,20 +124,55 @@
 
 ## Задача 3
 
-Установите профилирование `SET profiling = 1`.
-Изучите вывод профилирования команд `SHOW PROFILES;`.
-
-Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
-
-Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
-- на `MyISAM`
-- на `InnoDB`
-
-
-  
-- xxx  
+Установите профилирование `SET profiling = 1`.  
+Изучите вывод профилирования команд `SHOW PROFILES;`.  
+- Запрос SQL  
     ```
-    xxx
+    mysql> SET profiling = 1;
+    mysql> SHOW profiles;
+    +----------+------------+--------------------------------------------------------------------+
+    | Query_ID | Duration   | Query                                                              |
+    +----------+------------+--------------------------------------------------------------------+
+    |        1 | 0.00004300 | SHOW profiles                                                      |
+    |        2 | 0.00031800 | SELECT * FROM information_schema.user_attributes WHERE user='test' |
+    +----------+------------+--------------------------------------------------------------------+
+    ```
+
+Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.  
+- Запрос SQL  
+```
+mysql> SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'test_db';
++------------+--------+
+| TABLE_NAME | ENGINE |
++------------+--------+
+| orders     | InnoDB |
++------------+--------+
+```
+
+Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:  
+- на `MyISAM`
+    - Запрос SQL  
+        ```
+        mysql> ALTER TABLE orders ENGINE = myisam;
+        Query OK, 5 rows affected (0.06 sec)
+        ```
+- на `InnoDB`
+    - Запрос SQL  
+        ```
+        mysql> ALTER TABLE orders ENGINE = innodb;
+        Query OK, 5 rows affected (0.07 sec)
+        ```
+
+- Показать список профайлера  
+    ```
+    mysql> SHOW profiles;
+    +----------+------------+-------------------------------------+
+    | Query_ID | Duration   | Query                               |
+    +----------+------------+-------------------------------------+
+    | ...      |            |                                     |
+    |        4 | 0.05384500 | ALTER TABLE orders ENGINE = myisam  |
+    |        5 | 0.07100325 | ALTER TABLE orders ENGINE = innodb  |
+    +----------+------------+-------------------------------------+
     ```
   
 
