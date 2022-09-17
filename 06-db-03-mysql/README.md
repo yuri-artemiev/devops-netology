@@ -33,26 +33,49 @@
 - Резервная копия содержит таблицу `orders` и заполняет её данными.  
 - Подключимся к контейнеру и системе MySQL  
     `docker exec -it mysql bash`
+- Создадим пустую базу данный `test_db`
+    `mysql -u root -p -e "create database test_db"`
 - Восстановим базу данных `test_db` из резервной копии  
     `mysql -u root -p test_db < backup/test_dump.sql`
     
 
 Перейдите в управляющую консоль `mysql` внутри контейнера.
-
-
-
-
-
-
-
+- Подлючимся к системе MySQL  
+    `mysql -u root -p`  
 
 Используя команду `\h` получите список управляющих команд.
-
 Найдите команду для выдачи статуса БД и **приведите в ответе** из ее вывода версию сервера БД.
+- Выведем статус подключения
+    ```
+    mysql> \s
+    --------------
+    mysql  Ver 8.0.30 for Linux on x86_64 (MySQL Community Server - GPL)
+
+    Connection id:          13
+    Current database:       mysql
+    Current user:           root@localhost
+    ```
 
 Подключитесь к восстановленной БД и получите список таблиц из этой БД.
+- Подключимся к базе данных `test_db` и вывидим список таблиц  
+    ```
+    mysql> \r test_db
+    Connection id:    15
+    Current database: test_db
+    mysql> SHOW TABLES;
+    +-------------------+
+    | Tables_in_test_db |
+    +-------------------+
+    | orders            |
+    +-------------------+
+    ```
+
 
 **Приведите в ответе** количество записей с `price` > 300.
+- Запрос SQL  
+    ```
+    SELECT COUNT(*) FROM orders WHERE price > 300;
+    ```
 
 В следующих заданиях мы будем продолжать работу с данным контейнером.
 
