@@ -199,8 +199,10 @@ mysql> SELECT TABLE_NAME, ENGINE FROM information_schema.TABLES WHERE TABLE_SCHE
 - Чтобы отредактировать файл `my.cnf` воспользуемся копированием  
     - Из контейнера в локальную папку  
         `docker container cp mysql:/etc/my.cnf container-my.cnf`
-    - Отредактируем файл  
+    - Отредактируем файл `container-my.cnf`    
         ```
+        nano container-my.cnf
+        
         [mysqld]
         ...
         innodb_buffer_pool_size=1G
