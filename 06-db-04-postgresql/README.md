@@ -104,7 +104,36 @@ SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' OR
 
 Предложите SQL-транзакцию для проведения данной операции.
 
+Для проведения шардинга:  
+- Переименовываем таблицу `orders` в `orders_old`  
+- Создаём таблицу `orders` с типом `partitioned table`  
+- Создаём две партитиции, связанные с таблицей `orders`  
+- Вставляем содержимое из таблицы `orders_old` в таблицу `orders`  
+
+```
+BEGIN;
+ALTER TABLE orders RENAME TO orders_old;
+
+CREATE TABLE orders (
+	id serial4 NOT NULL,
+	title varchar(80) NOT NULL,
+	price int4 NULL DEFAULT 0
+) PARTITION BY RANGE (price);
+
+CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (499) TO (MAXVALUE);
+
+CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (499);
+
+INSERT INTO orders (SELECT * FROM orders_old);
+
+DROP TABLE orders_old;
+COMMIT;
+```
+
+
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
+
+- Да, можно было бы создать таблицу типа `partitioned table` используя оператор `PARTITION BY RANGE (price)` и связать с ней партиции.  
 
 ## Задача 4
 
