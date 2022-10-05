@@ -4,16 +4,54 @@
 
 Используя docker поднимите инстанс PostgreSQL (версию 13). Данные БД сохраните в volume.
 
+
+- Установим Docker  
+    ```
+    apt-get install ca-certificates curl gnupg lsb-release
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    ```
+- Создадим папки в текущей директории
+    ```
+    mkdir data
+    mkdir backup
+    ```
+- Запустим образ PostgreSQL  
+    `docker run --name postgres-06-db-04 -itd -v "${PWD}"/data:/var/lib/postgresql/data -v "${PWD}"/backup:/backup -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:13`
+
 Подключитесь к БД PostgreSQL используя `psql`.
+
+- Подключимся к контейнеру и системе PostgreSQL  
+    ```
+    docker exec -it postgres-06-db-04 bash
+    psql -U postgres
+    ```
 
 Воспользуйтесь командой `\?` для вывода подсказки по имеющимся в `psql` управляющим командам.
 
 **Найдите и приведите** управляющие команды для:
 - вывода списка БД
+    - `\l`
+
 - подключения к БД
+    - `\c DBNAME`
+
+
 - вывода списка таблиц
+    - `\dt`
+
+
 - вывода описания содержимого таблиц
+    - `\d TABLENAME`
+
+
 - выхода из psql
+    - `\q`
+
+
 
 ## Задача 2
 
