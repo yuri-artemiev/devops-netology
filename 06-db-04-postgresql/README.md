@@ -56,19 +56,45 @@
 ## Задача 2
 
 Используя `psql` создайте БД `test_database`.
+`CREATE DATABASE test_database;`
 
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-04-postgresql/test_data).
 
 Восстановите бэкап БД в `test_database`.
+- Скопируем файл бэкапа в volume контейнера  
+    - `cp /vagrant/06-db-04/test_dump.sql backup/test_dump.sql`
+- Подключимся к контейнеру и системе PostgreSQL  
+    - `docker exec -it postgres-06-db-04 bash`
+- Восстановим резервную копию из файла  
+    - `psql -U postgres -d test_database -f /backup/test_dump.sql`
+
 
 Перейдите в управляющую консоль `psql` внутри контейнера.
+```
+docker exec -it postgres-06-db-04 bash
+psql -U postgres
+```
 
 Подключитесь к восстановленной БД и проведите операцию ANALYZE для сбора статистики по таблице.
+```
+\c test_database
+ANALYZE VERBOSE orders;
+INFO:  analyzing "public.orders"
+INFO:  "orders": scanned 1 of 1 pages, containing 8 live rows and 0 dead rows; 8 rows in sample, 8 estimated total rows
+ANALYZE
+```
 
 Используя таблицу [pg_stats](https://postgrespro.ru/docs/postgresql/12/view-pg-stats), найдите столбец таблицы `orders` 
 с наибольшим средним значением размера элементов в байтах.
 
 **Приведите в ответе** команду, которую вы использовали для вычисления и полученный результат.
+```
+SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' ORDER BY avg_width DESC LIMIT 1;
+ tablename | attname | avg_width
+-----------+---------+-----------
+ orders    | title   |        16
+```
+
 
 ## Задача 3
 
