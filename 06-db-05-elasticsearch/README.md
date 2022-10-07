@@ -7,7 +7,8 @@
 - первоначальном конфигурировании elastcisearch
 - запуске elasticsearch в docker
 
-Используя докер образ [elasticsearch:7](https://hub.docker.com/_/elasticsearch) как базовый:
+Используя докер образ [centos:7](https://hub.docker.com/_/centos) как базовый и 
+[документацию по установке и запуску Elastcisearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/targz.html):
 
 - составьте Dockerfile-манифест для elasticsearch
 - соберите docker-образ и сделайте `push` в ваш docker.io репозиторий
