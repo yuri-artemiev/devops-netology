@@ -110,26 +110,32 @@ SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' OR
 - Создаём две партитиции, связанные с таблицей `orders`  
 - Вставляем содержимое из таблицы `orders_old` в таблицу `orders`  
 
-```
-BEGIN;
-ALTER TABLE orders RENAME TO orders_old;
+- Подключимся к базе данный `test_database`  
+	```
+	docker exec -it postgres-06-db-04 bash
+	psql -U postgres
+	\c test_database
+	```
+- Проведим запрос одной транзакцией  
+	```
+	BEGIN;
+	ALTER TABLE orders RENAME TO orders_old;
 
-CREATE TABLE orders (
-	id serial4 NOT NULL,
-	title varchar(80) NOT NULL,
-	price int4 NULL DEFAULT 0
-) PARTITION BY RANGE (price);
+	CREATE TABLE orders (
+		id serial4 NOT NULL,
+		title varchar(80) NOT NULL,
+		price int4 NULL DEFAULT 0
+	) PARTITION BY RANGE (price);
 
-CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (499) TO (MAXVALUE);
+	CREATE TABLE orders_1 PARTITION OF orders FOR VALUES FROM (499) TO (MAXVALUE);
 
-CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (499);
+	CREATE TABLE orders_2 PARTITION OF orders FOR VALUES FROM (0) TO (499);
 
-INSERT INTO orders (SELECT * FROM orders_old);
+	INSERT INTO orders (SELECT * FROM orders_old);
 
-DROP TABLE orders_old;
-COMMIT;
-```
-
+	DROP TABLE orders_old;
+	COMMIT;
+	```
 
 Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 
@@ -139,4 +145,20 @@ COMMIT;
 
 Используя утилиту `pg_dump` создайте бекап БД `test_database`.
 
-Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
+```
+docker exec -it postgres-06-db-04 bash
+psql -U postgres
+pg_dump -U postgres -d test_database -f /backup/test_dump_update1.sql
+```
+
+
+Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?  
+
+- Добавить ограничение `UNIQUE`  
+	```
+	CREATE TABLE public.orders (
+		id integer NOT NULL,
+		title character varying(80) NOT NULL UNIQUE,
+		price integer DEFAULT 0
+	);
+```
