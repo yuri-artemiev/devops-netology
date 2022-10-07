@@ -57,6 +57,8 @@
     docker run -itd -p 80:80 --name nginx yuriartemiev/elasticsearch:local
     ```
 
+`curl 'localhost:9200/_cat/health?v'`
+
 
 - Назначим тег образу
     ```
