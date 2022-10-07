@@ -32,6 +32,53 @@
 
 Далее мы будем работать с данным экземпляром elasticsearch.
 
+
+
+- Убедимся что текущей папке существуют файл
+    - `Dockerfile`
+    ```
+    xxx
+    ```
+
+
+- Запустим сборку обаза с тегом `yuriartemiev/elasticsearch:local` в текущей директории `.`  
+    ```
+    docker build -t yuriartemiev/elasticsearch:local .
+    ```
+- Проверим что обаз создался
+    ```
+    docker images
+    REPOSITORY           TAG             IMAGE ID       CREATED          SIZE
+    xxx
+    ```
+- Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порт `xxx`.
+    ```
+    docker run -itd -p 80:80 --name nginx yuriartemiev/elasticsearch:local
+    ```
+
+
+- Назначим тег образу
+    ```
+    docker tag bcc91249bceb yuriartemiev/elasticsearch:netology
+    ```
+- Подключаемся к Docker Hub
+    ```
+    docker login -u yuriartemiev
+    ```
+- Отправим образ в репозиторий
+    ```
+    docker push yuriartemiev/elasticsearch:netology
+    ```
+https://hub.docker.com/r/yuriartemiev/elasticsearch
+
+
+
+
+
+
+
+
+
 ## Задача 2
 
 В этом задании вы научитесь:
