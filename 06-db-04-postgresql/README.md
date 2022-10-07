@@ -55,7 +55,7 @@
 
 ## Задача 2
 
-Используя `psql` создайте БД `test_database`.
+Используя `psql` создайте БД `test_database`.  
 `CREATE DATABASE test_database;`
 
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/master/06-db-04-postgresql/test_data).
@@ -105,18 +105,18 @@ SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' OR
 Предложите SQL-транзакцию для проведения данной операции.
 
 Для проведения шардинга:  
-- Переименовываем таблицу `orders` в `orders_old`  
+- Переименуем таблицу `orders` в `orders_old`  
 - Создаём таблицу `orders` с типом `partitioned table`  
 - Создаём две партитиции, связанные с таблицей `orders`  
 - Вставляем содержимое из таблицы `orders_old` в таблицу `orders`  
-
+  
 - Подключимся к базе данный `test_database`  
 	```
 	docker exec -it postgres-06-db-04 bash
 	psql -U postgres
 	\c test_database
 	```
-- Проведим запрос одной транзакцией  
+- Проведём запрос одной транзакцией  
 	```
 	BEGIN;
 	ALTER TABLE orders RENAME TO orders_old;
@@ -154,11 +154,11 @@ pg_dump -U postgres -d test_database -f /backup/test_dump_update1.sql
 
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?  
 
-- Добавить ограничение `UNIQUE`  
+- Добавил бы ограничение `UNIQUE`  
 	```
 	CREATE TABLE public.orders (
 		id integer NOT NULL,
 		title character varying(80) NOT NULL UNIQUE,
 		price integer DEFAULT 0
 	);
-```
+	```
