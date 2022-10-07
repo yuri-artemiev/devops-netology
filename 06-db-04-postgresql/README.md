@@ -104,13 +104,13 @@ SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' OR
 
 Предложите SQL-транзакцию для проведения данной операции.
 
-Для проведения шардинга:  
+План для проведения шардинга:  
 - Переименуем таблицу `orders` в `orders_old`  
 - Создаём таблицу `orders` с типом `partitioned table`  
 - Создаём две партитиции, связанные с таблицей `orders`  
 - Вставляем содержимое из таблицы `orders_old` в таблицу `orders`  
   
-  
+Последовательность действий:
 - Подключимся к базе данный `test_database`  
 	```
 	docker exec -it postgres-06-db-04 bash
