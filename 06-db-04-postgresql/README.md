@@ -110,6 +110,7 @@ SELECT tablename, attname, avg_width FROM pg_stats WHERE tablename = 'orders' OR
 - Создаём две партитиции, связанные с таблицей `orders`  
 - Вставляем содержимое из таблицы `orders_old` в таблицу `orders`  
   
+  
 - Подключимся к базе данный `test_database`  
 	```
 	docker exec -it postgres-06-db-04 bash
