@@ -42,9 +42,10 @@
     apt-get update
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
     ```
-- Создадим папку 
+- Создадим папку для volume  
     ```
     mkdir -p ~/06-db-05/docker/elasticsearch/data
+    chmod -R 777 ~/06-db-05/docker/elasticsearch
     ```
 
 - Запустим контейнер `elasticsearch` чтобы достать файл конфигурации `elasticsearch.yml`
@@ -62,7 +63,6 @@
     ```
     cluster.name: "netology_test"
     path.data: /var/lib/elasticsearch/data
-    path.logs: /var/lib/elasticsearch/logs
     network.host: 0.0.0.0
     ```
 
@@ -74,8 +74,8 @@
     FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
     COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
     RUN mkdir -p /var/lib/elasticsearch/data
-    RUN mkdir -p /var/lib/elasticsearch/logs
-    RUN chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
+    RUN chmod -R 777 /var/lib/elasticsearch
+    RUN chown -R 1000:0 /var/lib/elasticsearch
     ```
 
 
@@ -91,35 +91,56 @@
 - Запустим сборку обаза с тегом `yuriartemiev/elasticsearch:local` в текущей директории `.`  
     ```
     docker build -t yuriartemiev/elasticsearch:local .
-    
     ```
     ```
     Sending build context to Docker daemon  4.096kB
-    Step 1/5 : FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    Step 1/4 : FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
      ---> 5fad10241ffd
-    Step 2/5 : COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
-     ---> 2c3df00855bb
+    Step 2/4 : COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+     ---> b94fa41a96d7
     ...
-    Successfully built ca86a345cec1
+    Successfully built a0fdc9741473
     Successfully tagged yuriartemiev/elasticsearch:local
     ```
 - Проверим что обаз создался
     ```
     docker images
     REPOSITORY                  TAG     IMAGE ID       CREATED              SIZE
-    yuriartemiev/elasticsearch  local   ca86a345cec1   About a minute ago   606MB
+    yuriartemiev/elasticsearch  local   a0fdc9741473   About a minute ago   606MB
     ```
 - Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порты `9200`, `9300`.
     ```
     docker run -itd --name elasticsearch-custom -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch:local
     ```
 
-`curl 'localhost:9200/_cat/health?v'`
+- Проверим выдачу с хост системы  
+    ```
+    curl 192.168.1.116:9200/
+    {
+      "name" : "df918fe7ab4d",
+      "cluster_name" : "netology_test",
+      "cluster_uuid" : "yXG2e3DPTdG2qB7CU_CCJA",
+      "version" : {
+        "number" : "7.17.6",
+        "build_flavor" : "default",
+        "build_type" : "docker",
+        "build_hash" : "f65e9d338dc1d07b642e14a27f338990148ee5b6",
+        "build_date" : "2022-08-23T11:08:48.893373482Z",
+        "build_snapshot" : false,
+        "lucene_version" : "8.11.1",
+        "minimum_wire_compatibility_version" : "6.8.0",
+        "minimum_index_compatibility_version" : "6.0.0-beta1"
+      },
+      "tagline" : "You Know, for Search"
+    }
+    ```
+
+
 
 
 - Назначим тег образу
     ```
-    docker tag bcc91249bceb yuriartemiev/elasticsearch:netology
+    docker tag a0fdc9741473 yuriartemiev/elasticsearch:netology
     ```
 - Подключаемся к Docker Hub
     ```
@@ -135,6 +156,15 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 
 
+
+
+
+docker container cp elasticsearch-custom:/etc/hostname container-hostname
+
+Likely root cause: java.nio.file.AccessDeniedException: /var/lib/elasticsearch/data/nodes
+For complete error details, refer to the log at /usr/share/elasticsearch/logs/netology_test.log
+
+`curl 'localhost:9200/_cat/health?v'`
 
 
 docker exec -it elasticsearch bash
@@ -203,6 +233,7 @@ curl 192.168.1.116:9200/_cat/health
 - Создадим папку 
     ```
     mkdir -p ~/06-db-05/docker/elasticsearch/snapshots
+    chmod -R 777 ~/06-db-05/docker/elasticsearch
     ```
 
 
