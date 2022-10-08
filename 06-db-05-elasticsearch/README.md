@@ -7,8 +7,7 @@
 - первоначальном конфигурировании elastcisearch
 - запуске elasticsearch в docker
 
-Используя докер образ [centos:7](https://hub.docker.com/_/centos) как базовый и 
-[документацию по установке и запуску Elastcisearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/targz.html):
+Используя докер образ [elasticsearch:7](https://hub.docker.com/_/elasticsearch) как базовый:
 
 - составьте Dockerfile-манифест для elasticsearch
 - соберите docker-образ и сделайте `push` в ваш docker.io репозиторий
@@ -34,12 +33,38 @@
 Далее мы будем работать с данным экземпляром elasticsearch.
 
 
+- Установим Docker  
+    ```
+    apt-get install ca-certificates curl gnupg lsb-release
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    ```
+- Создадим папку 
+    ```
+    mkdir -p ~/06-db-05/docker/data
+    ```
 
-- Убедимся что текущей папке существуют файл
+
+
+- Убедимся что текущей папке существуют два файла
     - `Dockerfile`
+    ```
+    FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    COPY --chown=elasticsearch:elasticsearch ./elasticsearch.yml /usr/share/elasticsearch/config/
+    ```
+    - `elasticsearch.yml`
     ```
     xxx
     ```
+    ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ELASTIC_PASSWORD: changeme
+    
+    - `~/docker/elasticsearch# ls`  
+    `Dockerfile  elasticsearch.yml`
+
 
 
 - Запустим сборку обаза с тегом `yuriartemiev/elasticsearch:local` в текущей директории `.`  
@@ -52,9 +77,9 @@
     REPOSITORY           TAG             IMAGE ID       CREATED          SIZE
     xxx
     ```
-- Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порт `xxx`.
+- Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порты `9200`, `9300`.
     ```
-    docker run -itd -p 80:80 --name nginx yuriartemiev/elasticsearch:local
+    docker run -itd --name elasticsearch -v "${PWD}"/data:/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:local
     ```
 
 `curl 'localhost:9200/_cat/health?v'`
@@ -111,6 +136,11 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
 иначе возможна потеря данных индексов, вплоть до полной, при деградации системы.
 
+
+
+
+
+
 ## Задача 3
 
 В данном задании вы научитесь:
@@ -123,6 +153,13 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 данную директорию как `snapshot repository` c именем `netology_backup`.
 
 **Приведите в ответе** запрос API и результат вызова API для создания репозитория.
+
+
+- Создадим папку 
+    ```
+    mkdir -p ~/06-db-05/docker/snapshots
+    ```
+
 
 Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
 
