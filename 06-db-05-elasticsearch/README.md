@@ -44,26 +44,46 @@
     ```
 - Создадим папку 
     ```
-    mkdir -p ~/06-db-05/docker/data
+    mkdir -p ~/06-db-05/docker/elasticsearch/data
     ```
+
+
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+docker run -itd --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+docker exec -it elasticsearch bash
+pwd
+    /usr/share/elasticsearch
+drwxrwxr-x 1 root root 4096 Oct  8 12:02 /usr/share/elasticsearch/
+-rw-rw-r-- 1 root root 53 Aug 23 15:07 /usr/share/elasticsearch/config/elasticsearch.yml
+drwxrwxr-x 1 elasticsearch root 4096 Oct  8 12:02 /usr/share/elasticsearch/data/
+Ctrl+D
+curl 192.168.1.116:9200/_cat/health
+docker container cp elasticsearch:/usr/share/elasticsearch/config/elasticsearch.yml ~/06-db-05/docker/container-elasticsearch.yml
+
+nano ~/06-db-05/docker/container-elasticsearch.yml
 
 
 
 - Убедимся что текущей папке существуют два файла
     - `Dockerfile`
-    ```
-    FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
-    COPY --chown=elasticsearch:elasticsearch ./elasticsearch.yml /usr/share/elasticsearch/config/
-    ```
+        ```
+        FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+        COPY --chown=elasticsearch:elasticsearch ./elasticsearch.yml /usr/share/elasticsearch/config/
+        RUN mkdir -p /var/lib/elasticsearch/data
+        RUN mkdir -p /var/lib/elasticsearch/logs
+        RUN chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
+        ```
     - `elasticsearch.yml`
-    ```
-    xxx
-    ```
-    ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    ELASTIC_PASSWORD: changeme
+        ```
+        cluster.name: "netology_test"
+        path.data: /var/lib/elasticsearch/data
+        path.logs: /var/lib/elasticsearch/logs
+        network.host: 0.0.0.0
+        ```
+
     
-    - `~/docker/elasticsearch# ls`  
-    `Dockerfile  elasticsearch.yml`
+    - `~/06-db-05/docker# ls`  
+        `Dockerfile  elasticsearch.yml`
 
 
 
@@ -79,7 +99,7 @@
     ```
 - Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порты `9200`, `9300`.
     ```
-    docker run -itd --name elasticsearch -v "${PWD}"/data:/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:local
+    docker run -itd --name elasticsearch -v "${PWD}"/elasticsearch/data:/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:local
     ```
 
 `curl 'localhost:9200/_cat/health?v'`
@@ -157,7 +177,7 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 - Создадим папку 
     ```
-    mkdir -p ~/06-db-05/docker/snapshots
+    mkdir -p ~/06-db-05/docker/elasticsearch/snapshots
     ```
 
 
