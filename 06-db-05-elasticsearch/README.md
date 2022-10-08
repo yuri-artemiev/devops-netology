@@ -47,59 +47,71 @@
     mkdir -p ~/06-db-05/docker/elasticsearch/data
     ```
 
+- Запустим контейнер `elasticsearch` чтобы достать файл конфигурации `elasticsearch.yml`
+    ```
+    docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    docker run -itd --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    docker container cp elasticsearch:/usr/share/elasticsearch/config/elasticsearch.yml ~/06-db-05/docker/container-elasticsearch.yml
+    docker stop elasticsearch
+    ```
 
-docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.6
-docker run -itd --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
-docker exec -it elasticsearch bash
-pwd
-    /usr/share/elasticsearch
-drwxrwxr-x 1 root root 4096 Oct  8 12:02 /usr/share/elasticsearch/
--rw-rw-r-- 1 root root 53 Aug 23 15:07 /usr/share/elasticsearch/config/elasticsearch.yml
-drwxrwxr-x 1 elasticsearch root 4096 Oct  8 12:02 /usr/share/elasticsearch/data/
-Ctrl+D
-curl 192.168.1.116:9200/_cat/health
-docker container cp elasticsearch:/usr/share/elasticsearch/config/elasticsearch.yml ~/06-db-05/docker/container-elasticsearch.yml
+- Отредактируем файл конфигурации на локально хосте  
+    ```
+    nano ~/06-db-05/docker/container-elasticsearch.yml
+    ```
+    ```
+    cluster.name: "netology_test"
+    path.data: /var/lib/elasticsearch/data
+    path.logs: /var/lib/elasticsearch/logs
+    network.host: 0.0.0.0
+    ```
 
-nano ~/06-db-05/docker/container-elasticsearch.yml
+- Создадим и отредатируем `Dokcerfile`  
+    ```
+    nano ~/06-db-05/docker/Dockerfile
+    ```
+    ```
+    FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+    RUN mkdir -p /var/lib/elasticsearch/data
+    RUN mkdir -p /var/lib/elasticsearch/logs
+    RUN chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
+    ```
 
 
 
 - Убедимся что текущей папке существуют два файла
-    - `Dockerfile`
-        ```
-        FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
-        COPY --chown=elasticsearch:elasticsearch ./elasticsearch.yml /usr/share/elasticsearch/config/
-        RUN mkdir -p /var/lib/elasticsearch/data
-        RUN mkdir -p /var/lib/elasticsearch/logs
-        RUN chown -R elasticsearch:elasticsearch /var/lib/elasticsearch
-        ```
-    - `elasticsearch.yml`
-        ```
-        cluster.name: "netology_test"
-        path.data: /var/lib/elasticsearch/data
-        path.logs: /var/lib/elasticsearch/logs
-        network.host: 0.0.0.0
-        ```
-
-    
-    - `~/06-db-05/docker# ls`  
-        `Dockerfile  elasticsearch.yml`
+    ```
+    ls ~/06-db-05/docker
+    container-elasticsearch.yml  Dockerfile  elasticsearch
+    ```
 
 
 
 - Запустим сборку обаза с тегом `yuriartemiev/elasticsearch:local` в текущей директории `.`  
     ```
     docker build -t yuriartemiev/elasticsearch:local .
+    
+    ```
+    ```
+    Sending build context to Docker daemon  4.096kB
+    Step 1/5 : FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+     ---> 5fad10241ffd
+    Step 2/5 : COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+     ---> 2c3df00855bb
+    ...
+    Successfully built ca86a345cec1
+    Successfully tagged yuriartemiev/elasticsearch:local
     ```
 - Проверим что обаз создался
     ```
     docker images
-    REPOSITORY           TAG             IMAGE ID       CREATED          SIZE
-    xxx
+    REPOSITORY                  TAG     IMAGE ID       CREATED              SIZE
+    yuriartemiev/elasticsearch  local   ca86a345cec1   About a minute ago   606MB
     ```
 - Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порты `9200`, `9300`.
     ```
-    docker run -itd --name elasticsearch -v "${PWD}"/elasticsearch/data:/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:local
+    docker run -itd --name elasticsearch-custom -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch:local
     ```
 
 `curl 'localhost:9200/_cat/health?v'`
@@ -120,6 +132,19 @@ nano ~/06-db-05/docker/container-elasticsearch.yml
 https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 
+
+
+
+
+
+docker exec -it elasticsearch bash
+pwd
+    /usr/share/elasticsearch
+drwxrwxr-x 1 root root 4096 Oct  8 12:02 /usr/share/elasticsearch/
+-rw-rw-r-- 1 root root 53 Aug 23 15:07 /usr/share/elasticsearch/config/elasticsearch.yml
+drwxrwxr-x 1 elasticsearch root 4096 Oct  8 12:02 /usr/share/elasticsearch/data/
+Ctrl+D
+curl 192.168.1.116:9200/_cat/health
 
 
 
