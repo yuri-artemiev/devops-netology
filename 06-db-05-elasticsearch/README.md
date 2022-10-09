@@ -32,7 +32,6 @@
 
 Далее мы будем работать с данным экземпляром elasticsearch.
 
-
 - Установим Docker  
     ```
     apt-get install ca-certificates curl gnupg lsb-release
@@ -47,16 +46,14 @@
     mkdir -p ~/06-db-05/docker/elasticsearch/data
     chmod -R 777 ~/06-db-05/docker/elasticsearch
     ```
-
-- Запустим контейнер `elasticsearch` чтобы достать файл конфигурации `elasticsearch.yml`
+- Запустим контейнер `elasticsearch` чтобы достать файл конфигурации `elasticsearch.yml`  
     ```
     docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.6
     docker run -itd --name elasticsearch -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
     docker container cp elasticsearch:/usr/share/elasticsearch/config/elasticsearch.yml ~/06-db-05/docker/container-elasticsearch.yml
     docker stop elasticsearch
     ```
-
-- Отредактируем файл конфигурации Elasticsearch на локально хосте  
+- Отредактируем файл конфигурации Elasticsearch на локальном хосте  
     ```
     nano ~/06-db-05/docker/container-elasticsearch.yml
     ```
@@ -65,7 +62,6 @@
     path.data: /var/lib/elasticsearch/data
     network.host: 0.0.0.0
     ```
-
 - Создадим и отредатируем `Dokcerfile`  
     ```
     nano ~/06-db-05/docker/Dockerfile
@@ -77,17 +73,11 @@
     RUN chmod -R 777 /var/lib/elasticsearch
     RUN chown -R 1000:0 /var/lib/elasticsearch
     ```
-
-
-
-- Убедимся что текущей папке существуют два файла
+- Убедимся, что текущей папке существуют два файла  
     ```
     ls ~/06-db-05/docker
     container-elasticsearch.yml  Dockerfile  elasticsearch
     ```
-
-
-
 - Запустим сборку обаза с тегом `yuriartemiev/elasticsearch:local` в текущей директории `.`  
     ```
     docker build -t yuriartemiev/elasticsearch:local .
@@ -102,20 +92,21 @@
     Successfully built a0fdc9741473
     Successfully tagged yuriartemiev/elasticsearch:local
     ```
-- Проверим что обаз создался
+- Проверим, что обаз создался  
     ```
     docker images
     REPOSITORY                  TAG     IMAGE ID       CREATED              SIZE
     yuriartemiev/elasticsearch  local   a0fdc9741473   About a minute ago   606MB
     ```
-- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-custom`, пробросить папку `~/elasticsearch/data`, опубликовать порты `9200`, `9300`.
+- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-custom`, пробросить папку `~/elasticsearch/data`, опубликовать порты `9200` и `9300`  
     ```
     docker run -itd --name elasticsearch-custom -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch:local
     ```
-
 - Проверим выдачу с хост системы  
     ```
     curl localhost:9200/
+    ```
+    ```
     {
       "name" : "df918fe7ab4d",
       "cluster_name" : "netology_test",
@@ -134,34 +125,19 @@
       "tagline" : "You Know, for Search"
     }
     ```
-
-
-
-
-- Назначим тег образу
+- Назначим тег образу  
     ```
     docker tag a0fdc9741473 yuriartemiev/elasticsearch:netology
     ```
-- Подключаемся к Docker Hub
+- Подключаемся к Docker Hub  
     ```
     docker login -u yuriartemiev
     ```
-- Отправим образ в репозиторий
+- Отправим образ в репозиторий  
     ```
     docker push yuriartemiev/elasticsearch:netology
     ```
 https://hub.docker.com/r/yuriartemiev/elasticsearch
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -196,16 +172,12 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
 иначе возможна потеря данных индексов, вплоть до полной, при деградации системы.
 
-
-
-- Создадим индексы
+- Создадим индексы  
     ```
-    curl -X PUT localhost:9200/ind-1 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
-    curl -X PUT localhost:9200/ind-2 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
-    curl -X PUT localhost:9200/ind-3 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'
+    curl -X PUT "localhost:9200/ind-1" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    curl -X PUT "localhost:9200/ind-2" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
+    curl -X PUT "localhost:9200/ind-3" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'
     ```
-
-
 - Выведим список индексов  
     ```
     curl -X GET "localhost:9200/_cat/indices?v=true"
@@ -216,7 +188,6 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     yellow open   ind-3            Pa3_6B4vQhG4WD2KxKK0VQ   4   2          0            0       904b           904b
     yellow open   ind-2            PYwlQ6t6TaSvmCoz04FvOg   2   1          0            0       452b           452b
     ```
-
 - Выведем состояние кластера  
     ```
     curl -X GET "localhost:9200/_cluster/health?pretty"
@@ -240,20 +211,13 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
       "active_shards_percent_as_number" : 50.0
     }
     ```
-
-
-- Часть индексов и кластер находится в состоянии yellow потому что недостаточно нод для обеспечения отказоустойчивости.  
-
+- Часть индексов и кластер находится в состоянии yellow потому что недостаточно нод для обеспечения отказоустойчивости  
 - Удалим индексы  
     ```
     curl -X DELETE "localhost:9200/ind-1"
     curl -X DELETE "localhost:9200/ind-2"
     curl -X DELETE "localhost:9200/ind-3"
     ```
-
-
-
-
 
 
 ## Задача 3
@@ -286,16 +250,13 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 Подсказки:
 - возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`  
 
-
-
-- Создадим папку на локальном хосте для volume контейнера
+Порядок действий:  
+- Создадим папку на локальном хосте для volume контейнера  
     ```
     mkdir -p ~/06-db-05/docker/elasticsearch/snapshots
     chmod -R 777 ~/06-db-05/docker/elasticsearch/snapshots
     ```
-
-
-- Отредактируем файл конфигурации Elasticsearch на локально хосте  
+- Отредактируем файл конфигурации Elasticsearch на локальном хосте  
     ```
     nano ~/06-db-05/docker/container-elasticsearch.yml
     ```
@@ -305,7 +266,6 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     path.repo: /var/lib/elasticsearch/snapshots
     network.host: 0.0.0.0
     ```
-
 - Отредатируем `Dokcerfile`  
     ```
     nano ~/06-db-05/docker/Dockerfile
@@ -318,38 +278,32 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     RUN chmod -R 777 /var/lib/elasticsearch
     RUN chown -R 1000:0 /var/lib/elasticsearch
     ```
-
-
 - Запустим сборку обаза с тегом `yuriartemiev/elasticsearch-snapshots:local` в текущей директории `.`  
     ```
     docker build -t yuriartemiev/elasticsearch-snapshots:local .
     ```
-
-- Проверим что обаз создался
+- Проверим, что обаз создался  
     ```
     docker images
     REPOSITORY                            TAG     IMAGE ID       CREATED          SIZE
     yuriartemiev/elasticsearch-snapshots  local   b86cc423f181   18 seconds ago   606MB
     ```
-- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-snapshots`, пробросить папки `~/elasticsearch/data` и `~/elasticsearch/snapshots`, опубликовать порты `9200` и `9300`.
+- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-snapshots`, пробросить папки `~/elasticsearch/data` и `~/elasticsearch/snapshots`, опубликовать порты `9200` и `9300`
     ```
     docker run -itd --name elasticsearch-snapshots -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -v "${PWD}"/elasticsearch/snapshots:/var/lib/elasticsearch/snapshots -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch-snapshots:local
     ```
-
 - Создадим репозиторий `netology_backup`  
     ```
-    curl -X POST localhost:9200/_snapshot/netology_backup?pretty -H 'Content-Type: application/json' -d'{"type": "fs", "settings": { "location":"/var/lib/elasticsearch/snapshots" }}'
+    curl -X POST "localhost:9200/_snapshot/netology_backup?pretty" -H 'Content-Type: application/json' -d'{"type": "fs", "settings": { "location":"/var/lib/elasticsearch/snapshots" }}'
     ```
     ```
     {
       "acknowledged" : true
     }
     ```
-
-
-- Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
+- Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов  
     ```
-    curl -X PUT localhost:9200/test -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    curl -X PUT "localhost:9200/test" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
     ```
     ```
     curl -X GET "localhost:9200/_cat/indices?v=true"
@@ -358,9 +312,7 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
     green  open   test             pxKLY9qkTMqzsH4a4IMksA   1   0          0            0       226b           226b
     ```
-
-
-- Создайте `snapshot`состояния кластера `elasticsearch`.
+- Создайте `snapshot`состояния кластера `elasticsearch`  
     ```
     curl -X PUT "localhost:9200/_snapshot/netology_backup/snapshot_1?wait_for_completion=true&pretty"
     ```
@@ -381,9 +333,7 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
       }
     }
     ```
-
-
-- Выведем список файлов в директории со `snapshot`ами.
+- Выведем список файлов в директории со `snapshot`ами  
     ```
     docker exec elasticsearch-snapshots ls -la /var/lib/elasticsearch/snapshots
     ```
@@ -397,34 +347,24 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     -rw-rw-r-- 1 elasticsearch root 29299 Oct  9 11:34 meta-4eT3OIDbQ8O42EvPbvqe4A.dat
     -rw-rw-r-- 1 elasticsearch root   709 Oct  9 11:34 snap-4eT3OIDbQ8O42EvPbvqe4A.dat
     ```
-
-
-
-- Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов.
+- Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов  
     ```
-    curl -X DELETE 'http://localhost:9200/test?pretty'
-    curl -X PUT localhost:9200/test-2?pretty -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    curl -X DELETE "http://localhost:9200/test?pretty"
+    curl -X PUT "localhost:9200/test-2?pretty" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
     curl -X GET "localhost:9200/_cat/indices?v=true"
     ```
     ```
     health status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
     green  open   test-2  f3yBdw_IRWOCHwiMVcjVnw   1   0          0            0       226b           226b
     ```
-
-
-- Восстановите состояние кластера `elasticsearch` из `snapshot`, созданного ранее. 
+- Восстановите состояние кластера `elasticsearch` из `snapshot`, созданного ранее  
     ```
     curl -X POST "localhost:9200/_snapshot/netology_backup/snapshot_1/_restore?wait_for_completion=true&pretty" -H 'Content-Type: application/json' -d'{ "indices": "test", "ignore_unavailable": true, "include_global_state": false, "include_aliases": false }'
     ```
-
-
-
-
-
-- **Приведите в ответе** запрос к API восстановления и итоговый список индексов.
+- **Приведите в ответе** запрос к API восстановления и итоговый список индексов  
 
     ```
-    curl -X GET localhost:9200/_cat/indices?v
+    curl -X GET "localhost:9200/_cat/indices?v"
     ```
     ```
     health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
