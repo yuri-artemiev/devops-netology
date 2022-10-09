@@ -42,7 +42,7 @@
     apt-get update
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
     ```
-- Создадим папку для volume  
+- Создадим папку на локальном хосте для volume контейнера  
     ```
     mkdir -p ~/06-db-05/docker/elasticsearch/data
     chmod -R 777 ~/06-db-05/docker/elasticsearch
@@ -56,7 +56,7 @@
     docker stop elasticsearch
     ```
 
-- Отредактируем файл конфигурации на локально хосте  
+- Отредактируем файл конфигурации Elasticsearch на локально хосте  
     ```
     nano ~/06-db-05/docker/container-elasticsearch.yml
     ```
@@ -108,14 +108,14 @@
     REPOSITORY                  TAG     IMAGE ID       CREATED              SIZE
     yuriartemiev/elasticsearch  local   a0fdc9741473   About a minute ago   606MB
     ```
-- Запустим контейнер чтобы проверить, что xxx. Название контейнера: `elasticsearch`, опубликовать порты `9200`, `9300`.
+- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-custom`, пробросить папку `~/elasticsearch/data`, опубликовать порты `9200`, `9300`.
     ```
     docker run -itd --name elasticsearch-custom -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch:local
     ```
 
 - Проверим выдачу с хост системы  
     ```
-    curl 192.168.1.116:9200/
+    curl localhost:9200/
     {
       "name" : "df918fe7ab4d",
       "cluster_name" : "netology_test",
@@ -159,22 +159,7 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 
 
-docker container cp elasticsearch-custom:/etc/hostname container-hostname
 
-Likely root cause: java.nio.file.AccessDeniedException: /var/lib/elasticsearch/data/nodes
-For complete error details, refer to the log at /usr/share/elasticsearch/logs/netology_test.log
-
-`curl 'localhost:9200/_cat/health?v'`
-
-
-docker exec -it elasticsearch bash
-pwd
-    /usr/share/elasticsearch
-drwxrwxr-x 1 root root 4096 Oct  8 12:02 /usr/share/elasticsearch/
--rw-rw-r-- 1 root root 53 Aug 23 15:07 /usr/share/elasticsearch/config/elasticsearch.yml
-drwxrwxr-x 1 elasticsearch root 4096 Oct  8 12:02 /usr/share/elasticsearch/data/
-Ctrl+D
-curl 192.168.1.116:9200/_cat/health
 
 
 
@@ -210,6 +195,61 @@ curl 192.168.1.116:9200/_cat/health
 
 При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
 иначе возможна потеря данных индексов, вплоть до полной, при деградации системы.
+
+
+
+- Создадим индексы
+    ```
+    curl -X PUT localhost:9200/ind-1 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    curl -X PUT localhost:9200/ind-2 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
+    curl -X PUT localhost:9200/ind-3 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'
+    ```
+
+
+- Выведим список индексов  
+    ```
+    curl -X GET "localhost:9200/_cat/indices?v=true"
+    ```
+    ```
+    health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+    green  open   ind-1            o80ic77lT-aRy-v_IM5pOg   1   0          0            0       226b           226b
+    yellow open   ind-3            Pa3_6B4vQhG4WD2KxKK0VQ   4   2          0            0       904b           904b
+    yellow open   ind-2            PYwlQ6t6TaSvmCoz04FvOg   2   1          0            0       452b           452b
+    ```
+
+- Выведем состояние кластера  
+    ```
+    curl -X GET "localhost:9200/_cluster/health?pretty"
+    ```
+    ```
+    {
+      "cluster_name" : "netology_test",
+      "status" : "yellow",
+      "timed_out" : false,
+      "number_of_nodes" : 1,
+      "number_of_data_nodes" : 1,
+      "active_primary_shards" : 10,
+      "active_shards" : 10,
+      "relocating_shards" : 0,
+      "initializing_shards" : 0,
+      "unassigned_shards" : 10,
+      "delayed_unassigned_shards" : 0,
+      "number_of_pending_tasks" : 0,
+      "number_of_in_flight_fetch" : 0,
+      "task_max_waiting_in_queue_millis" : 0,
+      "active_shards_percent_as_number" : 50.0
+    }
+    ```
+
+
+- Часть индексов и кластер находится в состоянии yellow потому что недостаточно нод для обеспечения отказоустойчивости.  
+
+- Удалим индексы  
+    ```
+    curl -X DELETE "localhost:9200/ind-1"
+    curl -X DELETE "localhost:9200/ind-2"
+    curl -X DELETE "localhost:9200/ind-3"
+    ```
 
 
 
