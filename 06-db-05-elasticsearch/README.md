@@ -51,7 +51,7 @@
 - Запустим контейнер `elasticsearch` чтобы достать файл конфигурации `elasticsearch.yml`
     ```
     docker pull docker.elastic.co/elasticsearch/elasticsearch:7.17.6
-    docker run -itd --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    docker run -itd --name elasticsearch -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.17.6
     docker container cp elasticsearch:/usr/share/elasticsearch/config/elasticsearch.yml ~/06-db-05/docker/container-elasticsearch.yml
     docker stop elasticsearch
     ```
@@ -269,14 +269,6 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 **Приведите в ответе** запрос API и результат вызова API для создания репозитория.
 
-
-- Создадим папку 
-    ```
-    mkdir -p ~/06-db-05/docker/elasticsearch/snapshots
-    chmod -R 777 ~/06-db-05/docker/elasticsearch
-    ```
-
-
 Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
 
 [Создайте `snapshot`](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-take-snapshot.html) 
@@ -293,5 +285,43 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 Подсказки:
 - возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`  
+
+
+
+- Создадим папку на локальном хосте для volume контейнера
+    ```
+    mkdir -p ~/06-db-05/docker/elasticsearch/snapshots
+    chmod -R 777 ~/06-db-05/docker/elasticsearch/snapshots
+    ```
+
+
+- Отредактируем файл конфигурации Elasticsearch на локально хосте  
+    ```
+    nano ~/06-db-05/docker/container-elasticsearch.yml
+    ```
+    ```
+    cluster.name: "netology_test"
+    path.data: /var/lib/elasticsearch/data
+    path.repo: /var/lib/elasticsearch/snapshots
+    network.host: 0.0.0.0
+    ```
+
+- Отредатируем `Dokcerfile`  
+    ```
+    nano ~/06-db-05/docker/Dockerfile
+    ```
+    ```
+    FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    COPY --chown=elasticsearch:elasticsearch ./container-elasticsearch.yml /usr/share/elasticsearch/config/elasticsearch.yml
+    RUN mkdir -p /var/lib/elasticsearch/data
+    RUN mkdir -p /var/lib/elasticsearch/snapshots
+    RUN chmod -R 777 /var/lib/elasticsearch
+    RUN chown -R 1000:0 /var/lib/elasticsearch
+    ```
+
+
+
+
+
 
 
