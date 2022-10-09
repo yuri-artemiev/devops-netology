@@ -320,6 +320,89 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
     ```
 
 
+- Запустим сборку обаза с тегом `yuriartemiev/elasticsearch-snapshots:local` в текущей директории `.`  
+    ```
+    docker build -t yuriartemiev/elasticsearch-snapshots:local .
+    ```
+
+- Проверим что обаз создался
+    ```
+    docker images
+    REPOSITORY                            TAG     IMAGE ID       CREATED          SIZE
+    yuriartemiev/elasticsearch-snapshots  local   b86cc423f181   18 seconds ago   606MB
+    ```
+- Запустим контейнер чтобы запросить состояние кластера. Название контейнера: `elasticsearch-snapshots`, пробросить папки `~/elasticsearch/data` и `~/elasticsearch/snapshots`, опубликовать порты `9200` и `9300`.
+    ```
+    docker run -itd --name elasticsearch-snapshots -v "${PWD}"/elasticsearch/data:/var/lib/elasticsearch/data -v "${PWD}"/elasticsearch/snapshots:/var/lib/elasticsearch/snapshots -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" yuriartemiev/elasticsearch-snapshots:local
+    ```
+
+- Создадим репозиторий `netology_backup`  
+    ```
+    curl -X POST localhost:9200/_snapshot/netology_backup?pretty -H 'Content-Type: application/json' -d'{"type": "fs", "settings": { "location":"/var/lib/elasticsearch/snapshots" }}'
+    ```
+    ```
+    {
+      "acknowledged" : true
+    }
+    ```
+
+
+- Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
+    ```
+    curl -X PUT localhost:9200/test -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    ```
+    ```
+    curl -X GET "localhost:9200/_cat/indices?v=true"
+    ```
+    ```
+    health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+    green  open   test             pxKLY9qkTMqzsH4a4IMksA   1   0          0            0       226b           226b
+    ```
+
+
+- Создайте `snapshot`состояния кластера `elasticsearch`.
+    ```
+    curl -X PUT "localhost:9200/_snapshot/netology_backup/snapshot_1?wait_for_completion=true&pretty"
+    ```
+    ```
+    {
+      "snapshot" : {
+        "snapshot" : "snapshot_1",
+        ...
+        "repository" : "netology_backup",
+        ...
+        "indices" : [
+          ...
+          "test"
+        ],
+        ...
+        "state" : "SUCCESS",
+        ...
+      }
+    }
+    ```
+
+
+- Выведем список файлов в директории со `snapshot`ами.
+    ```
+    docker exec elasticsearch-snapshots ls -la /var/lib/elasticsearch/snapshots
+    ```
+    ```
+    total 56
+    drwxrwxrwx 3 root          root  4096 Oct  9 11:34 .
+    drwxrwxrwx 1 elasticsearch root  4096 Oct  9 11:08 ..
+    -rw-rw-r-- 1 elasticsearch root  1422 Oct  9 11:34 index-0
+    -rw-rw-r-- 1 elasticsearch root     8 Oct  9 11:34 index.latest
+    drwxrwxr-x 6 elasticsearch root  4096 Oct  9 11:34 indices
+    -rw-rw-r-- 1 elasticsearch root 29299 Oct  9 11:34 meta-4eT3OIDbQ8O42EvPbvqe4A.dat
+    -rw-rw-r-- 1 elasticsearch root   709 Oct  9 11:34 snap-4eT3OIDbQ8O42EvPbvqe4A.dat
+    ```
+
+
+
+
+
+
 
 
 
