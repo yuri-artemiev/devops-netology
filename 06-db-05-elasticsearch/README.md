@@ -400,7 +400,37 @@ https://hub.docker.com/r/yuriartemiev/elasticsearch
 
 
 
+- Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов.
+    ```
+    curl -X DELETE 'http://localhost:9200/test?pretty'
+    curl -X PUT localhost:9200/test-2?pretty -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+    curl -X GET "localhost:9200/_cat/indices?v=true"
+    ```
+    ```
+    health status index   uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+    green  open   test-2  f3yBdw_IRWOCHwiMVcjVnw   1   0          0            0       226b           226b
+    ```
 
+
+- Восстановите состояние кластера `elasticsearch` из `snapshot`, созданного ранее. 
+    ```
+    curl -X POST "localhost:9200/_snapshot/netology_backup/snapshot_1/_restore?wait_for_completion=true&pretty" -H 'Content-Type: application/json' -d'{ "indices": "test", "ignore_unavailable": true, "include_global_state": false, "include_aliases": false }'
+    ```
+
+
+
+
+
+- **Приведите в ответе** запрос к API восстановления и итоговый список индексов.
+
+    ```
+    curl -X GET localhost:9200/_cat/indices?v
+    ```
+    ```
+    health status index            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+    green  open   test-2           f3yBdw_IRWOCHwiMVcjVnw   1   0          0            0       226b           226b
+    green  open   test             eofXEarNThuoTWX_x5Cj6w   1   0          0            0       226b           226b
+    ```
 
 
 
