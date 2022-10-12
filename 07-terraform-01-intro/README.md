@@ -77,3 +77,25 @@
 
 В виде результата этой задачи приложите вывод `--version` двух версий терраформа доступных на вашем компьютере 
 или виртуальной машине.
+
+- Скачаем предыдущую версию
+    ```
+    mkdir -p /usr/local/terraform/0.12
+    cd /usr/local/terraform/0.12
+    wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
+    unzip terraform_0.12.31_linux_amd64.zip
+    rm terraform_0.12.31_linux_amd64.zip
+    ln -s /usr/local/terraform/0.12/terraform /usr/bin/terraform_v012
+    chmod +x /usr/bin/terraform_v012
+    terraform_v012 --version
+    ```
+    ```
+    Terraform v0.12.31
+    ```
+- Посмотрим версию из пакетного менеджера
+    ```
+    terraform --version
+    ```
+    ```
+    Terraform v1.3.2
+    ```
