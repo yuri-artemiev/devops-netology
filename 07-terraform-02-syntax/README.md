@@ -41,6 +41,86 @@
             ```
 
 
+- Получите IAM-токен:
+    ```
+    yc iam create-token
+    ```
+- Сохраним токен в переменную окружения
+    ```
+    export YC_TOKEN=$(yc iam create-token)
+    ```
+
+- Настроем провайдер
+    ```
+    nano ~/.terraformrc
+    ```
+    ```
+    provider_installation {
+      network_mirror {
+        url = "https://terraform-mirror.yandexcloud.net/"
+        include = ["registry.terraform.io/*/*"]
+      }
+      direct {
+        exclude = ["registry.terraform.io/*/*"]
+      }
+    }
+  ```
+
+- Сгенерируем SSH ключи на локальной машине
+    ```
+    ssh-keygen
+    ```
+    Публичная часть ключа будет сохранена в файле <имя_ключа>.pub. Вставьте эту часть ключа в поле SSH-ключ при создании новой виртуальной машины через консоль управления.
+
+- Создадим конфигурацию
+    ```
+    mkdir -p ~/cloud-terraform
+    nano ~/cloud-terraform/main.tf
+    ```
+    ```
+    terraform {
+      required_providers {
+        yandex = {
+          source = "yandex-cloud/yandex"
+        }
+      }
+      required_version = ">= 0.13"
+    }
+
+    provider "yandex" {
+      zone = "<зона доступности по умолчанию>"
+    }
+    ```
+    В конфигурации виртуальной машины вам потребуется указать идентификатор образа загрузочного диска. Список доступных публичных образов можно получить командой CLI yc compute image list --folder-id standard-images.  
+Для доступа к ВМ через SSH сгенерируйте пару SSH-ключей и передайте публичную часть ключа на виртуальную машину в параметре ssh-keys блока metadata.
+
+- Инициализируем провайдера
+    ```
+    terraform init
+    ```
+
+- Проверьте конфигурацию командой:
+    ```
+    terraform validate
+    ```
+
+- Подготовим план
+    ```
+    terraform plan
+    ```
+
+- Создадим ресурсы
+    ```
+    terraform apply
+    ```
+    
+    
+- Удалим ресурсы
+    ```
+    terraform destroy
+    ```
+
+
 
 ## Задача 2. Создание aws ec2 или yandex_compute_instance через терраформ. 
 
@@ -73,3 +153,14 @@
 В качестве результата задания предоставьте:
 1. Ответ на вопрос: при помощи какого инструмента (из разобранных на прошлом занятии) можно создать свой образ ami?
 1. Ссылку на репозиторий с исходной конфигурацией терраформа.  
+
+
+
+
+
+- Чтобы удалить ресурсы, созданные с помощью Terraform:
+    ```
+    terraform destroy
+    ```
+
+
