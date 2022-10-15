@@ -45,9 +45,12 @@
     ```
     yc iam create-token
     ```
-- Сохраним токен в переменную окружения
+- Сохраним токен и параметры в переменную окружения
     ```
     export YC_TOKEN=$(yc iam create-token)
+    export YC_CLOUD_ID=$(yc config get cloud-id)
+    export YC_FOLDER_ID=$(yc config get folder-id)
+    export YC_ZONE=$(yc config get compute-default-zone)
     ```
 
 - Настроем провайдер
@@ -70,12 +73,12 @@
     ```
     ssh-keygen
     ```
-    Публичная часть ключа будет сохранена в файле <имя_ключа>.pub. Вставьте эту часть ключа в поле SSH-ключ при создании новой виртуальной машины через консоль управления.
+    Публичная часть ключа будет сохранена в файле id_rsa.pub. Вставьте эту часть ключа в поле SSH-ключ при создании новой виртуальной машины через консоль управления.
 
 - Создадим конфигурацию
     ```
-    mkdir -p ~/cloud-terraform
-    nano ~/cloud-terraform/main.tf
+    mkdir -p ~/terraform
+    nano ~/terraform/main.tf
     ```
     ```
     terraform {
@@ -88,7 +91,7 @@
     }
 
     provider "yandex" {
-      zone = "<зона доступности по умолчанию>"
+      zone = "ru-central1-a"
     }
     ```
     В конфигурации виртуальной машины вам потребуется указать идентификатор образа загрузочного диска. Список доступных публичных образов можно получить командой CLI yc compute image list --folder-id standard-images.  
@@ -98,6 +101,14 @@
     ```
     terraform init
     ```
+
+- Создадим файл конфигурации
+```
+
+
+
+```
+
 
 - Проверьте конфигурацию командой:
     ```
