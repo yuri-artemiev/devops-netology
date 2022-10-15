@@ -16,7 +16,7 @@
 
 Порядок действий:  
 
-- Регистрация на Яндекс Облаке по адресу console.cloud.yandex.ru  
+- Регистрация на Яндекс Облаке по адресу `console.cloud.yandex.ru`  
 - Создаём платёжный аккаунт с промо-кодом  
 - Скачаем и установим утилиту `yc`  
     - `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
@@ -123,7 +123,7 @@
 
 В качестве результата задания предоставьте:
 1. Ответ на вопрос: при помощи какого инструмента (из разобранных на прошлом занятии) можно создать свой образ ami?
-    - Можнос собрать образ с помощью packer
+    - Можно собрать образ с помощью `packer`  
 2. Ссылку на репозиторий с исходной конфигурацией терраформа.  
     - https://github.com/yuri-artemiev/devops-netology/tree/main/07-terraform-02-syntax
 
@@ -183,7 +183,6 @@
       network_id     = yandex_vpc_network.network-1.id
       v4_cidr_blocks = ["192.168.10.0/24"]
     }
-
 
     output "internal_ip_address_vm_1" {
       value = yandex_compute_instance.vm-1.network_interface.0.ip_address
