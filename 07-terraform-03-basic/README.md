@@ -11,6 +11,84 @@
 1. Зарегистрируйте бэкэнд в терраформ проекте как описано по ссылке выше. 
 
 
+Последовательность шагов:
+- Регистрация на Яндекс Облаке по адресу `console.cloud.yandex.ru`  
+- Создаём платёжный аккаунт с промо-кодом  
+- Скачаем и установим утилиту `yc`  
+    - `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
+- Запустим утилиту `yc`:    
+    - `yc init`  
+    - Получим OAuth токен по адресу в браузере `https://oauth.yandex.ru/authorize?response_type=token&client_id=1a6990aa636648e9b2ef855fa7bec2fb`  
+    - В утилите `yc`    
+        - Вставим токен  
+        - Выберем папку в Яндекс Облаке  
+        - Выберем создание Compute по-умолчанию  
+        - Выберем зону в Яндекс Облаке  
+    - Проверим созданные настройки Яндекс Облака    
+        - `yc config list`
+            ```
+            token: y0_A...
+            cloud-id: b1gjd8gta6ntpckrp97r
+            folder-id: b1gcthk9ak11bmpnbo7d
+            compute-default-zone: ru-central1-a
+            ```
+- Получим IAM-токен  
+    ```
+    yc iam create-token
+    ```
+- Сохраним токен и параметры в переменную окружения  
+    ```
+    export YC_TOKEN=$(yc iam create-token)
+    export YC_CLOUD_ID=$(yc config get cloud-id)
+    export YC_FOLDER_ID=$(yc config get folder-id)
+    export YC_ZONE=$(yc config get compute-default-zone)
+    ```
+- Настроем провайдер terraform  
+    ```
+    nano ~/.terraformrc
+    ```
+    ```
+    provider_installation {
+      network_mirror {
+        url = "https://terraform-mirror.yandexcloud.net/"
+        include = ["registry.terraform.io/*/*"]
+      }
+      direct {
+        exclude = ["registry.terraform.io/*/*"]
+      }
+    }
+    ```
+- Сгенерируем SSH ключи на локальной машине  
+    ```
+    ssh-keygen
+    ```
+- Создадим конфигурацию terraform  
+    ```
+    mkdir -p ~/07-03
+    nano ~/07-03/main.tf
+    ```
+    ```
+    terraform {
+      required_providers {
+        yandex = {
+          source = "yandex-cloud/yandex"
+        }
+      }
+      required_version = ">= 0.13"
+    }
+
+    provider "yandex" {
+      zone = "ru-central1-a"
+    }
+    ```
+- Инициализируем провайдер  
+    ```
+    terraform init
+    ```
+
+
+
+
 ## Задача 2. Инициализируем проект и создаем воркспейсы. 
 
 1. Выполните `terraform init`:
