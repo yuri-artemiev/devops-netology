@@ -204,7 +204,7 @@ dynamodb.
         region     = "ru-central1"
         key        = "terraform.tfstate"
         access_key = "YCAJEMPlx5hXK5stLB3dXt_Nd"
-        secret_key = "YCMKnkcqEgSdsnwkWX4kJiwqCxk5ElRnMA4RxMiW"
+        secret_key = "YCMK..."
 
         skip_region_validation      = true
         skip_credentials_validation = true
