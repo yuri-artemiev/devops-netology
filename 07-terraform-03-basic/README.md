@@ -179,7 +179,7 @@ dynamodb.
 * Вывод команды `terraform workspace list`.
 * Вывод команды `terraform plan` для воркспейса `prod`.  
 
-
+Порядок действий:
 - Выведем список рабочих зон  
     ```
     terraform workspace list
@@ -189,12 +189,135 @@ dynamodb.
     * prod
       stage
     ```
-
 - Создадим конфигурацию terraform main.tf  
-```
+    ```
+    terraform {
+      required_providers {
+        yandex = {
+          source = "yandex-cloud/yandex"
+        }
+      }
+      required_version = ">= 0.13"
+      backend "s3" {
+        endpoint   = "storage.yandexcloud.net"
+        bucket     = "s3-terraform"
+        region     = "ru-central1"
+        key        = "terraform.tfstate"
+        access_key = "YCAJEMPlx5hXK5stLB3dXt_Nd"
+        secret_key = "YCMKnkcqEgSdsnwkWX4kJiwqCxk5ElRnMA4RxMiW"
 
-```
+        skip_region_validation      = true
+        skip_credentials_validation = true
+      }
+    }
 
+    provider "yandex" {
+      zone = "ru-central1-a"
+    }
+
+
+    resource "yandex_compute_instance" "vm-1-count" {
+      name = "${terraform.workspace}-count-${count.index}"
+      count = local.vm-1-count-dic[terraform.workspace]
+
+      resources {
+        cores  = 2
+        memory = 2
+      }
+
+      boot_disk {
+        initialize_params {
+          image_id = "fd8kdq6d0p8sij7h5qe3"
+        }
+      }
+
+      network_interface {
+        subnet_id = yandex_vpc_subnet.subnet-1.id
+        nat       = true
+      }
+
+      metadata = {
+        ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+      }
+
+      lifecycle {
+        create_before_destroy = true
+      }
+    }
+
+
+    resource "yandex_compute_instance" "vm-2-foreach" {
+      name = "${terraform.workspace}-foreach-${each.key}"
+      for_each = local.vm-2-foreach-dic[terraform.workspace]
+
+      resources {
+        cores  = 2
+        memory = 2
+      }
+
+      boot_disk {
+        initialize_params {
+          image_id = "fd8kdq6d0p8sij7h5qe3"
+        }
+      }
+
+      network_interface {
+        subnet_id = yandex_vpc_subnet.subnet-1.id
+        nat       = true
+      }
+
+      metadata = {
+        ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+      }
+
+      lifecycle {
+        create_before_destroy = true
+      }
+    }
+
+
+    locals {
+      vm-1-count-dic = {
+        stage = 1
+        prod = 2
+      }
+
+      vm-2-foreach-dic = {
+        stage = toset(["1"])
+        prod = toset(["1", "2"])
+      }
+
+    }
+
+
+    resource "yandex_vpc_network" "network-1" {
+      name = "network1"
+    }
+
+    resource "yandex_vpc_subnet" "subnet-1" {
+      name           = "subnet1"
+      zone           = "ru-central1-a"
+      network_id     = yandex_vpc_network.network-1.id
+      v4_cidr_blocks = ["192.168.10.0/24"]
+    }
+
+
+    output "internal_ip_address_vm_1_count" {
+      value = yandex_compute_instance.vm-1-count[*].network_interface.0.ip_address
+    }
+
+    output "external_ip_address_vm_1_count" {
+      value = yandex_compute_instance.vm-1-count[*].network_interface.0.nat_ip_address
+    }
+
+    output "internal_ip_address_vm_2_foreach" {
+      value = values(yandex_compute_instance.vm-2-foreach)[*].network_interface.0.ip_address
+    }
+
+    output "external_ip_address_vm_2_foreach" {
+      value = values(yandex_compute_instance.vm-2-foreach)[*].network_interface.0.nat_ip_address
+    }
+    ```
 - Проверим конфигурацию terraform  
     ```
     terraform validate
@@ -503,12 +626,18 @@ dynamodb.
           + (known after apply),
           + (known after apply),
         ]
-      + external_ip_address_vm_2_foreach = (known after apply)
+      + external_ip_address_vm_2_foreach = [
+          + (known after apply),
+          + (known after apply),
+        ]
       + internal_ip_address_vm_1_count   = [
           + (known after apply),
           + (known after apply),
         ]
-      + internal_ip_address_vm_2_foreach = (known after apply)
+      + internal_ip_address_vm_2_foreach = [
+          + (known after apply),
+          + (known after apply),
+        ]
     ```
 - Создадим ресурсы в Яндекс Облаке  
     ```
@@ -519,7 +648,14 @@ dynamodb.
     yc compute instance list
     ```
     ```
-
+    +----------------------+----------------+---------------+---------+---------------+---------------+
+    |          ID          |      NAME      |    ZONE ID    | STATUS  |  EXTERNAL IP  |  INTERNAL IP  |
+    +----------------------+----------------+---------------+---------+---------------+---------------+
+    | fhm6cbb3k8i0epjn0img | prod-foreach-1 | ru-central1-a | RUNNING | 62.84.126.129 | 192.168.10.27 |
+    | fhm75qvcbs20cegvbeip | prod-count-0   | ru-central1-a | RUNNING | 62.84.117.210 | 192.168.10.3  |
+    | fhmo8qmmtmvn8aetcm6i | prod-foreach-2 | ru-central1-a | RUNNING | 51.250.73.57  | 192.168.10.34 |
+    | fhmtk91sv5jj6vh28mhk | prod-count-1   | ru-central1-a | RUNNING | 62.84.125.46  | 192.168.10.21 |
+    +----------------------+----------------+---------------+---------+---------------+---------------+
     ```
 - Удалим ресурсы в Яндекс Облаке  
     ```
