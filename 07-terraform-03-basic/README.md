@@ -85,6 +85,31 @@
     ```
     terraform init
     ```
+- Создадим сервисный аккаунт  
+    ```
+    yc iam service-account create --name terraform
+    ```
+- Назначим роль editor соданному сервисному аккаунту  
+    ```
+    yc resource-manager folder add-access-binding yuri-artemiev --role editor --subject serviceAccount:ajeul9o1i22i724de0j4
+    ```
+- Получим статический ключ доступа. 
+    ```
+    yc iam access-key create --service-account-name terraform
+    ```
+    ```
+    access_key:
+      id: ajel36i7s2obe04e71ig
+      service_account_id: ajeul9o1i22i724de0j4
+      created_at: "2022-10-16T12:04:26.562235525Z"
+      key_id: YCAJEMPlx5hXK5stLB3dXt_Nd
+    secret: YCMK...
+    ```
+- Создадим хранилище в Яндекс Облаке
+
+
+
+
 
 
 
