@@ -204,7 +204,311 @@ dynamodb.
     terraform plan
     ```
     ```
-    xxx
+    Terraform will perform the following actions:
+
+      # yandex_compute_instance.vm-1-count[0] will be created
+      + resource "yandex_compute_instance" "vm-1-count" {
+          + created_at                = (known after apply)
+          + folder_id                 = (known after apply)
+          + fqdn                      = (known after apply)
+          + hostname                  = (known after apply)
+          + id                        = (known after apply)
+          + metadata                  = {
+              + "ssh-keys" = <<-EOT
+                    ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkU4/aw3VSeK0jZMSb1Zu9kYdiVgv14s7UXji/iXvPREPWX+yx4iCtUg0eQqoZU3kxCNdUknYce7mqp0V01OoArlQo7UCUXi+XtyGoHLMO+j1uxdz6vjHWS5CPD9ghvPWcQbC6HkGzowkpwmXVJdxnmBkz8pBgkVklbx9OqYlv9VXqKLjaFejuQfd96cZNZbmseL6DNfmybPytuzAz2YyXeWiKHpALD0NIbZ+4AMAxF5Fcawp9+twaioYuD0Bzo6ktvjF3kjY71hlOStutAAhWKoVBEdW099SySVbqX4GqA5HEHVXYv5sXPvV9l6+4eU6KjAVqnkV39UM6f3BpQbG9Yqc6qP+ORnVCWtOz1oF6Y53bYwmmmfDQ9ix5sItqMMkQpCfV7jwyVc6X47tYsCb6mp8Rb3z6bAKDUNYySMXegiuaFetGbv8WY0PVxngjXLDr2/dEORUfbHruTTQ5/msWdLWY/sSwb+5RVLSnMsiLXG51TF1bgHvz6aMk/mCW2BE= root@07-terraform
+                EOT
+            }
+          + name                      = "prod-count-0"
+          + network_acceleration_type = "standard"
+          + platform_id               = "standard-v1"
+          + service_account_id        = (known after apply)
+          + status                    = (known after apply)
+          + zone                      = (known after apply)
+
+          + boot_disk {
+              + auto_delete = true
+              + device_name = (known after apply)
+              + disk_id     = (known after apply)
+              + mode        = (known after apply)
+
+              + initialize_params {
+                  + block_size  = (known after apply)
+                  + description = (known after apply)
+                  + image_id    = "fd8kdq6d0p8sij7h5qe3"
+                  + name        = (known after apply)
+                  + size        = (known after apply)
+                  + snapshot_id = (known after apply)
+                  + type        = "network-hdd"
+                }
+            }
+
+          + network_interface {
+              + index              = (known after apply)
+              + ip_address         = (known after apply)
+              + ipv4               = true
+              + ipv6               = (known after apply)
+              + ipv6_address       = (known after apply)
+              + mac_address        = (known after apply)
+              + nat                = true
+              + nat_ip_address     = (known after apply)
+              + nat_ip_version     = (known after apply)
+              + security_group_ids = (known after apply)
+              + subnet_id          = (known after apply)
+            }
+
+          + placement_policy {
+              + host_affinity_rules = (known after apply)
+              + placement_group_id  = (known after apply)
+            }
+
+          + resources {
+              + core_fraction = 100
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = (known after apply)
+            }
+        }
+
+      # yandex_compute_instance.vm-1-count[1] will be created
+      + resource "yandex_compute_instance" "vm-1-count" {
+          + created_at                = (known after apply)
+          + folder_id                 = (known after apply)
+          + fqdn                      = (known after apply)
+          + hostname                  = (known after apply)
+          + id                        = (known after apply)
+          + metadata                  = {
+              + "ssh-keys" = <<-EOT
+                    ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkU4/aw3VSeK0jZMSb1Zu9kYdiVgv14s7UXji/iXvPREPWX+yx4iCtUg0eQqoZU3kxCNdUknYce7mqp0V01OoArlQo7UCUXi+XtyGoHLMO+j1uxdz6vjHWS5CPD9ghvPWcQbC6HkGzowkpwmXVJdxnmBkz8pBgkVklbx9OqYlv9VXqKLjaFejuQfd96cZNZbmseL6DNfmybPytuzAz2YyXeWiKHpALD0NIbZ+4AMAxF5Fcawp9+twaioYuD0Bzo6ktvjF3kjY71hlOStutAAhWKoVBEdW099SySVbqX4GqA5HEHVXYv5sXPvV9l6+4eU6KjAVqnkV39UM6f3BpQbG9Yqc6qP+ORnVCWtOz1oF6Y53bYwmmmfDQ9ix5sItqMMkQpCfV7jwyVc6X47tYsCb6mp8Rb3z6bAKDUNYySMXegiuaFetGbv8WY0PVxngjXLDr2/dEORUfbHruTTQ5/msWdLWY/sSwb+5RVLSnMsiLXG51TF1bgHvz6aMk/mCW2BE= root@07-terraform
+                EOT
+            }
+          + name                      = "prod-count-1"
+          + network_acceleration_type = "standard"
+          + platform_id               = "standard-v1"
+          + service_account_id        = (known after apply)
+          + status                    = (known after apply)
+          + zone                      = (known after apply)
+
+          + boot_disk {
+              + auto_delete = true
+              + device_name = (known after apply)
+              + disk_id     = (known after apply)
+              + mode        = (known after apply)
+
+              + initialize_params {
+                  + block_size  = (known after apply)
+                  + description = (known after apply)
+                  + image_id    = "fd8kdq6d0p8sij7h5qe3"
+                  + name        = (known after apply)
+                  + size        = (known after apply)
+                  + snapshot_id = (known after apply)
+                  + type        = "network-hdd"
+                }
+            }
+
+          + network_interface {
+              + index              = (known after apply)
+              + ip_address         = (known after apply)
+              + ipv4               = true
+              + ipv6               = (known after apply)
+              + ipv6_address       = (known after apply)
+              + mac_address        = (known after apply)
+              + nat                = true
+              + nat_ip_address     = (known after apply)
+              + nat_ip_version     = (known after apply)
+              + security_group_ids = (known after apply)
+              + subnet_id          = (known after apply)
+            }
+
+          + placement_policy {
+              + host_affinity_rules = (known after apply)
+              + placement_group_id  = (known after apply)
+            }
+
+          + resources {
+              + core_fraction = 100
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = (known after apply)
+            }
+        }
+
+      # yandex_compute_instance.vm-2-foreach["1"] will be created
+      + resource "yandex_compute_instance" "vm-2-foreach" {
+          + created_at                = (known after apply)
+          + folder_id                 = (known after apply)
+          + fqdn                      = (known after apply)
+          + hostname                  = (known after apply)
+          + id                        = (known after apply)
+          + metadata                  = {
+              + "ssh-keys" = <<-EOT
+                    ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkU4/aw3VSeK0jZMSb1Zu9kYdiVgv14s7UXji/iXvPREPWX+yx4iCtUg0eQqoZU3kxCNdUknYce7mqp0V01OoArlQo7UCUXi+XtyGoHLMO+j1uxdz6vjHWS5CPD9ghvPWcQbC6HkGzowkpwmXVJdxnmBkz8pBgkVklbx9OqYlv9VXqKLjaFejuQfd96cZNZbmseL6DNfmybPytuzAz2YyXeWiKHpALD0NIbZ+4AMAxF5Fcawp9+twaioYuD0Bzo6ktvjF3kjY71hlOStutAAhWKoVBEdW099SySVbqX4GqA5HEHVXYv5sXPvV9l6+4eU6KjAVqnkV39UM6f3BpQbG9Yqc6qP+ORnVCWtOz1oF6Y53bYwmmmfDQ9ix5sItqMMkQpCfV7jwyVc6X47tYsCb6mp8Rb3z6bAKDUNYySMXegiuaFetGbv8WY0PVxngjXLDr2/dEORUfbHruTTQ5/msWdLWY/sSwb+5RVLSnMsiLXG51TF1bgHvz6aMk/mCW2BE= root@07-terraform
+                EOT
+            }
+          + name                      = "prod-foreach-1"
+          + network_acceleration_type = "standard"
+          + platform_id               = "standard-v1"
+          + service_account_id        = (known after apply)
+          + status                    = (known after apply)
+          + zone                      = (known after apply)
+
+          + boot_disk {
+              + auto_delete = true
+              + device_name = (known after apply)
+              + disk_id     = (known after apply)
+              + mode        = (known after apply)
+
+              + initialize_params {
+                  + block_size  = (known after apply)
+                  + description = (known after apply)
+                  + image_id    = "fd8kdq6d0p8sij7h5qe3"
+                  + name        = (known after apply)
+                  + size        = (known after apply)
+                  + snapshot_id = (known after apply)
+                  + type        = "network-hdd"
+                }
+            }
+
+          + network_interface {
+              + index              = (known after apply)
+              + ip_address         = (known after apply)
+              + ipv4               = true
+              + ipv6               = (known after apply)
+              + ipv6_address       = (known after apply)
+              + mac_address        = (known after apply)
+              + nat                = true
+              + nat_ip_address     = (known after apply)
+              + nat_ip_version     = (known after apply)
+              + security_group_ids = (known after apply)
+              + subnet_id          = (known after apply)
+            }
+
+          + placement_policy {
+              + host_affinity_rules = (known after apply)
+              + placement_group_id  = (known after apply)
+            }
+
+          + resources {
+              + core_fraction = 100
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = (known after apply)
+            }
+        }
+
+      # yandex_compute_instance.vm-2-foreach["2"] will be created
+      + resource "yandex_compute_instance" "vm-2-foreach" {
+          + created_at                = (known after apply)
+          + folder_id                 = (known after apply)
+          + fqdn                      = (known after apply)
+          + hostname                  = (known after apply)
+          + id                        = (known after apply)
+          + metadata                  = {
+              + "ssh-keys" = <<-EOT
+                    ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDkU4/aw3VSeK0jZMSb1Zu9kYdiVgv14s7UXji/iXvPREPWX+yx4iCtUg0eQqoZU3kxCNdUknYce7mqp0V01OoArlQo7UCUXi+XtyGoHLMO+j1uxdz6vjHWS5CPD9ghvPWcQbC6HkGzowkpwmXVJdxnmBkz8pBgkVklbx9OqYlv9VXqKLjaFejuQfd96cZNZbmseL6DNfmybPytuzAz2YyXeWiKHpALD0NIbZ+4AMAxF5Fcawp9+twaioYuD0Bzo6ktvjF3kjY71hlOStutAAhWKoVBEdW099SySVbqX4GqA5HEHVXYv5sXPvV9l6+4eU6KjAVqnkV39UM6f3BpQbG9Yqc6qP+ORnVCWtOz1oF6Y53bYwmmmfDQ9ix5sItqMMkQpCfV7jwyVc6X47tYsCb6mp8Rb3z6bAKDUNYySMXegiuaFetGbv8WY0PVxngjXLDr2/dEORUfbHruTTQ5/msWdLWY/sSwb+5RVLSnMsiLXG51TF1bgHvz6aMk/mCW2BE= root@07-terraform
+                EOT
+            }
+          + name                      = "prod-foreach-2"
+          + network_acceleration_type = "standard"
+          + platform_id               = "standard-v1"
+          + service_account_id        = (known after apply)
+          + status                    = (known after apply)
+          + zone                      = (known after apply)
+
+          + boot_disk {
+              + auto_delete = true
+              + device_name = (known after apply)
+              + disk_id     = (known after apply)
+              + mode        = (known after apply)
+
+              + initialize_params {
+                  + block_size  = (known after apply)
+                  + description = (known after apply)
+                  + image_id    = "fd8kdq6d0p8sij7h5qe3"
+                  + name        = (known after apply)
+                  + size        = (known after apply)
+                  + snapshot_id = (known after apply)
+                  + type        = "network-hdd"
+                }
+            }
+
+          + network_interface {
+              + index              = (known after apply)
+              + ip_address         = (known after apply)
+              + ipv4               = true
+              + ipv6               = (known after apply)
+              + ipv6_address       = (known after apply)
+              + mac_address        = (known after apply)
+              + nat                = true
+              + nat_ip_address     = (known after apply)
+              + nat_ip_version     = (known after apply)
+              + security_group_ids = (known after apply)
+              + subnet_id          = (known after apply)
+            }
+
+          + placement_policy {
+              + host_affinity_rules = (known after apply)
+              + placement_group_id  = (known after apply)
+            }
+
+          + resources {
+              + core_fraction = 100
+              + cores         = 2
+              + memory        = 2
+            }
+
+          + scheduling_policy {
+              + preemptible = (known after apply)
+            }
+        }
+
+      # yandex_vpc_network.network-1 will be created
+      + resource "yandex_vpc_network" "network-1" {
+          + created_at                = (known after apply)
+          + default_security_group_id = (known after apply)
+          + folder_id                 = (known after apply)
+          + id                        = (known after apply)
+          + labels                    = (known after apply)
+          + name                      = "network1"
+          + subnet_ids                = (known after apply)
+        }
+
+      # yandex_vpc_subnet.subnet-1 will be created
+      + resource "yandex_vpc_subnet" "subnet-1" {
+          + created_at     = (known after apply)
+          + folder_id      = (known after apply)
+          + id             = (known after apply)
+          + labels         = (known after apply)
+          + name           = "subnet1"
+          + network_id     = (known after apply)
+          + v4_cidr_blocks = [
+              + "192.168.10.0/24",
+            ]
+          + v6_cidr_blocks = (known after apply)
+          + zone           = "ru-central1-a"
+        }
+
+    Plan: 6 to add, 0 to change, 0 to destroy.
+
+    Changes to Outputs:
+      + external_ip_address_vm_1_count   = [
+          + (known after apply),
+          + (known after apply),
+        ]
+      + external_ip_address_vm_2_foreach = (known after apply)
+      + internal_ip_address_vm_1_count   = [
+          + (known after apply),
+          + (known after apply),
+        ]
+      + internal_ip_address_vm_2_foreach = (known after apply)
     ```
 - Создадим ресурсы в Яндекс Облаке  
     ```
