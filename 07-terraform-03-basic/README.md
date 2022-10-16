@@ -106,10 +106,49 @@
     secret: YCMK...
     ```
 - Создадим хранилище в Яндекс Облаке
-    ![07-terraform-03-01.png](07-terraform-03-01.png)
+    ![07-terraform-03-01.png](07-terraform-03-01.png)  
+- Настроем бекенд чтобы сохранить состояние Terraform в Object Storage  
+    ```
+    terraform {
+      required_providers {
+        yandex = {
+          source = "yandex-cloud/yandex"
+        }
+      }
+      required_version = ">= 0.13"
+      backend "s3" {
+        endpoint   = "storage.yandexcloud.net"
+        bucket     = "s3-terraform"
+        region     = "ru-central1"
+        key        = "terraform.tfstate"
+        access_key = "YCAJEMPlx5hXK5stLB3dXt_Nd"
+        secret_key = "YCMK..."
 
+        skip_region_validation      = true
+        skip_credentials_validation = true
+      }
+    }
 
+    provider "yandex" {
+      zone = "ru-central1-a"
+    }
+    ```
+- Переконфигурируем расположение terraform состояния  
+    ```
+    terraform init -reconfigure
+    ```
+    ```
+    Initializing the backend...
 
+    Successfully configured the backend "s3"! Terraform will automatically
+    use this backend unless the backend configuration changes.
+
+    Initializing provider plugins...
+    - Reusing previous version of yandex-cloud/yandex from the dependency lock file
+    - Using previously-installed yandex-cloud/yandex v0.80.0
+
+    Terraform has been successfully initialized!
+    ```
 
 
 
