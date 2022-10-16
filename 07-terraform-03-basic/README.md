@@ -162,8 +162,11 @@ dynamodb.
 1. Создайте два воркспейса `stage` и `prod`.
     - Запустим команды
         ```
-        xxx
+        terraform workspace new stage
+        terraform workspace new prod
         ```
+    - Проверим хранилище состояний  
+        ![07-terraform-03-02.png](07-terraform-03-02.png)  
 3. В уже созданный `aws_instance` добавьте зависимость типа инстанса от вокспейса, что бы в разных ворскспейсах 
 использовались разные `instance_type`.
 1. Добавим `count`. Для `stage` должен создаться один экземпляр `ec2`, а для `prod` два. 
