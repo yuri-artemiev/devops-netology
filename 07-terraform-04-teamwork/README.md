@@ -104,6 +104,48 @@
 
 В качестве результата приложите ссылку на файлы `server.yaml` и `atlantis.yaml`.
 
+- `server.yaml`
+    ```
+    repos:
+    - id: github.com/yuri-artemiev/.*/
+    apply_requirements: [approved, mergeable]
+    allowed_overrides: [workflow]
+    allow_custom_workflows: true
+    workflows:
+    custom:
+     plan:
+       steps:
+       - init
+       - plan:
+           extra_args: ["-lock", "false"]
+     apply:
+       steps:
+       - apply
+
+    ```
+- `atlantis.yaml`
+    ```
+    version: 3
+    parallel_plan: true
+    parallel_apply: true
+    projects:
+    - name: project1
+      dir: .
+      workspace: stage
+      delete_source_branch_on_merge: true
+      autoplan:
+        when_modified: ["*.tf"]
+        enabled: true
+      apply_requirements: [mergeable, approved]
+    - name: project1
+      dir: .
+      workspace: prod
+      autoplan:
+        when_modified: ["*.tf"]
+        enabled: true
+      apply_requirements: [mergeable, approved]
+    ```
+
 ## Задача 3. Знакомство с каталогом модулей. 
 
 1. В [каталоге модулей](https://registry.terraform.io/browse/modules) найдите официальный модуль от aws для создания
