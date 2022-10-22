@@ -18,23 +18,73 @@
 Шаги действий:
 - Зарегестрируемся на app.terraform.io
 - Выберем создание тестовой конфигурации
-```
-terraform login 
-```
+    ```
+    terraform login 
+    ```
 - Зайдём на портал terraform чтобы получить токен
-```
-https://app.terraform.io/app/settings/tokens?source=terraform-login
-```
+    ```
+    https://app.terraform.io/app/settings/tokens?source=terraform-login
+    ```
 - Вставим токен в коммандную строку
-```
-F7e2...
-```
 - Скачаем тестовую конфигурацию
-```
-git clone https://github.com/hashicorp/tfc-getting-started.git
-cd tfc-getting-started
-./scripts/setup.sh
-```
+    ```
+    git clone https://github.com/hashicorp/tfc-getting-started.git
+    cd tfc-getting-started
+    ./scripts/setup.sh
+    ```
+- Вывод `terraform plan`
+    ```
+    Terraform will perform the following actions:
+
+      # fakewebservices_database.prod_db will be created
+      + resource "fakewebservices_database" "prod_db" {
+          + id   = (known after apply)
+          + name = "Production DB"
+          + size = 256
+        }
+
+      # fakewebservices_load_balancer.primary_lb will be created
+      + resource "fakewebservices_load_balancer" "primary_lb" {
+          + id      = (known after apply)
+          + name    = "Primary Load Balancer"
+          + servers = [
+              + "Server 1",
+              + "Server 2",
+            ]
+        }
+
+      # fakewebservices_server.servers[0] will be created
+      + resource "fakewebservices_server" "servers" {
+          + id   = (known after apply)
+          + name = "Server 1"
+          + type = "t2.micro"
+          + vpc  = "Primary VPC"
+        }
+
+      # fakewebservices_server.servers[1] will be created
+      + resource "fakewebservices_server" "servers" {
+          + id   = (known after apply)
+          + name = "Server 2"
+          + type = "t2.micro"
+          + vpc  = "Primary VPC"
+        }
+
+      # fakewebservices_vpc.primary_vpc will be created
+      + resource "fakewebservices_vpc" "primary_vpc" {
+          + cidr_block = "0.0.0.0/1"
+          + id         = (known after apply)
+          + name       = "Primary VPC"
+        }
+
+    Plan: 5 to add, 0 to change, 0 to destroy.
+    ```
+- Созданная инфраструктура
+    ![07-terraform-04-01.png](07-terraform-04-01.png)  
+- Получаем рабочее место в Terraform Cloud
+    ```
+    https://app.terraform.io/app/example-org-4fb19a/workspaces/getting-started
+    ```
+
 
 ## Задача 2. Написать серверный конфиг для атлантиса. 
 
