@@ -107,21 +107,24 @@
 - `server.yaml`
     ```
     repos:
-    - id: github.com/yuri-artemiev/.*/
-    apply_requirements: [approved, mergeable]
-    allowed_overrides: [workflow]
-    allow_custom_workflows: true
+      - id: github.com/yuri-artemiev/.*/
+        branch: /.*/
+        apply_requirements: [approved, mergeable]
+        allowed_overrides: [workflow]
+        allowed_workflows: [custom]
+        allow_custom_workflows: true
+        delete_source_branch_on_merge: true
+        workflow: custom
     workflows:
-    custom:
-      plan:
-        steps:
-          - init
-          - plan:
-              extra_args: ["-lock", "false"]
-      apply:
-        steps:
-         - apply
-
+      custom:
+        plan:
+          steps:
+            - init
+            - plan:
+                extra_args: ["-lock", "false"]
+        apply:
+          steps:
+            - apply   
     ```
 - `atlantis.yaml`
     ```
