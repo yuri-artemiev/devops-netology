@@ -156,3 +156,29 @@
 Создайте аналогичный инстанс при помощи найденного модуля.   
 
 В качестве результата задания приложите ссылку на созданный блок конфигураций. 
+
+- Доступа к AWS нет, возможное содержание `main.tf`
+    ```
+    provider "aws" {
+      region = "us-east-2"
+    }
+    module "ec2_instance" {
+      source  = "terraform-aws-modules/ec2-instance/aws"
+      version = "~> 3.0"
+
+      name = "vm-1"
+
+      ami                    = "ami-ebd02392"
+      instance_type          = "t2.micro"
+      key_name               = "user1"
+      monitoring             = true
+      vpc_security_group_ids = ["sg-12345678"]
+      subnet_id              = "subnet-eddcdzz4"
+
+      tags = {
+        Terraform   = "true"
+        Environment = "dev"
+      }
+    }
+
+    ```
