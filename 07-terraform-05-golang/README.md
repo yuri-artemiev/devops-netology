@@ -49,44 +49,46 @@
     ```
 
 Последовательность дейтствий:
-- Создадим файл main.go
+- Создадим файл `07-05-03-01.go`
     ```
     package main
 
     import "fmt"
 
     func main() {
-        fmt.Print("Enter a number: ")
+        fmt.Print("Enter length in meteres: ")
         var input float64
         fmt.Scanf("%f", &input)
 
-        output := input * 2
+        output := input * 3.28084
 
-        fmt.Println(output)    
+        fmt.Println("Length in feet: ", output)    
     }
     ```
-- Скомпилируем и запустим файл maing.go
+- Скомпилируем и запустим файл `07-05-03-01.go`
     ```
     go run main.go
     ```
     ```
-    Enter a number: 5
-    10
+    Enter length in meteres: 10
+    Length in feet:  32.8084
     ```
-- Cкомпилиурем и запустим файл main.go
+- Cкомпилиурем и запустим файл `07-05-03-01.go`
     ```
-    go build main.go
-    ls -l
+    go build 07-05-03-01.go
+    ls -lh
     ```
-     ```
-    -rwxr-xr-x 1 root root 2.1M Oct 23 13:13 main
-    -rw-r--r-- 1 root root  182 Oct 23 13:12 main.go
-     ```
+    ```
+    -rwxr-xr-x 1 root root 2.1M Oct 23 13:49 07-05-03-01
+    -rw-r--r-- 1 root root  217 Oct 23 13:47 07-05-03-01.go
+    ```
  
 1. Напишите программу, которая найдет наименьший элемент в любом заданном списке, например:
     ```
     x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}
     ```
+    
+    
 1. Напишите программу, которая выводит числа от 1 до 100, которые делятся на 3. То есть `(3, 6, 9, …)`.
 
 В виде решения ссылку на код или сам код. 
