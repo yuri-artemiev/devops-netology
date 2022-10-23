@@ -85,66 +85,66 @@
     ```
     x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}
     ```  
-Последовательность действий:  
-- Создадим файл `07-05-03-02.go`
-    ```
-    package main
+    Последовательность действий:  
+    - Создадим файл `07-05-03-02.go`
+        ```
+        package main
 
-    import "fmt"
+        import "fmt"
 
-    func main() {
-        // input slice
-        x := []int{48, 96, 86, 68, 57, 82, 63, 70, 37, 34, 83, 27, 19, 97, 9, 17}
-        // accept the first element as min
-        min := x[0]
+        func main() {
+            // input slice
+            x := []int{48, 96, 86, 68, 57, 82, 63, 70, 37, 34, 83, 27, 19, 97, 9, 17}
+            // accept the first element as min
+            min := x[0]
 
-        for i := 1; i < len(x); i++ {
-            // if current element less than min - redefine min variable
-            if min > x[i] {
-                min = x[i]
+            for i := 1; i < len(x); i++ {
+                // if current element less than min - redefine min variable
+                if min > x[i] {
+                    min = x[i]
+                }
             }
+            // print min value
+            fmt.Println(min)
         }
-        // print min value
-        fmt.Println(min)
-    }
-    ```
-- Скомпилируем и запустим файл `07-05-03-02.go`
-    ```
-    go run 07-05-03-02.go
-    ```
-    ```
-    Minimal number:  9
-    ```
+        ```
+    - Скомпилируем и запустим файл `07-05-03-02.go`
+        ```
+        go run 07-05-03-02.go
+        ```
+        ```
+        Minimal number:  9
+        ```
 3. Напишите программу, которая выводит числа от 1 до 100, которые делятся на 3. То есть `(3, 6, 9, …)`.  
-Последовательность действий:  
-- Создадим файл `07-05-03-03.go`
-    ```
-    package main
+    Последовательность действий:  
+    - Создадим файл `07-05-03-03.go`
+        ```
+        package main
 
-    import "fmt"
+        import "fmt"
 
-    func main() {
+        func main() {
 
-        // empty slice
-        var s []int
+            // empty slice
+            var s []int
 
-        for i := 1; i <= 100; i++ {
-            // if remainder of a division by 3 equals 0 - append slice s
-            if i % 3 == 0 {
-                s = append(s, i)
-            }		
+            for i := 1; i <= 100; i++ {
+                // if remainder of a division by 3 equals 0 - append slice s
+                if i % 3 == 0 {
+                    s = append(s, i)
+                }
+            }
+            // print numbers that are divisible by 3 without a remainder
+            fmt.Println(s)
         }
-        // print numbers that are divisible by 3 without a remainder
-        fmt.Println(s)
-    }
-    ```
-- Скомпилируем и запустим файл `07-05-03-03.go`
-    ```
-    go run 07-05-03-03.go
-    ```
-    ```
-    [3 6 9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87 90 93 96 99]
-    ```
+        ```
+    - Скомпилируем и запустим файл `07-05-03-03.go`
+        ```
+        go run 07-05-03-03.go
+        ```
+        ```
+        [3 6 9 12 15 18 21 24 27 30 33 36 39 42 45 48 51 54 57 60 63 66 69 72 75 78 81 84 87 90 93 96 99]
+        ```
 
 В виде решения ссылку на код или сам код. 
 
