@@ -7,6 +7,19 @@
 1. Воспользуйтесь инструкций с официального сайта: [https://golang.org/](https://golang.org/).
 2. Так же для тестирования кода можно использовать песочницу: [https://play.golang.org/](https://play.golang.org/).
 
+Послудовательность действий:
+- Установи go из репозитория
+    ```
+    apt install golang-go 
+    ```
+- Проверим версию
+    ```
+    go version
+    ```
+    ```
+    go version go1.13.8 linux/amd64
+    ```
+
 ## Задача 2. Знакомство с gotour.
 У Golang есть обучающая интерактивная консоль [https://tour.golang.org/](https://tour.golang.org/). 
 Рекомендуется изучить максимальное количество примеров. В консоли уже написан необходимый код, 
@@ -21,19 +34,54 @@
     Для взаимодействия с пользователем можно использовать функцию `Scanf`:
     ```
     package main
-    
+
     import "fmt"
-    
+
     func main() {
         fmt.Print("Enter a number: ")
         var input float64
         fmt.Scanf("%f", &input)
-    
+
         output := input * 2
-    
+
         fmt.Println(output)    
     }
     ```
+
+Последовательность дейтствий:
+- Создадим файл main.go
+    ```
+    package main
+
+    import "fmt"
+
+    func main() {
+        fmt.Print("Enter a number: ")
+        var input float64
+        fmt.Scanf("%f", &input)
+
+        output := input * 2
+
+        fmt.Println(output)    
+    }
+    ```
+- Скомпилируем и запустим файл maing.go
+    ```
+    go run main.go
+    ```
+    ```
+    Enter a number: 5
+    10
+    ```
+- Cкомпилиурем и запустим файл main.go
+    ```
+    go build main.go
+    ls -l
+    ```
+     ```
+    -rwxr-xr-x 1 root root 2.1M Oct 23 13:13 main
+    -rw-r--r-- 1 root root  182 Oct 23 13:12 main.go
+     ```
  
 1. Напишите программу, которая найдет наименьший элемент в любом заданном списке, например:
     ```
