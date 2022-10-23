@@ -47,40 +47,40 @@
         fmt.Println(output)    
     }
     ```
-Последовательность дейтствий:  
-- Создадим файл `07-05-03-01.go`
-    ```
-    package main
+    Последовательность дейтствий:  
+    - Создадим файл `07-05-03-01.go`
+        ```
+        package main
 
-    import "fmt"
+        import "fmt"
 
-    func main() {
-        fmt.Print("Enter length in meteres: ")
-        var input float64
-        fmt.Scanf("%f", &input)
+        func main() {
+            fmt.Print("Enter length in meteres: ")
+            var input float64
+            fmt.Scanf("%f", &input)
 
-        output := input * 3.28084
+            output := input * 3.28084
 
-        fmt.Println("Length in feet: ", output)    
-    }
-    ```
-- Скомпилируем и запустим файл `07-05-03-01.go`
-    ```
-    go run 07-05-03-01.go
-    ```
-    ```
-    Enter length in meteres: 10
-    Length in feet:  32.8084
-    ```
-- Cкомпилиурем и проверим файл `07-05-03-01.go`
-    ```
-    go build 07-05-03-01.go
-    ls -lh
-    ```
-    ```
-    -rwxr-xr-x 1 root root 2.1M Oct 23 13:49 07-05-03-01
-    -rw-r--r-- 1 root root  217 Oct 23 13:47 07-05-03-01.go
-    ```
+            fmt.Println("Length in feet: ", output)    
+        }
+        ```
+    - Скомпилируем и запустим файл `07-05-03-01.go`
+        ```
+        go run 07-05-03-01.go
+        ```
+        ```
+        Enter length in meteres: 10
+        Length in feet:  32.8084
+        ```
+    - Cкомпилиурем и проверим файл `07-05-03-01.go`
+        ```
+        go build 07-05-03-01.go
+        ls -lh
+        ```
+        ```
+        -rwxr-xr-x 1 root root 2.1M Oct 23 13:49 07-05-03-01
+        -rw-r--r-- 1 root root  217 Oct 23 13:47 07-05-03-01.go
+        ```
 2. Напишите программу, которая найдет наименьший элемент в любом заданном списке, например:  
     ```
     x := []int{48,96,86,68,57,82,63,70,37,34,83,27,19,97,9,17,}
