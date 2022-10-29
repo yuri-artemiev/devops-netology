@@ -25,7 +25,7 @@
         - Файл `internal/service/sqs/name.go`   
         В последеней версии провайдера, имя из URL разделяется на три части по символу `/`. Если частей не три - возникает ошибка  
         `if len(parts) != 3`  
-        [name.go|https://github.com/hashicorp/terraform-provider-aws/blob/main/internal/service/sqs/name.go#L20]  
+        [name.go](https://github.com/hashicorp/terraform-provider-aws/blob/main/internal/service/sqs/name.go#L20)  
     * Какая максимальная длина имени? 
         - В новой версии не смог найти
     * Какому регулярному выражению должно подчиняться имя? 
