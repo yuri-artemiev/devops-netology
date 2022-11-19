@@ -21,18 +21,18 @@
         ```
         ansible-playbook -i inventory/test.yml site.yml
         ```
-        Значение факта `some_fact`
+    - Значение факта `some_fact`
         ```
         "msg": 12
         ```
 2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
     - Факт задаётся в файле `./group_vars/all/examp.yml`
-    - Изменим значение файкта `some_fact` в файле `./group_vars/all/examp.yml`
+    - Изменим значение факта `some_fact` в файле `./group_vars/all/examp.yml`
     - Запустим playbook
         ```
         ansible-playbook -i inventory/test.yml site.yml
         ```
-        Значение факта `some_fact`
+    - Значение факта `some_fact`
         ```
         "msg": "all default fact"
         ```
@@ -46,9 +46,11 @@
         apt-get update
         apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
         ```
-    - Запустим контейнеры из образов   
-        `docker run --name centos7 -itd centos:7`
-        `docker run --name ubuntu -itd ubuntu:latest`
+    - Запустим контейнеры из образов  
+        ```
+        docker run --name centos7 -itd centos:7
+        docker run --name ubuntu -itd ubuntu:latest
+        ```
     - Добавим Python на контейнер Ubuntu
         ```
         docker exec -it --user root 62ff0af1e073 /bin/bash
@@ -60,7 +62,7 @@
         ```
         ansible-playbook -i inventory/prod.yml site.yml
         ```
-        Значение факта `some_fact`
+    - Значение факта `some_fact`
         ```
         TASK [Print fact] 
         ok: [centos7] => {
@@ -71,13 +73,31 @@
         }
         ```
 7. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
-8.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
-9. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
-10. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
-11. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
-12. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
-13. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
-14. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
+    - Факт Ubuntu контейнера задаётся в файле `./group_vars/deb/examp.yml`
+    - Изменим значение факта `some_fact` в файле `./group_vars/deb/examp.yml`
+    - Факт Centos контейнера задаётся в файле `./group_vars/el/examp.yml`
+    - Изменим значение факта `some_fact` в файле `./group_vars/el/examp.yml`
+9.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
+    - Запустим playbook
+        ```
+        ansible-playbook -i inventory/prod.yml site.yml
+        ```
+    - Значение факта `some_fact`
+        ```
+        TASK [Print fact] 
+        ok: [centos7] => {
+            "msg": "el default fact"
+        }
+        ok: [ubuntu] => {
+            "msg": "deb default fact"
+        }
+        ```
+11. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
+12. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
+13. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
+14. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
+15. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
+16. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
 
 ## Необязательная часть
 
