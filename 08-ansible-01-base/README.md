@@ -5,9 +5,37 @@
 2. Создайте свой собственный публичный репозиторий на github с произвольным именем.
 3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 
+Шаги:
+- Устанавливаем утилиту `ansible`  
+    ```
+    apt install software-properties-common
+    apt-add-repository ppa:ansible/ansible
+    apt update
+    apt install ansible
+    ```
+    
+
 ## Основная часть
 1. Попробуйте запустить playbook на окружении из `test.yml`, зафиксируйте какое значение имеет факт `some_fact` для указанного хоста при выполнении playbook'a.
+- Запустим playbook
+    ```
+    ansible-playbook -i inventory/test.yml site.yml
+    ```
+    Значение факта `some_fact`
+    ```
+    "msg": 12
+    ```
 2. Найдите файл с переменными (group_vars) в котором задаётся найденное в первом пункте значение и поменяйте его на 'all default fact'.
+- Факт задаётся в файле `./group_vars/all/examp.yml`
+- Изменим значение файкта `some_fact` в файле `./group_vars/all/examp.yml`
+- Запустим playbook
+    ```
+    ansible-playbook -i inventory/test.yml site.yml
+    ```
+    Значение факта `some_fact`
+    ```
+    "msg": "all default fact"
+    ```
 3. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
 4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
 5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
