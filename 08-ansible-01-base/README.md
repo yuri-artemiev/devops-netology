@@ -93,11 +93,71 @@
         }
         ```
 11. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
-12. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
-13. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
-14. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
-15. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
-16. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
+    - Запустим команды шифрования файлов
+        ```
+        ansible-vault encrypt group_vars/deb/examp.yml 
+        ansible-vault encrypt group_vars/el/examp.yml
+        ```
+13. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
+    - Запустим playbook
+        ```
+        ansible-playbook -i inventory/prod.yml --ask-vault-pass site.yml
+        ```
+    - Запрос пароля
+        ```
+        Vault password:
+        ```
+    - Значение факта `some_fact`
+        ```
+        TASK [Print fact] 
+        ok: [centos7] => {
+            "msg": "el default fact"
+        }
+        ok: [ubuntu] => {
+            "msg": "deb default fact"
+        }
+        ```
+15. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
+    - Запустим комманду
+        ```
+        ansible-doc -t connection -l
+        ...
+        local        execute on controller
+        ...
+
+        ansible-doc -t connection local
+        ```
+17. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
+    - Добавим группу в файл `inventory/prod.yml`
+        ```
+        local:
+          hosts:
+            localhost:
+              ansible_connection: local
+        ```
+19. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
+    - Запустим playbook
+        ```
+        ansible-playbook -i inventory/prod.yml --ask-vault-pass site.yml
+        ```
+    - Запрос пароля
+        ```
+        Vault password:
+        ```
+    - Значение факта `some_fact`
+        ```
+        TASK [Print fact] 
+        ok: [centos7] => {
+            "msg": "el default fact"
+        }
+        ok: [ubuntu] => {
+            "msg": "deb default fact"
+        }
+        ok: [localhost] => {
+            "msg": "all default fact"
+        }
+        ```
+21. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
 
 ## Необязательная часть
 
