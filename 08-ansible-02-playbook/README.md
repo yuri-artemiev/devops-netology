@@ -24,22 +24,6 @@
     apt-get update
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
     ```
-- Запустим контейнеры из образов  
-    ```
-    docker run --name centos7 -itd centos:7
-    docker run --name ubuntu -itd ubuntu:latest
-    ```
-- Добавим Python на контейнер Ubuntu
-    ```
-    docker exec -it --user root 62ff0af1e073 /bin/bash
-    apt-get update
-    apt-get install --no-install-recommends -y python3
-    ```
-- Запустим playbook
-    ```
-    ansible-playbook -i inventory/test.yml site.yml
-    ```
-
 
 
 ## Основная часть
@@ -55,4 +39,103 @@
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
 10. Готовый playbook выложите в свой репозиторий, поставьте тег `08-ansible-02-playbook` на фиксирующий коммит, в ответ предоставьте ссылку на него.
 
+Шаги:
+### Clickhouse  
+- Отредактируем файл `playbook/inventory/prod.yml`
+    ```
+    ---
+    clickhouse:
+      hosts:
+        clickhouse-01:
+          ansible_connection: docker
+    ```
+- Отредактируем файл `playbook/group_vars/clickhouse.yml`
+    ```
+    ---
+    clickhouse_packages:
+      - clickhouse-common-static-22.9.4.32.x86_64.rpm
+      - clickhouse-server-22.9.4.32.x86_64.rpm
+      - clickhouse-client-22.9.4.32.x86_64.rpm
+    ```
+- Отредактируем файл `playbook/templates/config.xml.j2`
+- Запустим контейнер из образа
+    ```
+    docker run --name clickhouse-01 -itd -p 8123:8123 --privileged=true centos:7 /usr/sbin/init
+    ```
+- Запустим playbook
+    ```
+    ansible-playbook -i inventory/prod.yml site.yml
+    ```
+- Зайдём в docker конейнер
+    ```
+    docker exec -it --user root caa457848a6f /bin/bash
+    ```
+- Проверим установленные RPM пакеты
+    ```
+    rpm -qa | grep clickhouse
+    ```
+- Проверим установленный systemd сервис
+    ```
+    systemctl list-unit-files | grep clickhouse
+    ```
+- Проверим статус запущенного systemd сервиса
+    ```
+    systemctl status clickhouse-server
+    ```
+- Проверим слущащий порт
+    ```
+    ss -tlpn | grep 8123
+    ```
+- Проверим подключение
+    ```
+    curl localhost:8123
+    ```
 
+### Vector  
+- Отредактируем файл `playbook/inventory/prod.yml`
+    ```
+    ---
+    clickhouse:
+      hosts:
+        clickhouse-01:
+          ansible_connection: docker
+    vector:
+      hosts:
+        vector-01:
+          ansible_connection: docker
+    ```
+- Отредактируем файл `playbook/group_vars/vector.yml
+    ```
+    ---
+    vector_packages:
+      - vector-0.25.1-1.x86_64.rpm
+    ```
+- Отредактируем файл `playbook/templates/vector.toml.j2`
+- Запустим контейнер из образа
+    ```
+    docker run --name vector-01 -itd --privileged=true almalinux:8 /usr/sbin/init
+    ```
+- Запустим playbook
+    ```
+    ansible-playbook -i inventory/prod.yml site.yml
+    ```
+- Зайдём в docker конейнер
+    ```
+    docker exec -it --user root 8a4cee6f8c22 /bin/bash
+    ```
+- Проверим установленные RPM пакеты
+    ```
+    rpm -qa | grep vector
+    ```
+- Проверим установленный systemd сервис
+    ```
+    systemctl list-unit-files | grep vector
+    ```
+- Проверим статус запущенного systemd сервиса
+    ```
+    systemctl status vector
+    ```
+- Проверим логи в базе Clickhouse на веб `http://192.168.1.118:8123/play`
+    ```
+    SELECT * FROM logs.demo_logs;
+    ```

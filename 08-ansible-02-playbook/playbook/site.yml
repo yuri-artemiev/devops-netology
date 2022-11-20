@@ -1,34 +1,82 @@
 ---
+    # Clickhouse
 - name: Install Clickhouse
   hosts: clickhouse
-  handlers:
-    - name: Start clickhouse service
-      become: true
+  tasks:
+    - name: Clickhouse | Get RPM packages
+      ansible.builtin.get_url:
+        url: "https://packages.clickhouse.com/rpm/stable/{{ item }}"
+        dest: "/tmp/{{ item }}"
+      with_items: "{{ clickhouse_packages }}"
+
+    - name: Clickhouse | Install RPM packages 
+      ansible.builtin.yum:
+        name: /tmp/{{ item }}
+        state: present
+      with_items: "{{ clickhouse_packages }}"
+
+    - name: Clickhouse | Server configuration file
+      template:
+        src: config.xml.j2
+        dest: "/etc/clickhouse-server/config.xml"
+        # clickhouse
+        owner: "999"
+        # clickhouse
+        group: "998"
+        mode: "0400"
+
+    - name: Clickhouse | Service is running
       ansible.builtin.service:
         name: clickhouse-server
-        state: restarted
-  tasks:
-    - block:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/{{ item }}-{{ clickhouse_version }}.noarch.rpm"
-            dest: "./{{ item }}-{{ clickhouse_version }}.rpm"
-          with_items: "{{ clickhouse_packages }}"
-      rescue:
-        - name: Get clickhouse distrib
-          ansible.builtin.get_url:
-            url: "https://packages.clickhouse.com/rpm/stable/clickhouse-common-static-{{ clickhouse_version }}.x86_64.rpm"
-            dest: "./clickhouse-common-static-{{ clickhouse_version }}.rpm"
-    - name: Install clickhouse packages
-      become: true
-      ansible.builtin.yum:
-        name:
-          - clickhouse-common-static-{{ clickhouse_version }}.rpm
-          - clickhouse-client-{{ clickhouse_version }}.rpm
-          - clickhouse-server-{{ clickhouse_version }}.rpm
-      notify: Start clickhouse service
-    - name: Create database
-      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+        state: started
+
+    - name: Clickhouse | Create database
+      ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS logs;'"
       register: create_db
       failed_when: create_db.rc != 0 and create_db.rc !=82
       changed_when: create_db.rc == 0
+
+    - name: Clickhouse | Create table
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS  logs.demo_logs (message String) ENGINE = MergeTree() ORDER BY tuple();'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0
+
+    - name: Clickhouse | Show databases
+      ansible.builtin.command: "clickhouse-client -q 'SHOW DATABASES;'"
+      register: showed_db
+
+    - name: Troubleshoot | Print databases
+      ansible.builtin.debug:
+        var: showed_db.stdout_lines
+
+
+    # Vector
+- name: Install Vector
+  hosts: vector
+  tasks:
+    - name: Vector | Get RPM packages
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/0.25.1/{{ item }}"
+        dest: "/tmp/{{ item }}"
+      with_items: "{{ vector_packages }}"
+
+    - name: Vector | Install RPM packages 
+      ansible.builtin.yum:
+        name: /tmp/{{ item }}
+        state: present
+        disable_gpg_check: true
+      with_items: "{{ vector_packages }}"
+
+    - name: Vector | Server configuration file
+      template:
+        src: vector.toml.j2
+        dest: "/etc/vector/vector.toml"
+        owner: "0"
+        group: "0"
+        mode: "0664"
+
+    - name: Vector | Service is running
+      ansible.builtin.service:
+        name: vector
+        state: started

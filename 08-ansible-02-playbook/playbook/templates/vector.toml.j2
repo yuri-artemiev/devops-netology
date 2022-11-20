@@ -1,0 +1,25 @@
+[sources.dummy_logs]
+type = "demo_logs"
+format = "syslog"
+interval = 30
+
+# Parse Syslog logs
+# See the Vector Remap Language reference for more info: https://vrl.dev
+[transforms.parse_logs]
+type = "remap"
+inputs = ["dummy_logs"]
+source = '''
+. = parse_syslog!(string!(.message))
+'''
+
+# Send logs to clickhouse
+[sinks.clickhouse]
+type = "clickhouse"
+inputs = ["parse_logs"]
+database = "logs"
+endpoint = "http://192.168.1.118:8123"
+table = "demo_logs"
+compression = "gzip"
+skip_unknown_fields = true
+
+
