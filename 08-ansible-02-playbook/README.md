@@ -139,3 +139,4 @@
     ```
     SELECT * FROM logs.demo_logs;
     ```
+    ![08-ansible-02.png](08-ansible-02.png)
