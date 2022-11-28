@@ -63,7 +63,7 @@
     - `apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`  
     - `apt-get update && apt-get install packer`  
  - Редактируем манифест Packer в файле `centos-7-base.json`  
-    -  Изменяем идентификатор каталога Яндекс Облака  
+    - Изменяем идентификатор каталога Яндекс Облака  
         - `"folder_id": "b1gcthk9ak11bmpnbo7d"`  
     - Изменяем идентификатор подсети в Яндекс Облаке  
         - `"subnet_id": "e9bqg9e35b1s8430fk2i"`  

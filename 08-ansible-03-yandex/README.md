@@ -30,139 +30,180 @@
     apt update
     apt install ansible
     ```
-- Установим Docker  
+- Регистрация на Яндекс Облаке по адресу `console.cloud.yandex.ru`  
+- Создаём платёжный аккаунт с промо-кодом  
+- Скачаем и установим утилиту `yc`  
+    - `curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash`  
+- Запустим утилиту `yc`:    
+    - `yc init`  
+    - Получим OAuth токен по адресу в браузере `https://oauth.yandex.ru/authorize?response_type=token&client_id=1a6990aa636648e9b2ef855fa7bec2fb`  
+    - В утилите `yc`    
+        - Вставим токен  
+        - Выберем папку в Яндекс Облаке  
+        - Выберем создание Compute по-умолчанию  
+        - Выберем зону в Яндекс Облаке  
+    - Проверим созданные настройки Яндекс Облака    
+        - `yc config list`
+            ```
+            token: y0_A...
+            cloud-id: b1gjd8gta6ntpckrp97r
+            folder-id: b1gcthk9ak11bmpnbo7d
+            compute-default-zone: ru-central1-a
+            ```
+- Получим IAM-токен  
     ```
-    apt-get install ca-certificates curl gnupg lsb-release
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    apt-get update
-    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    yc iam create-token
     ```
-- Устанавливаем yc
-- Подключаемся к яндекс облаку с помощью yc cli
-- Создать виртуальные машины в яндекс облаке с помощью yc
-    Может быть использовать Anaible
+- Сохраним токен и параметры в переменную окружения  
     ```
-    - name: Create VM in Yandex cloud
-      delegate_to: 127.0.0.1
-      ansible.builtin.command: "/usr/bin/yc create vm --name {{ item }} --public-key"
-      with_items:
-        - clickhouse-01
-        - vector-01
-        - lighthouse-01
-      register: newnodes
+    export YC_TOKEN=$(yc iam create-token)
+    export YC_CLOUD_ID=$(yc config get cloud-id)
+    export YC_FOLDER_ID=$(yc config get folder-id)
+    export YC_ZONE=$(yc config get compute-default-zone)
     ```
-- Создать внутренний файл inventory
+- Сгенерируем SSH ключи на локальной машине  
     ```
-    - name: Create in-memory Ansible inventory
-      add_host:
-        name: "{{ item.server.public_v4 }}"
-        groups: created_nodes
-        ansible_user: ubuntu
-        instance_name: "{{ item.server.name }}"
-      loop: "{{ newnodes.results }}"
+    ssh-keygen
+    ```
+    ```
+    Your public key has been saved in /root/.ssh/id_rsa.pub
+    ```
+- Подготавливаем `group_vars` для переменных групп хостов
+    - Создаём папку `group_vars`
+    - Создаём файл `clickhouse_group.yml`
+        ```
+        ---
+        clickhouse_packages:
+          - clickhouse-common-static-22.9.4.32.x86_64.rpm
+          - clickhouse-server-22.9.4.32.x86_64.rpm
+          - clickhouse-client-22.9.4.32.x86_64.rpm
+        ```
+    - Создаём файл `lighthouse_group.yml`
+        ```
+        ---
+        lighthouse_packages: 
+          - git
+
+        ```
+    - Создаём файл `nginx_group.yml`
+        ```
+        ---
+        nginx_packages: 
+          - nginx
+        ```
+    - Создаём файл `vector_group.yml`
+        ```
+        ---
+        vector_packages: 
+          - vector-0.25.1-1.x86_64.rpm
+        ```
+- Подготавливаем `inbentory` для инвентарного файла
+    - Создаём папку `inventory`
+- Подготавливаем `templates` для шаблонов файлов конфигураций
+    - Создаём папку `templates`
+    - Создаём файл `config.xml.j2` конфигурация Clickhouse
+        ```
+        <clickhouse>
+            <logger>
+                <level>trace</level>
+                <log>/var/log/clickhouse-server/clickhouse-server.log</log>
+                <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+                <size>1000M</size>
+                <count>10</count>
+            </logger>
+            <http_port>8123</http_port>
+            <tcp_port>9000</tcp_port>
+        ...
+        ```
+    - Создаём файл `nginx.conf.j2` конфигурация nginx
+        ```
+        user nginx;
+        worker_processes auto;
+        error_log /var/log/nginx/error.log;
+        pid /run/nginx.pid;
+        ...
+        ```
+    - Создаём файл `prod.yml.j2` инвентарный файл
+        ```
+        ---
+        clickhouse_group:
+          hosts:
+            clickhouse-01:
+              ansible_host: {{ clickhouse_vm_ip }}
+              ansible_user: yc-user
+              ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+        ...
+        ```
+    - Создаём файл `vector.toml.j2` конфигруация Vector
+        ```
+        [sources.dummy_logs]
+        type = "demo_logs"
+        format = "syslog"
+        interval = 30
+        ...
+        ```
+- Подготавливаем `site.yml` для проигрывания ansible
+    - Создаём файл `site.yml`
+    - Разделы файла
+        - Создание виртуальных машин в Яндекс Облаке
+            ```
+            - name: Yandex Cloud | Configure Yandex Cloud
+              hosts: localhost
+              connection: local
+              gather_facts: no
+            ...
+            ```
+        - Установка `Clickhouse`
+            ```
+            - name: Clickhouse | Configure host clickhouse-01
+              hosts: clickhouse_group
+              become: true
+              gather_facts: no
+            ...
+            ```
+        - Установка `Vector`
+            ```
+            - name: Vector | Configure host vector-01
+              hosts: vector_group
+              become: true
+              gather_facts: no
+            ...
+            ```
+        - Установка `nginx`
+            ```
+            - name: nginx | Configure host nginx-01
+              hosts: nginx_group
+              become: true
+              gather_facts: no
+            ...
+            ```
+        - Установка `Lighthouse`
+            ```
+            - name: Lighthouse | Configure host lighthouse-01
+              hosts: lighthouse_group
+              become: true
+              gather_facts: no
+            ...
+            ```
+- Запускаем проигрывание `Ansible`  
+    `ansible-playbook site.yml`
+- Проверим подключение к созданной машине 'Clickhouse`
+    ```
+    ssh -i ~/.ssh/id_rsa yc-user@158.160.36.105
+    ```
+- Проверяем доступ к веб интерфейсу `Clickhouse`  
+    ```
+    158.160.36.105:8123/play
+    ```
+- Проверяем доступ к веб интерфейсу `Lighthouse` 
+    ``` 
+    51.250.72.71
+    ```  
+    Указываем адрес и порт `Clickhouse` сервера  
+- Проверим логи в базе `Clickhouse` на веб серверt `Lighthouse`  
+    ![08-ansible-03.png](08-ansible-03.png)
+- Проверяем созданный инвентарный файл `Ansbible`  
+    ```
+    ./inventory/prod.yml
     ```
 
-
-
-### Clickhouse  
-- Отредактируем файл `playbook/inventory/prod.yml`
-    ```
-    ---
-    clickhouse:
-      hosts:
-        clickhouse-01:
-          ansible_connection: docker
-    ```
-- Отредактируем файл `playbook/group_vars/clickhouse.yml`
-    ```
-    ---
-    clickhouse_packages:
-      - clickhouse-common-static-22.9.4.32.x86_64.rpm
-      - clickhouse-server-22.9.4.32.x86_64.rpm
-      - clickhouse-client-22.9.4.32.x86_64.rpm
-    ```
-- Отредактируем файл `playbook/templates/config.xml.j2`
-- Запустим контейнер из образа
-    ```
-    docker run --name clickhouse-01 -itd -p 8123:8123 --privileged=true centos:7 /usr/sbin/init
-    ```
-- Запустим playbook
-    ```
-    ansible-playbook -i inventory/prod.yml site.yml
-    ```
-- Зайдём в docker конейнер
-    ```
-    docker exec -it --user root caa457848a6f /bin/bash
-    ```
-- Проверим установленные RPM пакеты
-    ```
-    rpm -qa | grep clickhouse
-    ```
-- Проверим установленный systemd сервис
-    ```
-    systemctl list-unit-files | grep clickhouse
-    ```
-- Проверим статус запущенного systemd сервиса
-    ```
-    systemctl status clickhouse-server
-    ```
-- Проверим слущащий порт
-    ```
-    ss -tlpn | grep 8123
-    ```
-- Проверим подключение
-    ```
-    curl localhost:8123
-    ```
-
-### Vector  
-- Отредактируем файл `playbook/inventory/prod.yml`
-    ```
-    ---
-    clickhouse:
-      hosts:
-        clickhouse-01:
-          ansible_connection: docker
-    vector:
-      hosts:
-        vector-01:
-          ansible_connection: docker
-    ```
-- Отредактируем файл `playbook/group_vars/vector.yml
-    ```
-    ---
-    vector_packages:
-      - vector-0.25.1-1.x86_64.rpm
-    ```
-- Отредактируем файл `playbook/templates/vector.toml.j2`
-- Запустим контейнер из образа
-    ```
-    docker run --name vector-01 -itd --privileged=true almalinux:8 /usr/sbin/init
-    ```
-- Запустим playbook
-    ```
-    ansible-playbook -i inventory/prod.yml site.yml
-    ```
-- Зайдём в docker конейнер
-    ```
-    docker exec -it --user root 8a4cee6f8c22 /bin/bash
-    ```
-- Проверим установленные RPM пакеты
-    ```
-    rpm -qa | grep vector
-    ```
-- Проверим установленный systemd сервис
-    ```
-    systemctl list-unit-files | grep vector
-    ```
-- Проверим статус запущенного systemd сервиса
-    ```
-    systemctl status vector
-    ```
-- Проверим логи в базе Clickhouse на веб `http://192.168.1.118:8123/play`
-    ```
-    SELECT * FROM logs.demo_logs;
-    ```
-    ![08-ansible-02.png](08-ansible-02.png)

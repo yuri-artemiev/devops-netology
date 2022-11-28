@@ -1,0 +1,298 @@
+---
+- name: Yandex Cloud | Configure Yandex Cloud
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Localhost | Yandex Cloud Create network
+      ansible.builtin.command: "yc vpc network create --name network-01 --format json"
+      register: network_created
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        network_created_json: "{{ network_created.stdout | from_json }}"
+
+    - name: Localhost | Yandex Cloud Create subnet
+      ansible.builtin.command: "yc vpc subnet create --name subnet-01 --zone ru-central1-a --range 10.1.2.0/24 --network-name network-01 --format json"
+      register: subnet_created
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        subnet_created_json: "{{ subnet_created.stdout | from_json }}"
+
+
+
+#### Clickhouse
+    - name: Localhost | Yandex Cloud Create machine clickhouse-01
+      ansible.builtin.command: "yc compute instance create --name clickhouse-01 --zone ru-central1-a --network-interface subnet-name=subnet-01,nat-ip-version=ipv4 --create-boot-disk image-folder-id=standard-images,image-family=almalinux-8 --ssh-key ~/.ssh/id_rsa.pub --format json"
+      register: clickhouse_vm_created
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        clickhouse_vm_created_json: "{{ clickhouse_vm_created.stdout | from_json }}"
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        clickhouse_vm_ip: "{{ clickhouse_vm_created_json['network_interfaces'][0]['primary_v4_address']['one_to_one_nat']['address'] }}"
+
+    - name: Localhost | Print fact
+      ansible.builtin.debug:
+        msg: "{{ clickhouse_vm_ip }}"
+
+    - name: Localhost | Create in-memory inventory
+      add_host:
+        name: "clickhouse-01"
+        ansible_host: "{{ clickhouse_vm_ip }}"
+        ansible_user: "yc-user"
+        ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+        groups:
+          - added_hosts
+          - clickhouse_group
+
+
+
+#### Vector
+    - name: Localhost | Yandex Cloud Create machine vector-01
+      ansible.builtin.command: "yc compute instance create --name vector-01 --zone ru-central1-a --network-interface subnet-name=subnet-01,nat-ip-version=ipv4 --create-boot-disk image-folder-id=standard-images,image-family=almalinux-8 --ssh-key ~/.ssh/id_rsa.pub --format json"
+      register: vector_vm_created
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        vector_vm_created_json: "{{ vector_vm_created.stdout | from_json }}"
+
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        vector_vm_ip: "{{ vector_vm_created_json['network_interfaces'][0]['primary_v4_address']['one_to_one_nat']['address'] }}"
+
+    - name: Localhost | Print fact
+      ansible.builtin.debug:
+        msg: "{{ vector_vm_ip }}"
+
+    - name: Localhost | Create in-memory inventory
+      add_host:
+        name: "vector-01"
+        ansible_host: "{{ vector_vm_ip }}"
+        ansible_user: "yc-user"
+        ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+        groups:
+          - added_hosts
+          - vector_group
+
+
+
+#### Lighthouse & nginx
+    - name: Localhost | Yandex Cloud Create machine lighthouse-01
+      ansible.builtin.command: "yc compute instance create --name lighthouse-01 --zone ru-central1-a --network-interface subnet-name=subnet-01,nat-ip-version=ipv4 --create-boot-disk image-folder-id=standard-images,image-family=almalinux-8 --ssh-key ~/.ssh/id_rsa.pub --format json"
+      register: lighthouse_vm_created
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        lighthouse_vm_created_json: "{{ lighthouse_vm_created.stdout | from_json }}"
+
+    - name: Localhost | Set fact
+      ansible.builtin.set_fact:
+        lighthouse_vm_ip: "{{ lighthouse_vm_created_json['network_interfaces'][0]['primary_v4_address']['one_to_one_nat']['address'] }}"
+
+    - name: Localhost | Print fact
+      ansible.builtin.debug:
+        msg: "{{ lighthouse_vm_ip }}"
+
+    - name: Localhost | Create in-memory inventory
+      add_host:
+        name: "lighthouse-01"
+        ansible_host: "{{ lighthouse_vm_ip }}"
+        ansible_user: "yc-user"
+        ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+        groups:
+          - added_hosts
+          - lighthouse_group
+          - nginx_group
+
+    - name: Localhost | Remove Inventory file
+      ansible.builtin.file:
+        path: "./inventory/prod.yml"
+        state: absent
+
+    - name: Localhost | Create Inventory file
+      template:
+        src: prod.yml.j2
+        dest: "./inventory/prod.yml"
+
+
+
+
+
+
+#### Clickhouse
+- name: Clickhouse | Configure host clickhouse-01
+  hosts: clickhouse_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Clickhouse | Wait for SSH banners
+      wait_for_connection:
+        delay: 5
+        timeout: 180
+
+    - name: Clickhouse | Get RPM packages
+      ansible.builtin.get_url:
+        url: "https://packages.clickhouse.com/rpm/stable/{{ item }}"
+        dest: "/tmp/{{ item }}"
+      with_items: "{{ clickhouse_packages }}"
+
+    - name: Clickhouse | Install RPM packages 
+      ansible.builtin.yum:
+        name: /tmp/{{ item }}
+        state: present
+        disable_gpg_check: true
+      with_items: "{{ clickhouse_packages }}"
+
+    - name: Clickhouse | Server configuration file
+      template:
+        src: config.xml.j2
+        dest: "/etc/clickhouse-server/config.xml"
+        owner: "clickhouse"
+        group: "clickhouse"
+        mode: "0400"
+
+    - name: Clickhouse | Service is running
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: started
+
+    - name: Clickhouse | Create database
+      ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0
+
+    - name: Clickhouse | Create table
+      ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS  logs.demo_logs (message String) ENGINE = MergeTree() ORDER BY tuple();'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0
+
+    - name: Clickhouse | Show databases
+      ansible.builtin.command: "clickhouse-client -q 'SHOW DATABASES;'"
+      register: showed_db
+
+    - name: Clickhouse | Print databases
+      ansible.builtin.debug:
+        var: showed_db.stdout_lines
+
+
+#### Vector
+- name: Vector | Configure host vector-01
+  hosts: vector_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Vector | Wait for SSH banners
+      wait_for_connection:
+        delay: 5
+        timeout: 180
+
+    - name: Vector | Get RPM packages
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/vector/0.25.1/{{ item }}"
+        dest: "/tmp/{{ item }}"
+      with_items: "{{ vector_packages }}"
+
+    - name: Vector | Install RPM packages 
+      ansible.builtin.yum:
+        name: /tmp/{{ item }}
+        state: present
+        disable_gpg_check: true
+      with_items: "{{ vector_packages }}"
+
+    - name: Vector | Server configuration file
+      template:
+        src: vector.toml.j2
+        dest: "/etc/vector/vector.toml"
+        owner: "root"
+        group: "root"
+        mode: "0664"
+
+    - name: Vector | Service is running
+      ansible.builtin.service:
+        name: vector
+        state: started
+
+
+
+#### nginx
+- name: nginx | Configure host nginx-01
+  hosts: nginx_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: nginx | Wait for SSH banners
+      wait_for_connection:
+        delay: 5
+        timeout: 180
+
+    - name: nginx | Install packages 
+      ansible.builtin.yum:
+        name: "{{ item }}"
+        state: present
+        disable_gpg_check: true
+      with_items: "{{ nginx_packages }}"
+
+    - name: nginx | Server configuration file
+      template:
+        src: nginx.conf.j2
+        dest: "/etc/nginx/nginx.conf"
+        owner: "root"
+        group: "root"
+        mode: "0664"
+
+    - name: nginx | Enable Selinux reverse proxy
+      ansible.builtin.command: "{{ item }}"
+      with_items:
+        - "setsebool -P httpd_can_network_connect 1"
+        - "setsebool -P httpd_can_network_relay 1"
+
+    - name: nginx | Service is running
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+
+
+#### Lighthouse
+- name: Lighthouse | Configure host lighthouse-01
+  hosts: lighthouse_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Lighthouse | Wait for SSH banners
+      wait_for_connection:
+        delay: 5
+        timeout: 180
+
+    - name: lighthouse | Install packages 
+      ansible.builtin.yum:
+        name: "{{ item }}"
+        state: present
+        disable_gpg_check: true
+      with_items: "{{ lighthouse_packages }}"
+
+    - name: Lighthouse | Collect webroot files
+      ansible.builtin.find:
+        paths: /usr/share/nginx/html
+        hidden: true
+        recurse: true
+        file_type: any
+      register: collected_files
+
+    - name: Lighthouse | Remove collected files
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ collected_files.files }}"
+
+    - name: Lighthouse | Git checkout to webroot
+      ansible.builtin.git:
+        repo: 'https://github.com/VKCOM/lighthouse.git'
+        dest: /usr/share/nginx/html
