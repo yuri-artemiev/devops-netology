@@ -1,0 +1,66 @@
+---
+# tasks file for lighthouse
+- name: nginx | Wait for SSH banners
+  wait_for_connection:
+    delay: 5
+    timeout: 180
+  when: create_lighthouse | bool
+
+- name: nginx | Install packages 
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+    disable_gpg_check: true
+  with_items: "{{ nginx_packages }}"
+  when: create_lighthouse | bool
+
+- name: nginx | Server configuration file
+  template:
+    src: nginx.conf.j2
+    dest: "/etc/nginx/nginx.conf"
+    owner: "root"
+    group: "root"
+    mode: "0664"
+  when: create_lighthouse | bool
+
+- name: nginx | Enable Selinux reverse proxy
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - "setsebool -P httpd_can_network_connect 1"
+    - "setsebool -P httpd_can_network_relay 1"
+  when: create_lighthouse | bool
+
+- name: nginx | Service is running
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+
+- name: lighthouse | Install packages 
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+    disable_gpg_check: true
+  with_items: "{{ lighthouse_packages }}"
+  when: create_lighthouse | bool
+
+- name: Lighthouse | Collect webroot files
+  ansible.builtin.find:
+    paths: "{{ lighthouse_path }}"
+    hidden: true
+    recurse: true
+    file_type: any
+  register: collected_files
+  when: create_lighthouse | bool
+
+- name: Lighthouse | Remove collected files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ collected_files.files }}"
+  when: create_lighthouse | bool
+
+- name: Lighthouse | Git checkout to webroot
+  ansible.builtin.git:
+    repo: 'https://github.com/VKCOM/lighthouse.git'
+    dest: "{{ lighthouse_path }}"
+  when: create_lighthouse | bool

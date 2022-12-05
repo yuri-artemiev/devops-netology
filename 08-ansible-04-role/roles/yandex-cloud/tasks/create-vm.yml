@@ -1,0 +1,37 @@
+- name: Localhost | Yandex Cloud Create machine {{ vm_name }}
+  ansible.builtin.command: "yc compute instance create --name {{ vm_name }} --zone {{ yandex_zone }} --network-interface subnet-name=subnet-01,nat-ip-version=ipv4 --create-boot-disk image-folder-id=standard-images,image-family={{ yandex_image }} --ssh-key ~/.ssh/id_rsa.pub --format json"
+  register: "vm_created_output"
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    vm_created_json: "{{ vm_created_output.stdout | from_json }}"
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    vm_ip_variable_name: "{{ vm_name }}_vm_ip"
+  
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    "{{ vm_ip_variable_name }}": "{{ vm_created_json['network_interfaces'][0]['primary_v4_address']['one_to_one_nat']['address'] }}"
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    vm_ip: "{{ vm_created_json['network_interfaces'][0]['primary_v4_address']['one_to_one_nat']['address'] }}"
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    vm_group: "{{ vm_name }}_group"
+
+- name: Localhost | Print fact {{ vm_name }}
+  ansible.builtin.debug:
+    var: "vm_ip"
+
+- name: Localhost | Create in-memory inventory
+  add_host:
+    name: "{{ vm_name }}"
+    ansible_host: "{{ vm_ip }}"
+    ansible_user: "{{ yandex_user }}"
+    ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+    groups:
+      - added_hosts
+      - "{{ vm_group }}"

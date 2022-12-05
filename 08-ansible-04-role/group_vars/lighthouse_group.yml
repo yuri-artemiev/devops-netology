@@ -1,0 +1,7 @@
+---
+nginx_packages: 
+  - nginx
+  - policycoreutils-python-utils
+lighthouse_packages: 
+  - git
+

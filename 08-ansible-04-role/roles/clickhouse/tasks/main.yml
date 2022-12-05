@@ -1,0 +1,61 @@
+---
+# tasks file for clickhouse
+- name: Clickhouse | Wait for SSH banners
+  wait_for_connection:
+    delay: 5
+    timeout: 180
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Get RPM packages
+  ansible.builtin.get_url:
+    url: "https://packages.clickhouse.com/rpm/stable/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  loop: "{{ clickhouse_packages }}"
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Install RPM packages 
+  ansible.builtin.yum:
+    name: /tmp/{{ item }}
+    state: present
+    disable_gpg_check: true
+  loop: "{{ clickhouse_packages }}"
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Server configuration file
+  template:
+    src: config.xml.j2
+    dest: "/etc/clickhouse-server/config.xml"
+    owner: "clickhouse"
+    group: "clickhouse"
+    mode: "0400"
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Service is running
+  ansible.builtin.service:
+    name: clickhouse-server
+    state: started
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Create database
+  ansible.builtin.command: "clickhouse-client -q 'CREATE DATABASE IF NOT EXISTS logs;'"
+  register: create_db
+  failed_when: create_db.rc != 0 and create_db.rc !=82
+  changed_when: create_db.rc == 0
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Create table
+  ansible.builtin.command: "clickhouse-client -q 'CREATE TABLE IF NOT EXISTS  logs.demo_logs (message String) ENGINE = MergeTree() ORDER BY tuple();'"
+  register: create_db
+  failed_when: create_db.rc != 0 and create_db.rc !=82
+  changed_when: create_db.rc == 0
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Show databases
+  ansible.builtin.command: "clickhouse-client -q 'SHOW DATABASES;'"
+  register: showed_db
+  when: create_clickhouse | bool
+
+- name: Clickhouse | Print databases
+  ansible.builtin.debug:
+    var: showed_db.stdout_lines
+  when: create_clickhouse | bool

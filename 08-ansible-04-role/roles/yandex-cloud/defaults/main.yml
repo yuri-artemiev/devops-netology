@@ -1,0 +1,5 @@
+---
+# defaults file for yandex-cloud
+yandex_zone: ru-central1-a
+yandex_image: almalinux-8
+yandex_user: yc-user

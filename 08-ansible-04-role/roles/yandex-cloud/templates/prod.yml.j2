@@ -1,0 +1,33 @@
+---
+clickhouse_group:
+  hosts:
+    clickhouse:
+      ansible_host: {{ clickhouse_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+vector_group:
+  hosts:
+    vector:
+      ansible_host: {{ vector_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+lighthouse_group:
+  hosts:
+    lighthouse:
+      ansible_host: {{ lighthouse_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+added_hosts:
+  hosts:
+    clickhouse:
+      ansible_host: {{ clickhouse_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+    vector:
+      ansible_host: {{ vector_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+    lighthouse:
+      ansible_host: {{ lighthouse_vm_ip }}
+      ansible_user: yc-user
+      ansible_ssh_common_args: -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no

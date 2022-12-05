@@ -1,0 +1,51 @@
+---
+- name: Yandex Cloud | Configure Yandex Cloud
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Include Yandex Cloud role
+      include_role:
+        name: yandex-cloud
+      vars:
+        create_network: true
+        create_vm: true
+        vm_names:
+          - clickhouse
+          - vector
+          - lighthouse
+
+- name: Clickhouse | Configure host clickhouse
+  hosts: clickhouse_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Include Clickhouse role
+      include_role:
+        name: clickhouse
+      vars:
+        create_clickhouse: true
+
+- name: Vector | Configure host vector
+  hosts: vector_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Include Vector role
+      include_role:
+        name: vector
+      vars:
+        create_vector: true
+
+- name: Lighthouse | Configure host lighthouse
+  hosts: lighthouse_group
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Include Lighthouse role
+      include_role:
+        name: lighthouse
+      vars:
+        create_lighthouse: true
+
+

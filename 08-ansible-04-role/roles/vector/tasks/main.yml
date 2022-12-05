@@ -1,0 +1,37 @@
+---
+# tasks file for vector
+- name: Vector | Wait for SSH banners
+  wait_for_connection:
+    delay: 5
+    timeout: 180
+  when: create_vector | bool
+
+- name: Vector | Get RPM packages
+  ansible.builtin.get_url:
+    url: "https://packages.timber.io/vector/0.25.1/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  with_items: "{{ vector_packages }}"
+  when: create_vector | bool
+
+- name: Vector | Install RPM packages 
+  ansible.builtin.yum:
+    name: /tmp/{{ item }}
+    state: present
+    disable_gpg_check: true
+  with_items: "{{ vector_packages }}"
+  when: create_vector | bool
+
+- name: Vector | Server configuration file
+  template:
+    src: vector.toml.j2
+    dest: "/etc/vector/vector.toml"
+    owner: "root"
+    group: "root"
+    mode: "0664"
+  when: create_vector | bool
+
+- name: Vector | Service is running
+  ansible.builtin.service:
+    name: vector
+    state: started
+  when: create_vector | bool

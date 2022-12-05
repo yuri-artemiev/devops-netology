@@ -1,0 +1,43 @@
+---
+# tasks file for yandex-cloud
+#### Network
+- name: Localhost | Yandex Cloud Create network
+  ansible.builtin.command: "yc vpc network create --name network-01 --format json"
+  register: network_created
+  when: create_network | bool
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    network_created_json: "{{ network_created.stdout | from_json }}"
+  when: create_network | bool
+
+- name: Localhost | Yandex Cloud Create subnet
+  ansible.builtin.command: "yc vpc subnet create --name subnet-01 --zone {{ yandex_zone }} --range 10.1.2.0/24 --network-name network-01 --format json"
+  register: subnet_created
+  when: create_network | bool
+
+- name: Localhost | Set fact
+  ansible.builtin.set_fact:
+    subnet_created_json: "{{ subnet_created.stdout | from_json }}"
+  when: create_network | bool
+
+#### Virtual machines
+- name: Localhost | Create virtual machine
+  include_tasks: create-vm.yml
+  loop: "{{ vm_names }}"
+  loop_control:
+    loop_var: vm_name
+  when: create_vm | bool
+
+- name: Localhost | Remove Inventory file
+  ansible.builtin.file:
+    path: "./inventory/prod.yml"
+    state: absent
+  when: create_vm | bool
+
+- name: Localhost | Create Inventory file
+  template:
+    src: prod.yml.j2
+    dest: "./inventory/prod.yml"
+  when: create_vm | bool
+

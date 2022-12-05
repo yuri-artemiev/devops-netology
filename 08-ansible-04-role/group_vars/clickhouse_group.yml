@@ -1,0 +1,5 @@
+---
+clickhouse_packages:
+  - clickhouse-common-static-22.9.4.32.x86_64.rpm
+  - clickhouse-server-22.9.4.32.x86_64.rpm
+  - clickhouse-client-22.9.4.32.x86_64.rpm
