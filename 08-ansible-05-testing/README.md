@@ -36,3 +36,127 @@
 4. Выложите свои roles в репозитории. В ответ приведите ссылки.
 
 ---
+
+
+Шаги:
+### Molecule
+- Устанавливаем утилиту `ansible`  
+    ```
+    apt install software-properties-common
+    apt-add-repository ppa:ansible/ansible
+    apt update
+    apt install ansible
+    ```
+- Установим Docker  
+    ```
+    apt-get install ca-certificates curl gnupg lsb-release
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    ```
+- Установим Molecule
+    ```
+    apt update
+    apt install python3-pip
+    pip3 install "molecule==3.5.2"
+    pip3 install molecule_docker
+    ```
+- Скачаем образ контейнера
+    ```
+    docker pull aragast/netology:latest
+    ```
+- Создадим сценарии тестирования в роли `vector`
+    ```
+    cd playbook/roles/vector/
+    molecule init scenario --driver-name docker
+    ```
+- Установим линтеры
+    ```
+    pip3 install ansible-lint
+    pip3 install yamllint
+    ```
+- Для выявления ошибок запустим последовательно команды molecue
+    ```
+    molecule create
+    molecule list
+    molecule converge
+    molecule verify
+    molecule login --host vector-centos8
+    molecule destroy
+    ```
+- Руководствуемся последовательностью шагов в molecule
+    ```
+    ---
+    default:
+      - dependency
+      - lint
+      - cleanup
+      - destroy
+      - syntax
+      - create
+      - prepare
+      - converge
+      - idempotence
+      - side_effect
+      - verify
+      - cleanup
+    ```
+- Для исправления ошибок molecule, воспользуемся командами
+    - Запуск контейнер из образа
+        ```
+        docker run --name tmp-centos8 -itd --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 2480:2480 quay.io/centos/centos:stream8 /usr/sbin/init
+        ```
+    - Подключение в терминал контейнера в docker
+        ```
+        docker exec -it --user root tmp-centos8 /bin/bash
+        ```
+    - Список запущенных площадок в molecule
+        ```
+        molecule list
+        ```
+        ```
+          Instance Name       │ Driver Name │ Provisioner Name │ Scenario Name │ Created │ Converged
+        ╶─────────────────────┼─────────────┼──────────────────┼───────────────┼─────────┼───────────╴
+          vector-centos8      │ docker      │ ansible          │ default       │ true    │ true
+          vector-ubuntu-22.04 │ docker      │ ansible          │ default       │ true    │ true
+
+        ```
+- Запустим полный тест molecule, после того как molecule будет проходить без ошибок
+    ```
+    molecule test
+    ```
+
+
+### Tox
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+

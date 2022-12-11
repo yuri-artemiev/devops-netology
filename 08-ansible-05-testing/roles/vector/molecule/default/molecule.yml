@@ -1,0 +1,56 @@
+---
+# перечисление зависимостей роли
+dependency:
+  name: galaxy
+#  указание параметров выбранного driver
+driver:
+  name: docker
+lint: |
+  yamllint .
+  ansible-lint .
+# перечисление хостов для выбранного driver
+platforms:
+  - name: vector-centos8
+    image: quay.io/centos/centos:stream8
+    pre_build_image: true
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    port_bindings:
+      8686: 8686
+    env:
+      ANSIBLE_USER: ansible
+      SUDO_GROUP: wheel
+      DEPLOY_GROUP: deployer
+      container: docker
+  - name: vector-ubuntu-22.04
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+    command: /usr/sbin/init
+    privileged: true
+    capabilities:
+      - SYS_ADMIN
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup
+    port_bindings:
+      8686: 8686
+    env:
+      ANSIBLE_USER: ansible
+      SUDO_GROUP: wheel
+      DEPLOY_GROUP: deployer
+      container: docker
+#  указание поставщика для molecule
+provisioner:
+  name: ansible
+# выбор framework для проведения проверок
+verifier:
+  name: ansible

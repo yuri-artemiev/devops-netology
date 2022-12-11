@@ -1,0 +1,6 @@
+---
+# defaults file for vector
+vector_packages_rpm: 
+  - vector-0.25.1-1.x86_64.rpm
+vector_packages_deb: 
+  - vector_0.25.1-1_amd64.deb

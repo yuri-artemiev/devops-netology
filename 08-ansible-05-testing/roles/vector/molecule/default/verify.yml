@@ -1,0 +1,26 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Vector | Set variable
+      ansible.builtin.command: "vector --version"
+      register: vector_version_output
+
+    - name: Vector | Set variable
+      ansible.builtin.systemd:
+        name: "vector"
+      register: vector_service_status
+
+    - name: Vector | Set variable
+      ansible.builtin.command: "curl 127.0.0.1:8686/health"
+      register: vector_curl_output
+
+    - name: Vector | Assert
+      ansible.builtin.assert:
+        that: 
+          - "'vector 0.25.1' in vector_version_output.stdout"
+          - "'active' in vector_service_status.status.ActiveState"
+          - "'\"ok\":true' in vector_curl_output.stdout"

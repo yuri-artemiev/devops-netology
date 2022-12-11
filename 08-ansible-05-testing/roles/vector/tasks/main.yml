@@ -1,0 +1,55 @@
+---
+# tasks file for vector
+- name: Vector | Wait for SSH banners
+  ansible.builtin.wait_for_connection:
+    delay: 5
+    timeout: 180
+
+- name: Vector | Get RPM packages
+  ansible.builtin.get_url:
+    url: "https://packages.timber.io/vector/0.25.1/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  with_items: "{{ vector_packages_rpm }}"
+  when: "ansible_os_family == 'RedHat'"
+
+- name: Vector | Install RPM packages 
+  ansible.builtin.yum:
+    name: /tmp/{{ item }}
+    state: present
+    disable_gpg_check: true
+  with_items: "{{ vector_packages_rpm }}"
+  when: "ansible_os_family == 'RedHat'"
+
+- name: Vector | Get DEB packages
+  ansible.builtin.get_url:
+    url: "https://packages.timber.io/vector/0.25.1/{{ item }}"
+    dest: "/tmp/{{ item }}"
+  with_items: "{{ vector_packages_deb }}"
+  when: "ansible_os_family == 'Debian'"
+
+- name: Vector | Install DEB packages 
+  ansible.builtin.apt:
+    deb: /tmp/{{ item }}
+  with_items: "{{ vector_packages_deb }}"
+  when: "ansible_os_family == 'Debian'"
+
+# Install curl on Ubuntu for test
+- name: Ubuntu | Install curl
+  ansible.builtin.apt:
+    name: curl
+    state: present
+    update_cache: yes
+  when: "ansible_os_family == 'Debian'"
+
+- name: Vector | Server configuration file
+  ansible.builtin.template:
+    src: vector.toml.j2
+    dest: "/etc/vector/vector.toml"
+    owner: "root"
+    group: "root"
+    mode: "0664"
+
+- name: Vector | Service is running
+  ansible.builtin.service:
+    name: vector
+    state: started
