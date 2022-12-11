@@ -34,12 +34,12 @@
   when: "ansible_os_family == 'Debian'"
 
 # Install curl on Ubuntu for test
-- name: Ubuntu | Install curl
-  ansible.builtin.apt:
-    name: curl
-    state: present
-    update_cache: yes
-  when: "ansible_os_family == 'Debian'"
+# - name: Ubuntu | Install curl
+  # ansible.builtin.apt:
+    # name: curl
+    # state: present
+    # update_cache: yes
+  # when: "ansible_os_family == 'Debian'"
 
 - name: Vector | Server configuration file
   ansible.builtin.template:

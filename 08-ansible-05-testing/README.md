@@ -18,7 +18,7 @@
 
 ### Tox
 
-1. Добавьте в директорию с vector-role файлы из [директории](./example)
+1. Добавьте в директорию с vector-role файлы из [директории](./tox)
 2. Запустите `docker run --privileged=True -v <path_to_repo>:/opt/vector-role -w /opt/vector-role -it aragast/netology:latest /bin/bash`, где path_to_repo - путь до корня репозитория с vector-role на вашей файловой системе.
 3. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
 5. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
@@ -77,12 +77,44 @@
     pip3 install ansible-lint
     pip3 install yamllint
     ```
+- Отредактируем molecule/default/converge.yml
+    ```
+    ---
+    - name: Converge
+      hosts: all
+      tasks:
+        - name: "Include vector"
+          include_role:
+            name: "vector"
+    ```
+- Отредактируем molecule/default/molecule.yml
+    ```
+    ---
+    dependency:
+      name: galaxy
+    driver:
+      name: docker
+    lint: |
+      yamllint .
+      ansible-lint .
+    ...
+    ```
+- Отредактируем molecule/default/verify.yml
+    ```
+    ---
+    # This is an example playbook to execute Ansible tests.
+    - name: Verify
+      hosts: all
+      gather_facts: false
+      tasks:
+    ...
+    ```
 - Для выявления ошибок запустим последовательно команды molecue
     ```
-    molecule create
+    molecule create -s default
+    molecule converge -s default
+    molecule verify -s default
     molecule list
-    molecule converge
-    molecule verify
     molecule login --host vector-centos8
     molecule destroy
     ```
@@ -130,9 +162,59 @@
 
 
 ### Tox
+3. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
+5. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
+6. Пропишите правильную команду в `tox.ini` для того чтобы запускался облегчённый сценарий.
+8. Запустите команду `tox`. Убедитесь, что всё отработало успешно.
+9. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
 
 
 
+- Скопируем файлы из репозитория в корень роли vector
+    - tox.ini
+    - tox-requirements.txt
+- Отредактируем файл tox-requirements.txt
+    ```
+    selinux
+    ansible-lint==5.1.3
+    yamllint==1.26.3
+    lxml
+    molecule==3.4.0
+    molecule_podman
+    molecule_docker
+    jmespath
+    ```
+- Скопируем сценарий molecule/default в сценарий molecule/compatibility 
+    ```
+    cp -r molecule/default molecule/compatibility 
+    ```
+- Отредактируем molecule.yml в сценарии compatibility
+    ```
+    driver:
+      name: podman
+    ```
+- Отредактируем molecule/compatability/converge.yml
+    ```
+    ---
+    - name: Converge
+      hosts: all
+      tasks:
+        - name: "Include vector"
+          include_role:
+            name: "vector-role"
+    ```
+- Запустим команду
+    ```
+    docker run --name tox -it --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /vagrant/08-05/playbook/roles/vector:/opt/vector-role -w /opt/vector-role -p 2480:2480 aragast/netology:latest /bin/bash
+    ```
+- Очистим директории от старых пакетов в контейнере (исправляет баг с зависимостями)
+    ```
+    rm -rf /opt/vector-role/.tox/
+    ```
+- Запустим внутри контейнера окружение tox с чистого листа
+    ```
+    tox -r
+    ```
 
 
 
