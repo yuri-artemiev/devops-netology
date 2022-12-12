@@ -138,7 +138,7 @@
 - Для исправления ошибок molecule, воспользуемся командами
     - Запуск контейнер из образа
         ```
-        docker run --name tmp-centos8 -itd --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 2480:2480 quay.io/centos/centos:stream8 /usr/sbin/init
+        docker run --name tmp-centos8 -itd --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -p 8686:8686 quay.io/centos/centos:stream8 /usr/sbin/init
         ```
     - Подключение в терминал контейнера в docker
         ```
@@ -155,20 +155,13 @@
           vector-ubuntu-22.04 │ docker      │ ansible          │ default       │ true    │ true
 
         ```
-- Запустим полный тест molecule, после того как molecule будет проходить без ошибок
+- Запустим полный тест molecule, после того как отдельные шаги в molecule будут проходить без ошибок
     ```
     molecule test
     ```
 
 
 ### Tox
-3. Внутри контейнера выполните команду `tox`, посмотрите на вывод.
-5. Создайте облегчённый сценарий для `molecule` с драйвером `molecule_podman`. Проверьте его на исполнимость.
-6. Пропишите правильную команду в `tox.ini` для того чтобы запускался облегчённый сценарий.
-8. Запустите команду `tox`. Убедитесь, что всё отработало успешно.
-9. Добавьте новый тег на коммит с рабочим сценарием в соответствии с семантическим версионированием.
-
-
 
 - Скопируем файлы из репозитория в корень роли vector
     - tox.ini
@@ -188,7 +181,7 @@
     ```
     cp -r molecule/default molecule/compatibility 
     ```
-- Отредактируем molecule.yml в сценарии compatibility
+- Отредактируем molecule/compatability/molecule.yml
     ```
     driver:
       name: podman
@@ -203,9 +196,9 @@
           include_role:
             name: "vector-role"
     ```
-- Запустим команду
+- Запустим образе контейнера в Docker командой
     ```
-    docker run --name tox -it --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /vagrant/08-05/playbook/roles/vector:/opt/vector-role -w /opt/vector-role -p 2480:2480 aragast/netology:latest /bin/bash
+    docker run --name tox -it --privileged=true --cap-add=SYS_ADMIN --tmpfs /run --tmpfs /run/lock --tmpfs /tmp -v /sys/fs/cgroup:/sys/fs/cgroup:ro -v /vagrant/08-05/playbook/roles/vector:/opt/vector-role -w /opt/vector-role -p 8686:8686 aragast/netology:latest /bin/bash
     ```
 - Очистим директории от старых пакетов в контейнере (исправляет баг с зависимостями)
     ```
