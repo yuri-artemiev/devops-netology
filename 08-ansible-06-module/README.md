@@ -182,8 +182,174 @@ if __name__ == '__main__':
 
 ---
 
-### Как оформить ДЗ?
+Шаги:
 
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
+- Скачаем репозиторий ansible 
+    ```
+    git clone https://github.com/ansible/ansible.git
+    ```
+- Посольку требования к версии Python повысились в hacking env обновим Python
+    ```
+    add-apt-repository ppa:deadsnakes/ppa
+    apt update
+    apt install python3.10
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
+    update-alternatives --config python3
+    apt remove --purge python3-apt
+    apt autoclean
+    apt install python3-apt
+    apt install python3.10-distutils
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    python3.10 get-pip.py
+    ```
+- Установим venv
+    ```
+    apt install python3.10-venv
+    ```
+- В диретктрии ansible создадим виртуальное окружение
+    ```
+    python3 -m venv venv
+    ```
+- Активируем виртуальное окружение
+    ```
+    . venv/bin/activate
+    ```
+- Установим зависимости
+    ```
+    pip install -r requirements.txt
+    ```
+- Запустим настройку окружения
+    ```
+    . hacking/env-setup
+    ```
+- В виртуальном окружении создадим новый `my_own_module.py` файл
+    ```
+    nano lib/ansible/modules/my_own_module.py
+    ```
+- module должен создавать текстовый файл на удалённом хосте по пути, определённом в параметре `path`, с содержимым, определённым в параметре `content`
+- Создадим файл содержимого, который будем передавать модулю
+    ```
+    nano payload.json
+    {
+        "ANSIBLE_MODULE_ARGS": {
+            "path": "test_file.txt",
+            "content": "test content"
+        }
+    }
+    ```
+- Проверим module на исполняемость локально
+    ```
+    python3 -m ansible.modules.my_own_module payload.json
+    {"changed": true, "invocation": {"module_args": {"path": "test_file.txt", "content": "test content"}}}
+    ```
+- Проверим файл создался
+    ```
+    cat test_file.txt
+    test content
+    ```
+- Создадим playbook для проигрывания модуля в нём
+    ```
+    nano my_own_playbook.yml
+    ---
+    - name: Import my_own_module 
+      hosts: localhost
+      tasks:
+      - name: Run my_own_module
+        my_own_module:
+          path: './test_file.txt'
+          content: "test content"
+    ```
+- Проиграем playbook
+    ```
+    ansible-playbook --connection=local --inventory localhost, my_own_playbook.yml
+    ```
+- Выйдем из виртуального окружения
+    ```
+    deactivate
+    ```
+- Инициализируем новую коллекцию
+    ```
+    cd ..
+    ansible-galaxy collection init my_own_namespace.yandex_cloud_elk
+    ```
+- Скопируем в коллекцию созданный модуль
+    ```
+    mkdir -p my_own_namespace/yandex_cloud_elk/plugins/modules
+    cp ansible/lib/ansible/modules/my_own_module.py my_own_namespace/yandex_cloud_elk/plugins/modules/
+    ```
+- Создадим роль 
+    ```
+    cd my_own_namespace/yandex_cloud_elk/roles/
+    ansible-galaxy role init my_own_role
+    ```
+- Изменим файл переменных в файле main.yml
+    ```
+    nano my_own_namespace/yandex_cloud_elk/roles/defaults/main.yml
+    ---
+    # defaults file for my_own_role
+    path: './test_file.txt'
+    content: "test content"
+    ```
+- Изменим задачи в файле main.yml
+    ```
+    nano my_own_namespace/yandex_cloud_elk/tasks/main.yml
+    ---
+    # tasks file for my_own_role
+    - name: Create file
+      my_own_module:
+        path: "{{ path }}"
+        content: "{{ content }}"
+    ```
+- Создадим файл my_own_playbook.yml для проигрывания роли 
+    ```
+    nano my_own_namespace/yandex_cloud_elk/my_own_playbook.yml
+    ---
+    - name: Import my_own_role
+      hosts: localhost
+      roles:
+        - role: my_own_role
+    ```
+- Проверим модуль в коллекции
+    ```
+    ANSIBLE_LIBRARY=./plugins/modules ansible -m my_own_module -a 'path=./test_file.txt content="test content"' localhost
+    ```
+- Проиграем playbook
+    ```
+    ANSIBLE_LIBRARY=./plugins/modules ansible-playbook --connection=local --inventory localhost, my_own_playbook.yml
+    ```
+- Создадим архив коллекции
+    ```
+    ansible-galaxy collection build
+    ```
+- Создадим вторую директорию для коллекции
+    ```
+    cd ..
+    mkdir tmp
+    cd tmp
+    ```
+- Скопируем архив коллекции в новую директорию
+    ```
+    cp ../my_own_namespace/yandex_cloud_elk/my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz .
+    ```
+- Установим коллекцию из архива
+```
+ansible-galaxy collection install my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
+Installing 'my_own_namespace.yandex_cloud_elk:1.0.0' to '/root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk'
+```
+- Проиграем playbook из коллекции
+    ```
+    cd /root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk
+    ansible-playbook --connection=local --inventory localhost, my_own_playbook.yml
+    ```
+- Проверим, что файл появился
+    ```
+    cat test_file.txt
+    test content
+    ```
 
----
+
+
+
+
+
+

@@ -1,0 +1,15 @@
+namespace: my_own_namespace
+name: yandex_cloud_elk
+version: 1.0.0
+readme: README.md
+authors:
+- Yuri Artemiev <yuri.artemiev@netology.ru>
+description: Custom module my_own_module
+license:
+- GPL-2.0-or-later
+repository: https://github.com/yuri-artemiev/devops-netology/tree/main/08-ansible-06-module
+documentation: http://docs.example.com
+homepage: https://github.com/yuri-artemiev/devops-netology/tree/main/08-ansible-06-module
+issues: https://github.com/yuri-artemiev/devops-netology/issues
+
+

@@ -1,0 +1,5 @@
+---
+- name: Import my_own_role
+  hosts: localhost
+  roles:
+    - role: my_own_role
