@@ -188,7 +188,7 @@ if __name__ == '__main__':
     ```
     git clone https://github.com/ansible/ansible.git
     ```
-- Посольку требования к версии Python повысились в hacking env обновим Python
+- Поскольку требования к версии Python повысились в env, обновим Python
     ```
     add-apt-repository ppa:deadsnakes/ppa
     apt update
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     ```
     apt install python3.10-venv
     ```
-- В диретктрии ansible создадим виртуальное окружение
+- В директории ansible создадим виртуальное окружение
     ```
     python3 -m venv venv
     ```
@@ -226,7 +226,6 @@ if __name__ == '__main__':
     ```
     nano lib/ansible/modules/my_own_module.py
     ```
-- module должен создавать текстовый файл на удалённом хосте по пути, определённом в параметре `path`, с содержимым, определённым в параметре `content`
 - Создадим файл содержимого, который будем передавать модулю
     ```
     nano payload.json
@@ -242,7 +241,7 @@ if __name__ == '__main__':
     python3 -m ansible.modules.my_own_module payload.json
     {"changed": true, "invocation": {"module_args": {"path": "test_file.txt", "content": "test content"}}}
     ```
-- Проверим файл создался
+- Проверим, что файл создался
     ```
     cat test_file.txt
     test content
@@ -282,7 +281,7 @@ if __name__ == '__main__':
     cd my_own_namespace/yandex_cloud_elk/roles/
     ansible-galaxy role init my_own_role
     ```
-- Изменим файл переменных в файле main.yml
+- Изменим файл переменных у роли в файле main.yml
     ```
     nano my_own_namespace/yandex_cloud_elk/roles/defaults/main.yml
     ---
@@ -290,7 +289,7 @@ if __name__ == '__main__':
     path: './test_file.txt'
     content: "test content"
     ```
-- Изменим задачи в файле main.yml
+- Изменим задачи у роли в файле main.yml
     ```
     nano my_own_namespace/yandex_cloud_elk/tasks/main.yml
     ---
@@ -332,10 +331,10 @@ if __name__ == '__main__':
     cp ../my_own_namespace/yandex_cloud_elk/my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz .
     ```
 - Установим коллекцию из архива
-```
-ansible-galaxy collection install my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
-Installing 'my_own_namespace.yandex_cloud_elk:1.0.0' to '/root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk'
-```
+    ```
+    ansible-galaxy collection install my_own_namespace-yandex_cloud_elk-1.0.0.tar.gz
+    Installing 'my_own_namespace.yandex_cloud_elk:1.0.0' to '/root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk'
+    ```
 - Проиграем playbook из коллекции
     ```
     cd /root/.ansible/collections/ansible_collections/my_own_namespace/yandex_cloud_elk
@@ -346,10 +345,3 @@ Installing 'my_own_namespace.yandex_cloud_elk:1.0.0' to '/root/.ansible/collecti
     cat test_file.txt
     test content
     ```
-
-
-
-
-
-
-
