@@ -78,6 +78,6 @@
 - Создадим спринт и добавим в него задачи
 - Проведём задачи по спринту
 - Экспортируем workflow через свойства
-* [Bug workflow.xml](Bug%20workflow.xml")
-* [all workflow.xml](all%20workflow.xml")
+    * [Bug workflow.xml](Bug%20workflow.xml)
+    * [all workflow.xml](all%20workflow.xml)
 
