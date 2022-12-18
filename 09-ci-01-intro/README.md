@@ -34,6 +34,7 @@
 - Создадим проект типа Kanban и Company manged
 - Добавим доску типа Scrum в существующий проект
 - Cоздадим новый bug workflow
+    - Свойства проекта -> Workflows
     - Add worflow -> Create new
     - Name: bug workflow
     - Добавив на диаграмму bug workflow статусы
@@ -46,7 +47,9 @@
         - Done
         - Closed
     - Добавим на диаграмму переходы между статусами
+    ![09-ci-01-01.png](09-ci-01-01.png)
 - Cоздадим новый all workflow
+    - Свойства проекта -> Workflows
     - Add worflow -> Create new
     - Name: all workflow
     - Добавив на диаграмму all workflow статусы
@@ -57,3 +60,22 @@
         - Done
         - Closed
     - Добавим на диаграмму переходы между статусами
+    ![09-ci-01-02.png](09-ci-01-02.png)
+- Привяжем workflow к типа задач
+    - Свойства проекта -> Workflows -> Add existing workflow
+    - Выберем Bug workflow для типа bug
+    - Выберем all workflow для остальных типов
+    - Опубликуем новую схему нажав Publish
+- Выберем Kanban доску
+- Распределим статусы по Kanban доске
+    - Заёдём в свойства доски -> Колонки
+- Создадим задачи с разными типами и проведём их через статусы
+- Выберем Scrum доску
+- Распределим статусы по Kanban доске
+    - Заёдём в свойства доски -> Колонки
+- Создадим спринт и добавим в него задачи
+- Проведём задачи по спринту
+- Экспортируем workflow через свойства
+    ![Bug workflow.xml](Bug workflow.xml)
+    ![all workflow.xml](all workflow.xml)
+
