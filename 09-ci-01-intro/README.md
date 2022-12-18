@@ -33,7 +33,7 @@
 - Зарегистрируемся в Jira
 - Создадим проект типа Kanban и Company manged
 - Добавим доску типа Scrum в существующий проект
-- Cоздадим новый bug workflow
+- Создадим новый bug workflow
     - Свойства проекта -> Workflows
     - Add worflow -> Create new
     - Name: bug workflow
@@ -48,7 +48,7 @@
         - Closed
     - Добавим на диаграмму переходы между статусами
     ![09-ci-01-01.png](09-ci-01-01.png)
-- Cоздадим новый all workflow
+- Создадим новый all workflow
     - Свойства проекта -> Workflows
     - Add worflow -> Create new
     - Name: all workflow
@@ -61,21 +61,23 @@
         - Closed
     - Добавим на диаграмму переходы между статусами
     ![09-ci-01-02.png](09-ci-01-02.png)
-- Привяжем workflow к типа задач
+- Привяжем workflow к типу задачи
     - Свойства проекта -> Workflows -> Add existing workflow
     - Выберем Bug workflow для типа bug
     - Выберем all workflow для остальных типов
     - Опубликуем новую схему нажав Publish
 - Выберем Kanban доску
 - Распределим статусы по Kanban доске
-    - Заёдём в свойства доски -> Колонки
+    - Зайдём в свойства доски -> Колонки
+    - Добавим созданные статусы в колонки
 - Создадим задачи с разными типами и проведём их через статусы
 - Выберем Scrum доску
 - Распределим статусы по Kanban доске
-    - Заёдём в свойства доски -> Колонки
+    - Зайдём в свойства доски -> Колонки
+    - Добавим созданные статусы в колонки
 - Создадим спринт и добавим в него задачи
 - Проведём задачи по спринту
 - Экспортируем workflow через свойства
-    ![Bug workflow.xml](Bug workflow.xml)
-    ![all workflow.xml](all workflow.xml)
+    [Bug workflow.xml](Bug workflow.xml)
+    [all workflow.xml](all workflow.xml)
 
