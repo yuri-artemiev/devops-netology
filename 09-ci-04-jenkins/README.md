@@ -115,7 +115,7 @@
         - Создадим учётные данные нажав System > Global credentials > Add Credentials
             - SSH username with private key
             - ID: jenkins-master-ssh
-            - Username: jenkins
+            - Username: git
             - Private key: указать закрытый ключ
 
 
@@ -134,10 +134,9 @@
         - jenkins-agent:
             - ssh ansible@158.160.49.122 sudo cat /home/jenkins/.ssh/id_rsa
 
-    - В браузере откроем [SSH and GPG keys / Add SSH key|https://github.com/settings/ssh/new]
+    - В браузере откроем GitHub кллючи репозитория [SSH and GPG keys / Add SSH key|https://github.com/settings/ssh/new]
 
-        - Username: jenkins
-        - Private Key: закрытый ключ полученный ранее
+        - Вставим публичный ключ
 
 
 
@@ -213,8 +212,32 @@ pipeline{
 
 
 - Скопируем скрипт в файл `Jenkinsfile` и сохраним в репозиторий
-- 
 
 
+- Создадим задачу Scripted Pipeline Job
+    - В меню выберем Создать item выбераем Pipeline
+        - Definition: Script: Пишем срипт
+        - 
+    - Укажим путь до Jenkins файла в репозитории
+        pipeline/Jenkinsfile
+
+
+node("linux"){
+    stage("Git checkout"){
+        git credentialsId: '5ac0095d-0185-431b-94da-09a0ad9b0e2c', url: 'git@github.com:aragastmatb/example-playbook.git'
+    }
+    stage("Sample define secret_check"){
+        secret_check=true
+    }
+    stage("Run playbook"){
+        if (secret_check){
+            sh 'ansible-playbook site.yml -i inventory/prod.yml'
+        }
+        else{
+            echo 'need more action'
+        }
+        
+    }
+}
 
 
