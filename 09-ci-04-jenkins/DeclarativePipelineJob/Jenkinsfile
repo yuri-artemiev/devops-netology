@@ -1,0 +1,35 @@
+pipeline{
+    agent any
+    stages{
+        stage('Clear previous code'){
+            steps{
+                sh 'rm -rf devops-netology'
+            }
+        }
+        stage('Git checkout'){
+            steps{
+                sh 'git clone https://github.com/yuri-artemiev/devops-netology.git'
+            }
+        }
+        stage('Remove unneeded requirement'){
+            steps{
+                sh 'sed -i "/molecule_podman/d" devops-netology/08-ansible-05-testing/roles/vector/tox-requirements.txt'
+            }
+        }
+        stage('Fixing test configuration'){
+            steps{
+                sh 'sed -i "/ansible-lint/d" devops-netology/08-ansible-05-testing/roles/vector/molecule/default/molecule.yml'
+            }
+        }
+        stage('Install pip modules'){
+            steps{
+                sh 'pip3 install -r devops-netology/08-ansible-05-testing/roles/vector/tox-requirements.txt'
+            }
+        }
+        stage('Run molecule test'){
+            steps{
+                sh 'cd devops-netology/08-ansible-05-testing/roles/vector && molecule test'
+            }
+        }
+    }
+}
