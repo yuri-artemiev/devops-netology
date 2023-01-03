@@ -159,7 +159,7 @@
                     cd 08-ansible-05-testing/roles/vector
                     # Потому что установлен только Docker
                     sed -i '/molecule_podman/d' tox-requirements.txt  
-                    # Потому что выдаёт ошибку версии*
+                    # Потому что выдаёт ошибку версии
                     sed -i '/ansible-lint/d' molecule/default/molecule.yml  
                     pip3 install -r tox-requirements.txt
                     molecule test
