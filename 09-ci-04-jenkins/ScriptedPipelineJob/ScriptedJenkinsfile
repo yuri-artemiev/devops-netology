@@ -1,0 +1,13 @@
+node(){
+    stage("Git checkout"){
+        git url: 'https://github.com/aragastmatb/example-playbook.git'
+    }
+    stage("Run playbook"){
+        if ( "${prod_run}" == "true" ){
+            sh 'ansible-playbook -i inventory/prod.yml site.yml'
+        }
+        else{
+            sh 'ansible-playbook -i inventory/prod.yml site.yml --check --diff'
+        }
+    }
+}
