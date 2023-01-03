@@ -85,9 +85,9 @@
     ansible_host: 51.250.89.99
     ansible_user: ansible
     ``` 
-- Запустим проигрывание в Ansible
+- Запустим проигрывание в Ansible  
     `ansible-playbook -i inventory/cicd/hosts.yml site.yml`
-- Получим изначальный пароль для Jenkis с машины jenkins-master
+- Получим изначальный пароль для Jenkis с машины jenkins-master  
     `ssh ansible@51.250.66.197 sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
 - Открываем в браузере
     - jenkins-master: http://51.250.66.197:8080
