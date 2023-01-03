@@ -86,36 +86,38 @@
     ansible_user: ansible
     ``` 
 - Запустим проигрывание в Ansible  
-    `ansible-playbook -i inventory/cicd/hosts.yml site.yml`
+    - `ansible-playbook -i inventory/cicd/hosts.yml site.yml`
 - Получим изначальный пароль для Jenkis с машины jenkins-master  
-    `ssh ansible@51.250.66.197 sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
-- Открываем в браузере
-    - jenkins-master: http://51.250.66.197:8080
+    - `ssh ansible@51.250.66.197 sudo cat /var/lib/jenkins/secrets/initialAdminPassword`
+- Настроим Jenkins мастер в первоначальной настройке
+    - Откроем браузер`http://51.250.66.197:8080`
         - Введём первоначальный пароль
         - Выбираем Install sugested plugins
         - Создадим локального пользователя admin/1a6990aa636648e9b2ef855fa7bec2fb
-        - Оставим Jenkins URL http://51.250.66.197:8080/
+        - Оставим Jenkins URL `http://51.250.66.197:8080/`
 - Настроим агент
-    - В меню Jenkins выберем Настроить Jenkins / Управление средами сборки 
-    - Выберем в меню Новый узел 
-        - Название узла: jenkins-agent
-        - Тип: Permanent agent
-    - В настройках агента укажем:
-        - Number of executors; 2
-        - Корень удалённой ФС: /opt/jenkins_agent/
-        - Способ запуска: Launch agent via execution of command on the controller
-        - Команда запуска: ssh 51.250.89.99 java -jar /opt/jenkins_agent/agent.jar
-    - Настроем хост чтобы разрешить пользователю jenkins запух привелигированных команд
+    - В веб консоли управления Jenkins
+        - В меню Jenkins выберем Настроить Jenkins / Управление средами сборки 
+        - Выберем в меню Новый узел 
+            - Название узла: jenkins-agent
+            - Тип: Permanent agent
+        - В настройках агента укажем:
+            - Number of executors: 2
+            - Корень удалённой ФС: /opt/jenkins_agent/
+            - Способ запуска: Launch agent via execution of command on the controller
+            - Команда запуска: `ssh 51.250.89.99 java -jar /opt/jenkins_agent/agent.jar`
+    - Настроем агент на хосте чтобы разрешить пользователю jenkins запуск привилегированных команд
         ```
         ssh ansible@51.250.89.99
         echo "jenkins ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/dont-prompt-jenkins-for-sudo-password
         ```
 - Настроем мастер
-    - В меню Jenkins выберем Настроить Jenkins / Управление средами сборки 
-    - Выберем мастер
-    - В меню выберем Настроить 
-        - Количество процессов-исполнителей: 0
-    - В меню Jenkins выберем Настроить Jenkins / Глобальные настройки безопасности / Git Host Key Verification Configuration / No verification
+    - В веб консоли управления Jenkins
+        - В меню Jenkins выберем Настроить Jenkins / Управление средами сборки 
+        - Выберем мастер
+        - В меню выберем Настроить 
+            - Количество процессов-исполнителей: 0
+        - В меню Jenkins выберем Настроить Jenkins / Глобальные настройки безопасности / Git Host Key Verification Configuration / No verification
     - Настроим хост на подключение к агенту по SSH
         ```
         ssh ansible@51.250.66.197
@@ -126,44 +128,44 @@
 - Добавил закрытый ключ в Jenkins
     - Получим закрытые ключи из хоста
         - jenkins-master:
-            - ssh ansible@51.250.66.197 sudo cat /home/jenkins/.ssh/id_rsa
+            - `ssh ansible@51.250.66.197 sudo cat /home/jenkins/.ssh/id_rsa`
         - jenkins-agent:
-            - ssh ansible@51.250.89.99 sudo cat /home/jenkins/.ssh/id_rsa 
-    - jenkins-master: http://51.250.66.197:8080
+            - `ssh ansible@51.250.89.99 sudo cat /home/jenkins/.ssh/id_rsa`
+    - В веб консоли управления Jenkins
         - В меню Jenkins выберем Manage Credentials      
             - Создадим учётные данные нажав System > Global credentials > Add Credentials
                 - SSH username with private key
                 - ID: git
                 - Username: git
-                - Private key: указать закрытый ключ
+                - Private key: укажем закрытый ключ из хоста
 - Добавим публичный ключ Jenkins в GitHub репозиторий
     - Получим публичные ключи из хоста
         - jenkins-master:
-            - ssh ansible@51.250.66.197 sudo cat /home/jenkins/.ssh/id_rsa.pub
+            - `ssh ansible@51.250.66.197 sudo cat /home/jenkins/.ssh/id_rsa.pub`
         - jenkins-agent:
-            - ssh ansible@51.250.89.99 sudo cat /home/jenkins/.ssh/id_rsa.pub
-
-    - В браузере откроем GitHub колючи репозитория в настройкаъ / SSH and GPG keys / Add SSH key
-        - `https://github.com/settings/ssh/new`
-        - Вставим публичный ключ
-- Создадим задачу Freestyle Job
+            - `ssh ansible@51.250.89.99 sudo cat /home/jenkins/.ssh/id_rsa.pub`
+    - В браузере откроем GitHub ключи репозитория в Настройках / SSH and GPG keys / Add SSH key
+        - Вставим публичный ключ из хоста
+- Создадим задачу **Freestyle Job**
     - В меню выберем Создать item 
         - Имя: Freestyle Job
         - Тип: Создать задачу со свободной конфигурацией
             - Управление исходным кодом
                 - Git
-                    - Repository URL: https://github.com/yuri-artemiev/devops-netology.git
+                    - Repository URL: `https://github.com/yuri-artemiev/devops-netology.git`
             - Шаги сборки
                 - Выполнить команду shell
-                    - cd 08-ansible-05-testing/roles/vector
+                    ```
+                    cd 08-ansible-05-testing/roles/vector
                     # Потому что установлен только Docker
-                    - sed -i '/molecule_podman/d' tox-requirements.txt
-                    # Потому что выдаёт ошибку версии
-                    - sed -i '/ansible-lint/d' molecule/default/molecule.yml
-                    - pip3 install -r tox-requirements.txt
-                    - molecule test
+                    sed -i '/molecule_podman/d' tox-requirements.txt  
+                    # Потому что выдаёт ошибку версии*
+                    sed -i '/ansible-lint/d' molecule/default/molecule.yml  
+                    pip3 install -r tox-requirements.txt
+                    molecule test
+                    ```
     - На странице проекта выберем в меню Собрать сейчас
-- Создадим задачу Declarative Pipeline Job
+- Создадим задачу **Declarative Pipeline Job**
     - В меню выберем Создать item 
         - Имя: Declarative Pipeline Job
         - Тип: Pipeline
@@ -187,7 +189,7 @@
                                 sh 'sed -i "/molecule_podman/d" devops-netology/08-ansible-05-testing/roles/vector/tox-requirements.txt'
                             }
                         }
-                        stage('Fixing test configuration'){
+                        stage('Fixing molecule version compatability'){
                             steps{
                                 sh 'sed -i "/ansible-lint/d" devops-netology/08-ansible-05-testing/roles/vector/molecule/default/molecule.yml'
                             }
@@ -208,7 +210,7 @@
     - На странице проекта выберем в меню Собрать сейчас
 - Скопируем скрипт в файл `Jenkinsfile` и сохраним в репозиторий
     [Declarative Pipeline](DeclarativePipelineJob/Jenkinsfile)
-- Создадим задачу Scripted Pipeline Job
+- Создадим задачу **Scripted Pipeline Job**
     - В меню выберем Создать item 
         - Имя: Scripted Pipeline Job
         - Тип: Pipeline
@@ -216,9 +218,6 @@
                 - Choice parameter:
                     - Тип: Boolean Parameter
                     - Имя: prod_run
-                    - Варианты: true, false
-
-
             - Definition: Script
                 ```
                 node(){
@@ -238,5 +237,4 @@
     - На странице проекта выберем в меню Собрать с параметрами
 - Скопируем скрипт в файл `ScriptedJenkinsfile` и сохраним в репозиторий
     [Scripted Pipeline](ScriptedPipelineJob/ScriptedJenkinsfile)
-
 
