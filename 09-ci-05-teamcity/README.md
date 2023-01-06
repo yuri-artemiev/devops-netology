@@ -134,4 +134,81 @@
         - Token: публичный ключ
     - Подождём завершение сканирования репозитория
     - Выберем Build step: Maven
-- 
+- В веб бразуере откроем nexus: http://62.84.126.44:8081/
+        - Зайдём под пользователем admin\admin123
+        - меняем пароль на 1a6990aa636648e9b2ef855fa7bec2fb
+- В форке репозитория изменим адрес nexus
+    - Отредактируем файл [pom.xml](pom.xml)
+        ```
+        <url>http://62.84.126.44:8081/repository/maven-releases</url>
+        ```
+- Изменим build конфигурацию
+    - В панели управления Teamcity Server / в настройках проекта выберем Go to build configuration
+    - Запустим сборку выбрав Run
+    ![09-ci-05-01.png](09-ci-05-01.png)
+- Изменим настройки срабатывания сборок
+    - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration /  Build Step
+    - Edit / Add condition
+        - teamcity.build.branch equals master
+            - Goals: clean deploy
+        - teamcity.build.branch does not equal master
+            - Goals: clean test
+    ![09-ci-05-02.png](09-ci-05-02.png)
+- Отредактируем настройки подключения к nexus в [settings.xml](teamcity/settings.xml)
+    - `<password>1a6990aa636648e9b2ef855fa7bec2fb</password>`
+- Добавим настройки подключения к nexus в Teamcity
+    - В панели управления Teamcity Server / Projects / netology / Maven Settings / Upload settings file
+    - Загрузим отредактированный файл settings.xml
+    - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration /  Build Steps / Maven deploy
+    - В User settings selection выберем settings.xml
+- Запустим новую сборку
+    - В панели управления Teamcity Server / Projects / netology / Build 
+    - Нажмём кнопку Run
+    - Дождёмся окончания сборки
+- Проверем загрузку артефактов в Nexus
+    - В панели управления nexus зайдём в Browse / maven-releases
+        ![09-ci-05-03.png](09-ci-05-03.png)
+- Сохраним настройки проекта Teamcity в репозитории GitHub
+    - В панели управления Teamcity Server / Projects / netology / Edit Project / Versioned Settings
+    - Выберем Synchronization enabled
+        - VCS root: git@github.com:yuri-artemiev/example-teamcity.git#refs/heads/master
+- Создадим ветку feature/add_reply в форке репозитория
+- Сделаем изменения в новой ветке
+    - src/main/java/plaindoll/HelloPlayer.java
+        - `System.out.println(welcomer.sayNewText());`
+    - src/main/java/plaindoll/Welcomer.java
+        ```
+        public String sayNewText(){
+            return "This is a new text in branch, hunter.";
+        }
+        ```
+    - src/test/java/plaindoll/WelcomerTest.java
+        ```
+        public void welcomerSaysNewText(){
+            assertThat(welcomer.sayNewText(), containsString("text"));
+        }
+        ```
+    - Сделаем пуш изменений в новую ветку
+- Проверим что Teamcity провёл тесты
+    - В панели управления Teamcity Server / Projects / netology / Build 
+        ![09-ci-05-04.png](09-ci-05-04.png)
+- Изменим версию приложения в новой ветке форка репозитория
+    - Отредактируем файл pom.xml 
+        ```
+        <version>0.0.3</version>
+        ```
+- Создадим запроси на внедрение изменений в ветку master в репозитории
+    - `https://github.com/yuri-artemiev/example-teamcity/pull/1`
+    - Выберем Merge pull request / Confirm merge чтобы применить изменения в основную ветку
+        ![09-ci-05-05.png](09-ci-05-05.png)
+- Настроим конфигурацию сборки в Teamcity
+    - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration / General settings
+    - Укажем в Artifact paths: target/*.jar => target
+- Запустим сборку проекта в Teamcitry
+- Проверим наличие артефактов
+    - Teamcity
+        ![09-ci-05-06.png](09-ci-05-06.png)
+    - Nexus
+        ![09-ci-05-07.png](09-ci-05-07.png)
+
+[Репозиторий example-teamcity](https://github.com/yuri-artemiev/example-teamcity)
