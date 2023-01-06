@@ -79,18 +79,18 @@
     ```
     Your public key has been saved in /root/.ssh/id_rsa.pub
     ```
-- Создаём контейнер в Яндекс Облаке
+- Создаём контейнер `Teamcity Server` в Яндекс Облаке
     - Укажем образ jetbrains/teamcity-server
-    - Укажем пользователя ansible при создании машины
-    - Укажем публичный ключ при создании машины
+    - Укажем пользователя ansible при создании контейнера
+    - Укажем публичный ключ при создании контейнера
     - teamcity-server: 158.160.44.39
-- Создаём контейнер в Яндекс Облаке
+- Создаём контейнер `Teamcity Agent` в Яндекс Облаке
     - Укажем образ jetbrains/teamcity-agent
-    - Укажем переменную окружения SERVER_URL: "http://158.160.44.39:8111"
-    - Укажем пользователя ansible при создании машины
-    - Укажем публичный ключ при создании машины
+    - Укажем переменную окружения `SERVER_URL: http://158.160.44.39:8111`
+    - Укажем пользователя ansible при создании контейнера
+    - Укажем публичный ключ при создании контейнера
     - teamcity-agent: 51.250.77.177
-- Создаём виртуальную машину в Яндекс Облаке
+- Создаём виртуальную машину `Nexus` в Яндекс Облаке
     - Укажем пользователя ansible при создании машины
     - Укажем публичный ключ при создании машины
     - nexus: 62.84.126.44
@@ -98,80 +98,84 @@
     - teamcity-server: `ssh ansible@158.160.44.39`
     - teamcity-agent: `ssh ansible@51.250.77.177`
     - nexus: `ssh ansible@62.84.126.44`
-- Пропишем в файле `infrastructure/inventory/cicd/hosts.yml` адреса машин и пользователя ansible
+- Пропишем в файле `infrastructure/inventory/cicd/hosts.yml` адрес машины nexus и пользователя ansible
     ```
     ansible_host: 62.84.126.44
     ansible_user: ansible
     ``` 
 - Запустим проигрывание в Ansible  
     - `ansible-playbook -i inventory/cicd/hosts.yml site.yml`
-- Откроем в веб браузере панель управления Teamcity
-    - http://158.160.44.39:8111
+- Проведём первичную настройку Teamcity Server
+    - В веб браузере откроем панель управления Teamcity `http://158.160.44.39:8111`
     - Выбираем использовать внутреннюю базу данных
     - Создаём пользователя admin / 1a6990aa636648e9b2ef855fa7bec2fb
-    - Создадим проект нажава Create project / Manually
+    - Создадим проект нажав Create project / Manually
 - Авторизуем агента Teamcity
-    - В панели управление Teamcity Server выберем Agents / Unauthorized
+    - В панели управления Teamcity Server выберем Agents / Unauthorized
     - Выберем агента и нажмём Authorize
-- Создадим форк репозиторий
+- Создадим форк репозитория `example-teamcity`
     - В веб бразуере откроем репозиторий https://github.com/aragastmatb/example-teamcity
     - Выберем Create a new fork
     - Оставим настройки по умолчанию
     - Нажмём Create fork
-    - Адрес форка https://github.com/yuri-artemiev/example-teamcity
-- Создадим доступ к репозиторию
-    - На локальной машине сохраним приватный ключ /root/.ssh/id_rsa
-    - Открываем панель управления Teamcity Server / Root project / SSH keys / Upload SSH key / выберем сохранённый приватный ключ
-    - На локальной машине сохраним приватный ключ /root/.ssh/id_rsa.pub
+    - Адрес форка репозитория: https://github.com/yuri-artemiev/example-teamcity
+- Добавим доступ Teamcity к репозиторию
+    - На локальной машине сохраним приватный ключ `/root/.ssh/id_rsa`
+    - Откроем панель управления Teamcity Server / Root project / SSH keys / Upload SSH key / выберем сохранённый приватный ключ
+    - На локальной машине сохраним приватный ключ `/root/.ssh/id_rsa.pub`
     - В веб браузере откроем настройки GitHub аккаунта / SSH and GPG keys / New SSH key / Вставим публичный ключ в поле key
     - В веб браузере форка репозитория нажмём Code / SSH / Copy URL
-        - git@github.com:yuri-artemiev/example-teamcity.git
-- Создадим build конфигурацию
+        - `git@github.com:yuri-artemiev/example-teamcity.git`
+- Создадим конфигурацию сборки в Teamcity
     - В панели управления Teamcity Server выберем созданный проект
     - В настройках проекта выберем New build configuration / From repository
-        - Repository URL: git@github.com:yuri-artemiev/example-teamcity.git
-        - Username: git
+        - Repository URL: `git@github.com:yuri-artemiev/example-teamcity.git`
+        - Username: `git`
         - Token: публичный ключ
     - Подождём завершение сканирования репозитория
-    - Выберем Build step: Maven
-- В веб бразуере откроем nexus: http://62.84.126.44:8081/
-        - Зайдём под пользователем admin\admin123
-        - меняем пароль на 1a6990aa636648e9b2ef855fa7bec2fb
+    - Выберем Build step: `Maven`
+    - Сохраним конфигурацию
+- Поменяем доступ к Nexus
+    - В веб бразуере откроем панель управления nexus http://62.84.126.44:8081/
+    - Зайдём под пользователем admin\admin123
+    - Поменяем пароль на 1a6990aa636648e9b2ef855fa7bec2fb
 - В форке репозитория изменим адрес nexus
     - Отредактируем файл [pom.xml](pom.xml)
         ```
         <url>http://62.84.126.44:8081/repository/maven-releases</url>
         ```
-- Изменим build конфигурацию
+- Проверим сборку в Teamcity
     - В панели управления Teamcity Server / в настройках проекта выберем Go to build configuration
     - Запустим сборку выбрав Run
     ![09-ci-05-01.png](09-ci-05-01.png)
-- Изменим настройки срабатывания сборок
-    - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration /  Build Step
+- Изменим настройки срабатывания сборок в Teamcity
+    - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration / Build Steps
+    - Сделаем два шага сборки добавив условие
     - Edit / Add condition
         - teamcity.build.branch equals master
             - Goals: clean deploy
         - teamcity.build.branch does not equal master
             - Goals: clean test
+
     ![09-ci-05-02.png](09-ci-05-02.png)
-- Отредактируем настройки подключения к nexus в [settings.xml](teamcity/settings.xml)
-    - `<password>1a6990aa636648e9b2ef855fa7bec2fb</password>`
-- Добавим настройки подключения к nexus в Teamcity
+- Отредактируем настройки подключения Teamcity к Nexus
+    - В [settings.xml](teamcity/settings.xml) файле укажем верные данные
+        - `<password>1a6990aa636648e9b2ef855fa7bec2fb</password>`
     - В панели управления Teamcity Server / Projects / netology / Maven Settings / Upload settings file
     - Загрузим отредактированный файл settings.xml
     - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration /  Build Steps / Maven deploy
     - В User settings selection выберем settings.xml
-- Запустим новую сборку
+- Запустим новую сборку в Teamcity
     - В панели управления Teamcity Server / Projects / netology / Build 
     - Нажмём кнопку Run
     - Дождёмся окончания сборки
-- Проверем загрузку артефактов в Nexus
-    - В панели управления nexus зайдём в Browse / maven-releases
-        ![09-ci-05-03.png](09-ci-05-03.png)
+    - Проверем загрузку артефактов в Nexus
+        - В панели управления Nexus зайдём в Browse / maven-releases
+            ![09-ci-05-03.png](09-ci-05-03.png)
 - Сохраним настройки проекта Teamcity в репозитории GitHub
     - В панели управления Teamcity Server / Projects / netology / Edit Project / Versioned Settings
     - Выберем Synchronization enabled
-        - VCS root: git@github.com:yuri-artemiev/example-teamcity.git#refs/heads/master
+        - VCS root: `git@github.com:yuri-artemiev/example-teamcity.git#refs/heads/master`
 - Создадим ветку feature/add_reply в форке репозитория
 - Сделаем изменения в новой ветке
     - src/main/java/plaindoll/HelloPlayer.java
@@ -184,6 +188,7 @@
         ```
     - src/test/java/plaindoll/WelcomerTest.java
         ```
+        @Test
         public void welcomerSaysNewText(){
             assertThat(welcomer.sayNewText(), containsString("text"));
         }
@@ -197,14 +202,15 @@
         ```
         <version>0.0.3</version>
         ```
-- Создадим запроси на внедрение изменений в ветку master в репозитории
+- Создадим запрос на внедрение изменений в ветку master в репозитории
     - `https://github.com/yuri-artemiev/example-teamcity/pull/1`
     - Выберем Merge pull request / Confirm merge чтобы применить изменения в основную ветку
+
         ![09-ci-05-05.png](09-ci-05-05.png)
 - Настроим конфигурацию сборки в Teamcity
     - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration / General settings
-    - Укажем в Artifact paths: target/*.jar => target
-- Запустим сборку проекта в Teamcitry
+    - Укажем в Artifact paths: `target/*.jar => target`
+- Запустим сборку проекта в Teamcity
 - Проверим наличие артефактов
     - Teamcity
         ![09-ci-05-06.png](09-ci-05-06.png)
