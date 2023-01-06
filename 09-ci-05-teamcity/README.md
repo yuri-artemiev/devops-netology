@@ -206,7 +206,7 @@
     - `https://github.com/yuri-artemiev/example-teamcity/pull/1`
     - Выберем Merge pull request / Confirm merge чтобы применить изменения в основную ветку
 
-        ![09-ci-05-05.png](09-ci-05-05.png)
+    ![09-ci-05-05.png](09-ci-05-05.png)
 - Настроим конфигурацию сборки в Teamcity
     - В панели управления Teamcity Server / Projects / netology / Build / Edit configuration / General settings
     - Укажем в Artifact paths: `target/*.jar => target`
@@ -217,4 +217,4 @@
     - Nexus
         ![09-ci-05-07.png](09-ci-05-07.png)
 
-[Репозиторий example-teamcity](https://github.com/yuri-artemiev/example-teamcity)
+[Форк репозитория example-teamcity](https://github.com/yuri-artemiev/example-teamcity)
