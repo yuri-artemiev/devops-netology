@@ -1,0 +1,23 @@
+stages:
+  - build
+  - deploy
+image: docker:20.10.16
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+services:
+  - docker:20.10.16-dind
+builder:
+  stage: build
+  script:
+    - docker build -t python-api:latest .
+  except:
+    - main
+deployer:
+  stage: deploy
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - main

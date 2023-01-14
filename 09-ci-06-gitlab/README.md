@@ -98,7 +98,7 @@
     Your public key has been saved in /root/.ssh/id_rsa.pub
     ```
 - Создаём виртуальную машину `gitlab-master` в Яндекс Облаке
-    - В Cloud Marketplace укажем GitLab
+    - В каталоге Cloud Marketplace выберем GitLab
     - Укажем пользователя ansible при создании виртуальной машины
     - Укажем публичный ключ SSH при создании виртуальной машины
     - gitlab-master: 51.250.6.93
@@ -118,17 +118,16 @@
 - Зададим настройки приватности
     - Admin / Settings / General
     - В блоке Sign-up restrictions отключим опцию Sign-up enabled
-- Создадим проект netology нажав кнопку New project
+- Создадим проект `netology` нажав кнопку New project
     - Create blank project
     - Project name: netology
     - Visibility level: public
-    - Создать проект
-    - Settings / CI/CD / Auto DevOps отключим  Default to Auto DevOps pipeline
+    - Admin / Settings / CI/CD / Auto DevOps отключим  Default to Auto DevOps pipeline
     - `http://51.250.6.93/root/netology`
 - Заполним репозиторий
     - В директории проекта нажмём Add / New file
-    - Укажем имя: python-api.py
-    - Укажем содержимоев: 
+    - Укажем имя: `python-api.py`
+    - Укажем содержимое: 
         ```
         from flask import Flask, request
         from flask_restful import Resource, Api
@@ -151,7 +150,7 @@
         ![09-06-01.png](09-06-01.png)
 - Установим GitLab Runner
     - Возьмём токен в веб панели управления GitLab 
-        - Settings / CI/CD / Runners / Specific runners
+        - Admin / Settings / CI/CD / Runners / Specific runners
             `GR1348941Jm1MoPqzXhYpWPVGz_FF`
     - Подключимся SSH к GitLab серверу
         ```
@@ -206,8 +205,8 @@
         ```
 - Подготовим зависимости для проекта Python
     - В директории проекта нажмём Add / New file
-    - Укажем имя: requirements.txt
-    - Укажем содержимоев: 
+    - Укажем имя: `requirements.txt`
+    - Укажем содержимое: 
         ```
         flask
         flask_restful
@@ -215,8 +214,8 @@
         ```
 - Создадим Dockerfile для развёртывания контейнера нашего приложения
     - В директории проекта нажмём Add / New file
-    - Укажем имя: Dockerfile
-    - Укажем содержимоев:
+    - Укажем имя: `Dockerfile`
+    - Укажем содержимое:
         ```
         FROM centos:7
 
@@ -235,7 +234,7 @@
         CI_REGISTRY=docker.io
         CI_REGISTRY_IMAGE=index.docker.io/yuriartemiev/python-api
         ```
-    - Project / CI/CD / Editor / Configure pipeline
+    - Project / CI/CD / Editor / Configure pipeline (файл `.gitlab-ci.yml`)
         ```
         stages:
           - build
@@ -249,16 +248,12 @@
         builder:
           stage: build
           script:
-            - echo "  workdir env $WORDIR"
             - docker build -t python-api:latest .
           except:
             - main
         deployer:
           stage: deploy
           script:
-            - echo "  CI_REGISTRY $CI_REGISTRY"
-            - echo "  CI_REGISTRY_USER $CI_REGISTRY_USER"
-            - echo "  CI_REGISTRY_IMAGE $CI_REGISTRY_IMAGE"
             - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
             - docker build --pull -t "$CI_REGISTRY_IMAGE" .
             - docker push "$CI_REGISTRY_IMAGE"
@@ -269,9 +264,9 @@
     ![09-06-05.png](09-06-05.png)
 - Создадим Issue
     - Issues / New issue
-    - Title: Изменить message
+    - Title: `Изменить message`
     - Description: Изменить текст с { "message": "Already started" } на { "message": "Running"}
-    - Lables: Create project label 
+    - Lables: Create project label
         - Name: feature
     ![09-06-02.png](09-06-02.png)
 - Создадим отедльную ветку для изменения
@@ -283,16 +278,16 @@
     - Сохраним изменения в ветке `1-message`
         ![09-06-07.png](09-06-07.png)
 - Применим изменения
-    - Переходи на вкладку Merge requests
+    - Перейдём на вкладку Merge requests
     - Выбираем наш запрос `1-message`
     - Выбираем Mark as ready
     - Выбираем Merge
         ![09-06-08.png](09-06-08.png)
     - Зайдём во вкладку Issue и увидем закрытый тикет в Closed
         ![09-06-09.png](09-06-09.png)
-    - Зайдем на влкадку CI/CD Pipelines и увидем что сценарий проигрался
+    - Зайдем на вкладку CI/CD Pipelines и увидем, что сценарий проигрался
         ![09-06-10.png](09-06-10.png)
-    - Зайдём в репозиторий Dokcer HUB и убдимся что контеёнер создан
+    - Зайдём в репозиторий Docker Hub и убдимся, что контейнер создан
         ![09-06-11.png](09-06-11.png)
 - Проверим контейнер из репозитория
     ```
@@ -307,16 +302,9 @@
 
 ## Комментарии
 
-Похоже, что хранение контейнеров в GitLab сложно настрпоить без сертификата и nginx, что мне выходит кажется выходит за рамки задания. В настройках GitLab сервера по-умолчанию Container Registry остуствует. Пожалуйста осветите эту конфигурацию в лекциях.
+Похоже, что хранение контейнеров в GitLab сложно настроить без сертификата и nginx, что мне кажется выходит за рамки задания. В настройках GitLab сервера по-умолчанию Container Registry остуствует. Возможно следует осветить эту конфигурацию в лекциях.
 
 ![09-06-04.png](09-06-04.png)
-
-Конфигурация, которая не заработала:
-```
-    - docker build -t $CI_REGISTRY/root/netology/python-api:latest .
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $CI_REGISTRY/root/netology/python-api:latest
-```
 
 
 
