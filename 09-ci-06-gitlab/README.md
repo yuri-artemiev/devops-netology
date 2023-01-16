@@ -150,8 +150,7 @@
         ![09-06-01.png](09-06-01.png)
 - Установим GitLab Runner
     - Возьмём токен в веб панели управления GitLab 
-        - Admin / Settings / CI/CD / Runners / Specific runners
-            `GR1348941Jm1MoPqzXhYpWPVGz_FF`
+        - Admin / Settings / CI/CD / Runners / Specific runners: `GR1348941Jm1MoPqzXhYpWPVGz_FF`
     - Подключимся SSH к GitLab серверу
         ```
         ssh ansible@51.250.6.93
@@ -168,7 +167,8 @@
         gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
         gitlab-runner start
         ```
-    - Зарегистрируем GitLab Runner
+- Зарегистрируем GitLab Runner
+    - Запустим комманду на сервере
         ```
         gitlab-runner register
             GitLab instance URL: http://51.250.6.93
@@ -182,7 +182,8 @@
         nano /etc/gitlab-runner/config.toml
             privileged = true
         ```
-    ![09-06-03.png](09-06-03.png)
+    - Проверим, что GitLab Runner подключился в панели управления GitLab
+        ![09-06-03.png](09-06-03.png)
 - Подготовим зависимости для GitLab Runner
     - Подключимся SSH к GitLab серверу
         ```
@@ -287,7 +288,7 @@
         ![09-06-09.png](09-06-09.png)
     - Зайдем на вкладку CI/CD Pipelines и увидем, что сценарий проигрался
         ![09-06-10.png](09-06-10.png)
-    - Зайдём в репозиторий Docker Hub и убдимся, что контейнер создан
+    - Зайдём в репозиторий Docker Hub и убедимся, что контейнер создан
         ![09-06-11.png](09-06-11.png)
 - Проверим контейнер из репозитория
     ```
@@ -302,7 +303,7 @@
 
 ## Комментарии
 
-Похоже, что хранение контейнеров в GitLab сложно настроить без сертификата и nginx, что мне кажется выходит за рамки задания. В настройках GitLab сервера по-умолчанию Container Registry остуствует. Возможно следует осветить эту конфигурацию в лекциях.
+Похоже, что хранение контейнеров в self-hosted GitLab сложно настроить без сертификата и nginx, что мне кажется выходит за рамки задания. В настройках GitLab сервера по-умолчанию Container Registry остуствует. Возможно следует осветить эту конфигурацию в лекциях.
 
 ![09-06-04.png](09-06-04.png)
 
