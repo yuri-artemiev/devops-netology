@@ -98,13 +98,13 @@
     - Add new panel
         - Title: Memory free
             - Data source: Prometheus
-            - Field / Unit / Data / bytes
+            - Field: / Unit / Data / bytes
             - Metrics:
                 - `node_memory_MemFree_bytes`
     - Add new panel
         - Title: Disk free
             - Data source: Prometheus
-            - Field / Unit / Data / bytes
+            - Field: / Unit / Data / bytes
             - Metrics:
                 - `node_filesystem_free_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}`
 
@@ -112,7 +112,7 @@
 - Создадим правило Alert на панели
     - Alert / Create alert 
         - Conditions
-            - When avg() of qurety is above и указываем значение
+            - `when avg() of qurety is above` и указываем значение
     - Проверим список оповещений
         - Alerting / alert rules
 
