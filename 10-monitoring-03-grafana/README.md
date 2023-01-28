@@ -87,26 +87,27 @@
         - Title: CPU utilization
             - Data source: Prometheus
             - Metrics:
-                - 100 - (rate(node_cpu_seconds_total{job="nodeexporter", mode="idle"}[1m]) * 100)
+                - `100 - (rate(node_cpu_seconds_total{job="nodeexporter", mode="idle"}[1m]) * 100)`
     - Add new panel
         - Title: CPU load average
             - Data source: Prometheus
             - Metrics:
-                - node_load1{job="nodeexporter"}
-                - node_load5{job="nodeexporter"}
-                - node_load15{job="nodeexporter"}
+                - `node_load1{job="nodeexporter"}`
+                - `node_load5{job="nodeexporter"}`
+                - `node_load15{job="nodeexporter"}`
     - Add new panel
         - Title: Memory free
             - Data source: Prometheus
             - Field / Unit / Data / bytes
             - Metrics:
-                - node_memory_MemFree_bytes
+                - `node_memory_MemFree_bytes`
     - Add new panel
         - Title: Disk free
             - Data source: Prometheus
             - Field / Unit / Data / bytes
             - Metrics:
-                - node_filesystem_free_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}
+                - `node_filesystem_free_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs|vfat"}`
+
     ![10-03-02.png](10-03-02.png)
 - Создадим правило Alert на панели
     - Alert / Create alert 
@@ -114,8 +115,10 @@
             - When avg() of qurety is above и указываем значение
     - Проверим список оповещений
         - Alerting / alert rules
+
     ![10-03-03.png](10-03-03.png)
 - Сохраним Dashboard
     - Dashboard settings / JSON Model / Save Changes
+
     [graphana-dashboard.json](graphana-dashboard.json)
 
