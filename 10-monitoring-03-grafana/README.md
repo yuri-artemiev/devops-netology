@@ -74,10 +74,11 @@
     docker-compose -f docker-compose.yml up -d
     ```
 - Подключим Prometheus как источник данных в Graphana
-    - Откроем веб браузер `http://192.168.1.120:3000'
+    - Откроем веб браузер `http://192.168.1.120:3000`
         - Пароль по умолчанию `admin` / `admin`
     - Перейдём в Configuration / Data sources / Add data source / Prometheus / Select
         - URL: `http://prometheus:9090`
+
     ![10-03-01.png](10-03-01.png)
 - Создадим новый Dashboard
     - Create / Dashboard
