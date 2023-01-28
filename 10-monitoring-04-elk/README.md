@@ -76,7 +76,7 @@ Filebeat следует сконфигурировать для отправки
     apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
     ```
 - Отредактируем конфигурацию Docker Compose
-  - [docker-compose.yml](10-monitoring-04-elk/help/docker-compose.yml)  
+  - [docker-compose.yml](help/docker-compose.yml)  
     ```dockerfile
     logstash:
         volumes:
@@ -86,7 +86,7 @@ Filebeat следует сконфигурировать для отправки
         networks:
           - elastic
     ```
-  - [logstash.conf](10-monitoring-04-elk/help/configs/logstash.conf)
+  - [logstash.conf](help/configs/logstash.conf)
     ```text
     input {
       beats {
