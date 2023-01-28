@@ -112,7 +112,7 @@
 - Создадим правило Alert на панели
     - Alert / Create alert 
         - Conditions
-            - `when avg() of qurety is above` и указываем значение
+            - `when avg() of query is above` и указываем значение
     - Проверим список оповещений
         - Alerting / alert rules
 
