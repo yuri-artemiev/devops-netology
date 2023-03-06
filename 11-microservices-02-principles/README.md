@@ -106,7 +106,8 @@ curl -X GET http://localhost/images/4e6df220-295e-4231-82bc-45e4b1484430.jpg
 - Amazon API Gateway
 - Azure API Gateway
 
-|| Имя || Kong || Tyk || APIGee || AWS Gateway || Azure Gateway || Express Gateway ||
+| Имя | Kong | Tyk | APIGee | AWS Gateway | Azure Gateway | Express Gateway |
+| --- | --- | --- | --- | --- | --- | --- | 
 | Сложность развёртывания | Single node | Single node | Many nodes with different roles | Cloud vendor PaaS | Cloud vendor PaaS | Flexible |
 | Система хранения | Cassandra or Postgres | Redis | Cassandra, Zookeeper, and Postgres | Cloud vendor PaaS | Cloud vendor PaaS | Redis |
 | Основан на языке | NGINX/Lua | GoLang | Java | Not open | Not open | Node.js Express |
