@@ -109,7 +109,7 @@
          - containerPort: 8080
     ```
 
-    ![](pod-echoserver.yaml)
+    ![pod-echoserver.yaml](pod-echoserver.yaml)
 
 - Применим конфигурацию пода
     ```
@@ -174,7 +174,7 @@
          - containerPort: 8080
     ```
 
-    ![](pod-netology-web.yaml)
+    ![pod-netology-web.yaml](pod-netology-web.yaml)
 
 - Создадим `service-netology-svc.yaml` файл с конфигурацией сервиса
     ```
@@ -192,7 +192,7 @@
         app: netology-web
     ```
 
-    ![](service-netology-svc.yaml)
+    ![service-netology-svc.yaml](service-netology-svc.yaml)
 
 - Применим конфигурацию пода
     ```
