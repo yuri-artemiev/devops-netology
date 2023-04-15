@@ -239,6 +239,7 @@
     [pod/deployment-2-7d876659d7-2hwh4/multitool] Replacing default HTTPS port (443) with the value specified by the user - (HTTPS_PORT: 11443).
     ```
 
+    Увидим, что порты под запустился, потому что порты опубликовались на свободных портах и конфликт исчез.
 
 ### 2. После запуска увеличить количество реплик работающего приложения до 2.
 
@@ -356,6 +357,8 @@
 
     ![](12-03-03.PNG)
 
+    Увидим, что запустились два пода с двумя контейнерами в каждом.
+
 ### 4. Создать Service, который обеспечит доступ до реплик приложений из п.1.
 
 - Создадим файл `service-1.yml` с конфигурацией сервиса
@@ -463,7 +466,7 @@
 
     Увидим, что сервис опубликовал порты и nginx вместе с multitool отвечают на запросы по этим портам.
 
-- Удалим развернутые ресуры
+- Удалим развёрнутые ресурсы
 
     ```
     kubectl delete -f deployment-3.yml -f service-1.yml -f pod-1.yml
@@ -528,7 +531,7 @@
 
     ![deployment-4.yml](deployment-4.yml)
 
-    В развёртывание указаны основной контейнер nginx и подготовительный контейнер busybox. Busybox запрашивает разрешение DNS имени каждые 5 секунд.
+    В развёртывании указаны основной контейнер nginx и подготовительный контейнер busybox. Busybox запрашивает разрешение DNS имени каждые 5 секунд.
 
 - Запускаем развёртывание командой `kubectl apply -f deployment-4.yml`
 
@@ -536,6 +539,7 @@
 
     ```
     kubectl get pod -o wide
+
     NAME                           READY   STATUS     RESTARTS   AGE   IP          NODE            NOMINATED NODE   READINESS GATES
     deployment-4-99b9c99d6-wvp4b   0/1     Init:0/1   0          34s   10.1.2.94   12-kubernetes   <none>           <none>
     ```
@@ -588,15 +592,6 @@
 
 - Запускаем развёртывание командой `kubectl apply -f service-2.yml`
 
-- Проверяем состояние подов до создания сервиса командой `kubectl get pod -o wide`
-
-    ```
-    kubectl get pod -o wide
-
-    NAME                           READY   STATUS    RESTARTS   AGE   IP          NODE            NOMINATED NODE   READINESS GATES
-    deployment-4-99b9c99d6-wvp4b   1/1     Running   0          17m   10.1.2.94   12-kubernetes   <none>           <none>
-    ```
-
 - Проверим список сервисов командой `kubectl get service`
 
     ```
@@ -615,16 +610,11 @@
 
     ![](12-03-09.PNG)
 
-    Увидим что под запустился потому что с созданием сервиса создалось DNS имя. Подготовительный контейнер busibox успешно выполнился и запустился основной контейнер nginx.
+    Увидим, что под запустился потому что с созданием сервиса создалось DNS имя. Подготовительный контейнер busybox успешно выполнился и запустился основной контейнер nginx.
 
 
-- Удалим развернутые ресуры
+- Удалим развёрнутые ресурсы
 
     ```
     kubectl delete -f deployment-4.yml -f service-2.yml
     ```
-
-
-
-
-
