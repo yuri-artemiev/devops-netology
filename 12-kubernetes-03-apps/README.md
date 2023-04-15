@@ -290,7 +290,7 @@
 
 ### 3. Продемонстрировать количество подов до и после масштабирования.
 
-- Проверяем количество подов до увеличения реплик командой `kubectl get pods`, `kubectl get deployment` и `kubectl get replicaset`
+- Проверяем количество подов до увеличения реплик командами `kubectl get pods`, `kubectl get deployment` и `kubectl get replicaset`
 
     ```
     kubectl get pods
@@ -313,7 +313,7 @@
     ```
 
 
-- Проверяем количество подов после увеличения реплик командой `kubectl get pods`, `kubectl get deployment` и `kubectl get replicaset`
+- Проверяем количество подов после увеличения реплик командами `kubectl get pods`, `kubectl get deployment` и `kubectl get replicaset`
 
     ```
     kubectl get pods
