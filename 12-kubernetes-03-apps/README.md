@@ -148,7 +148,7 @@
     deployment-1   0/1     1            0           7m12s
     ```
 
-    ![](12-03-01.png)
+    ![](12-03-01.PNG)
 
 - Проверим логи пода командой `kubectl logs`
     ```
@@ -227,7 +227,7 @@
 
 - Проверяем состояние подов командой `kubectl get pods` и `kubectl get deployment`
 
-    ![](12-03-02.png)
+    ![](12-03-02.PNG)
 
 - Проверим логи развёртывания пода 
 
@@ -354,7 +354,7 @@
     12s         Normal    Started             pod/deployment-2-7d876659d7-qtxwn    Started container multitool
     ```
 
-    ![](12-03-03.png)
+    ![](12-03-03.PNG)
 
 ### 4. Создать Service, который обеспечит доступ до реплик приложений из п.1.
 
@@ -398,7 +398,7 @@
     service-1    ClusterIP   10.152.183.172   <none>        80/TCP,8080/TCP,11443/TCP   8s
     ```
 
-    ![](12-03-04.png)
+    ![](12-03-04.PNG)
 
 - Проверим проброс портов до сервиса запустив последовательно команды:
 
@@ -407,7 +407,7 @@
     - `kubectl port-forward service/service-1 :8080`
     - `curl --silent -i 127.0.0.1:43481 | grep Server`
 
-    ![](12-03-05.png)
+    ![](12-03-05.PNG)
 
 
 ### 5. Создать отдельный Pod с приложением multitool и убедиться с помощью `curl`, что из пода есть доступ до приложений из п.1.
@@ -459,7 +459,7 @@
     kubectl exec pod-1 -- curl --silent -i 10.1.2.89:8080 | grep Server
     ```
 
-    ![](12-03-06.png)
+    ![](12-03-06.PNG)
 
 
 - Удалим развернутые ресуры
@@ -537,7 +537,7 @@
     deployment-4-99b9c99d6-wvp4b   0/1     Init:0/1   0          34s   10.1.2.94   12-kubernetes   <none>           <none>
     ```
 
-    ![](12-03-08.png)
+    ![](12-03-08.PNG)
 
 - Проверим логи пода командой `kubectl logs`
     ```
@@ -546,7 +546,7 @@
     Error from server (BadRequest): container "nginx" in pod "deployment-4-99b9c99d6-wvp4b" is waiting to start: PodInitializing
     ```
 
-    ![](12-03-07.png)
+    ![](12-03-07.PNG)
 
 - Проверим рзарешение имени сервиса командой
 
@@ -608,7 +608,7 @@
 
 - Проверяем состояние подов после создания сервиса командой `kubectl get pod -o wide`
 
-    ![](12-03-09.png)
+    ![](12-03-09.PNG)
 
     Увидим что под запустился
 
