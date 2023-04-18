@@ -51,10 +51,6 @@
 ------
 
 
-
-
-------
-
 # Ответ
 
 - Проведём установку MicroK8S из прошлого задания
@@ -103,9 +99,33 @@
 
 - Создадим файл `deployment-frontend.yml` с развёртыванием frontend с количеством реплик 3.
 
-   ```
-
-   ```
+    ```
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: deployment-frontend
+      name: deployment-frontend
+      namespace: default
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: deployment-frontend
+      template:
+        metadata:
+          labels:
+            app: deployment-frontend
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              ports:
+                - name: http
+                  containerPort: 80
+                  protocol: TCP
+    ```
 
     ![deployment-frontend.yml](deployment-frontend.yml)
 
@@ -126,16 +146,25 @@
 
 
 
-
-
-
 ### 2. Создать Deployment приложения _backend_ из образа multitool. 
 
 - Создадим файл `deployment-backend.yml` с развёртыванием multitool.
 
-   ```
-
-   ```
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-backend
+    spec:
+      selector:
+        app: deployment-backend
+      ports:
+        - name: multitool-http
+          port: 9002
+          protocol: TCP
+          targetPort: 8080
+    ```
 
     ![deployment-backend.yml](deployment-backend.yml)
 
@@ -162,9 +191,21 @@
 
 - Создадим файл `service-frontend.yml` с развёртыванием сервиса для frontend.
 
-   ```
-
-   ```
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-frontend
+    spec:
+      selector:
+        app: deployment-frontend
+      ports:
+        - name: nginx-http
+          port: 9001
+          protocol: TCP
+          targetPort: 80
+    ```
 
     ![service-frontend.yml](service-frontend.yml)
 
@@ -172,9 +213,21 @@
 
 - Создадим файл `service-backend.yml` с развёртыванием сервиса для backend.
 
-   ```
-
-   ```
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-backend
+    spec:
+      selector:
+        app: deployment-backend
+      ports:
+        - name: multitool-http
+          port: 9002
+          protocol: TCP
+          targetPort: 8080
+    ```
 
     ![service-backend.yml](service-backend.yml)
 
@@ -210,14 +263,7 @@
 
 
 
-
-
-
 ### 5. Предоставить манифесты Deployment и Service в решении, а также скриншоты или вывод команды п.4.
-
-
-
-
 
 ## Задание 2.
 
@@ -226,19 +272,37 @@
 - Включим ingress контроллер командой `microk8s enable ingress`
 
 
-
-
-
-
 ### 2. Создать Ingress, обеспечивающий доступ снаружи по IP-адресу кластера MicroK8S так, чтобы при запросе только по адресу открывался _frontend_ а при добавлении /api - _backend_.
-
-
 
 - Создадим файл `ingress-1.yml` с развёртыванием ingress правила.
 
-   ```
-
-   ```
+    ```
+    ---
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: ingress-1
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      rules:
+      - http:
+          paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-frontend
+                port:
+                  number: 9001
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: service-backend
+                port:
+                  number: 9002
+    ```
 
     ![ingress-1.yml](ingress-1.yml)
 
@@ -275,10 +339,7 @@
     ![](12-05-05.png)
 
 
-
-
 ### 3. Продемонстрировать доступ с помощью браузера или `curl` с локального компьютера.
-
 
 - Проверим IP адрес нод
 
@@ -300,12 +361,7 @@
     Увидим, что доступ по адресу ноды в зависимости от префикса URL подключается либо к frontend сервису, либо к backend сервису.
 
 
-
-
-
-
 ### 4. Предоставить манифесты и скриншоты или вывод команды п.2.
-
 
 - Удалим развёрнутые ресурсы
 
