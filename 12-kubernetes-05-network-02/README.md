@@ -383,5 +383,5 @@
 - Удалим развёрнутые ресурсы
 
     ```
-    kubectl delete -f deployment-frontend.yml -f deployment-backend.yml -f service-frontend.yml -f service-backend.yml -f ingress-1.yml.yml
+    kubectl delete -f deployment-frontend.yml -f deployment-backend.yml -f service-frontend.yml -f service-backend.yml -f ingress-1.yml
     ```
