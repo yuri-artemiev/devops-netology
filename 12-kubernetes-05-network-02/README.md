@@ -152,18 +152,35 @@
 
     ```
     ---
-    apiVersion: v1
-    kind: Service
+    apiVersion: apps/v1
+    kind: Deployment
     metadata:
-      name: service-backend
-    spec:
-      selector:
+      labels:
         app: deployment-backend
-      ports:
-        - name: multitool-http
-          port: 9002
-          protocol: TCP
-          targetPort: 8080
+      name: deployment-backend
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: deployment-backend
+      template:
+        metadata:
+          labels:
+            app: deployment-backend
+        spec:
+          containers:
+            - name: multitool
+              image: wbitt/network-multitool
+              ports:
+                - name: http-8080
+                  containerPort: 8080
+                  protocol: TCP
+              env:
+                - name: HTTP_PORT
+                  value: "8080"
+                - name: HTTPS_PORT
+                  value: "11443"
     ```
 
     ![deployment-backend.yml](deployment-backend.yml)
