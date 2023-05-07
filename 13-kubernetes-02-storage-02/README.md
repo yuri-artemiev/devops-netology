@@ -122,7 +122,24 @@
 - Создадим файл `persistentvolume-1.yml` с развёртыванием постоянного тома. 
 
     ```
-
+    ---
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+      name: persistentvolume-1
+      labels:
+        app: persistentvolume-1
+      namespace: default
+    spec:
+      storageClassName: storageclass-1
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce
+      capacity:
+        storage: 1Gi
+      hostPath:
+        path: "/node/persistentvolume-1"
+      persistentVolumeReclaimPolicy: Delete
     ```
 
     ![persistentvolume-1.yml](persistentvolume-1.yml)
@@ -130,7 +147,21 @@
 - Создадим файл `persistentvolumeclaim-1.yml` с развёртыванием заявки на том. 
 
     ```
-
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: persistentvolumeclaim-1
+      labels:
+        app: persistentvolumeclaim-1
+      namespace: default
+    spec:
+      storageClassName: storageclass-1
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
     ```
 
     ![persistentvolumeclaim-1.yml](persistentvolumeclaim-1.yml)
@@ -156,7 +187,40 @@
 - Создадим файл `deployment-1.yml` с развёртыванием двух контейнеров с общим томом. 
 
     ```
-
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: deployment-1
+      labels:
+        app: deployment-1
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: deployment-1
+      template:
+        metadata:
+          labels:
+            app: deployment-1
+        spec:
+          containers:
+            - name: busybox
+              image: busybox
+              command: ['sh', '-c', 'i=0; file="/output/output.txt"; while true; do echo "$((i++)) | PID: $$ | File: $(readlink -f $file)" >> $file; sleep 5; done']
+              volumeMounts:
+                - name: volume-1
+                  mountPath: /output
+            - name: multitool
+              image: wbitt/network-multitool
+              volumeMounts:
+                - name: volume-1
+                  mountPath: /input
+          volumes:
+            - name: volume-1
+              persistentVolumeClaim:
+                claimName: persistentvolumeclaim-1
     ```
 
     ![deployment-1.yml](deployment-1.yml)
@@ -275,9 +339,6 @@
 
 
 
-
-
-
 ## Задание 2.
 
 
@@ -320,7 +381,23 @@
 - Создадим файл `storageclass-2.yml` с развёртыванием класса хранилища. 
 
     ```
-
+    ---
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: storageclass-2
+      labels:
+        app: storageclass-2
+      namespace: default
+    provisioner: nfs.csi.k8s.io
+    parameters:
+      server: 192.168.1.122
+      share: /node/nfsserver-1
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate
+    mountOptions:
+      - hard
+      - nfsvers=4.1
     ```
 
     ![storageclass-2.yml](storageclass-2.yml)
@@ -344,7 +421,21 @@
 - Создадим файл `persistentvolumeclaim-2.yml` с развёртыванием заявки на том. 
 
     ```
-
+    ---
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: persistentvolumeclaim-2
+      labels:
+        app: persistentvolumeclaim-2
+      namespace: default
+    spec:
+      storageClassName: storageclass-2
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
     ```
 
     ![persistentvolumeclaim-2.yml](persistentvolumeclaim-2.yml)
@@ -381,7 +472,34 @@
 - Создадим файл `deployment-2.yml` с развёртыванием контейнера с томом. 
 
     ```
-
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: deployment-2
+      labels:
+        app: deployment-2
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: deployment-2
+      template:
+        metadata:
+          labels:
+            app: deployment-2
+        spec:
+          containers:
+            - name: multitool
+              image: wbitt/network-multitool
+              volumeMounts:
+                - name: volume-2
+                  mountPath: /input
+          volumes:
+            - name: volume-2
+              persistentVolumeClaim:
+                claimName: persistentvolumeclaim-2
     ```
 
     ![deployment-2.yml](deployment-2.yml)
@@ -408,9 +526,6 @@
     ```
 
     ![](13-02-09.png)
-
-
-
 
 
 ### 3. Продемонстрировать возможность чтения и записи файла изнутри пода. 
