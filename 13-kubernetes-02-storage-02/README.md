@@ -273,7 +273,7 @@
 
 ### 4. Удалить Deployment и PVC. Продемонстрировать, что после этого произошло с PV. Пояснить, почему.
 
-- Удалим развёрнутый deployment и persistentvolumeclaim
+- Удалим развёрнутый deployment и persistent volume claim
 
     ```
     kubectl delete -f deployment-1.yml -f persistentvolumeclaim-1.yml
@@ -323,7 +323,7 @@
     kubectl delete -f persistentvolume-1.yml
     ```
 
-- Проверим файл на локальном диске после удаления persistentvolume
+- Проверим файл на локальном диске после удаления persisten tvolume
     ```
     ls -lah /node/persistentvolume-1/output.txt
 
@@ -401,6 +401,8 @@
     ```
 
     ![storageclass-2.yml](storageclass-2.yml)
+
+    Укажем адрес NFS сервера и путь до шары на нём.
 
 - Запускаем развёртывание командой `kubectl apply -f storageclass-2.yml`
 
@@ -539,7 +541,7 @@
     Sun May  7 15:42:45 UTC 2023
     ```
 
-    ![](13-01-10.png)
+    ![](13-02-10.png)
 
     Увидим, что файл доступен на запись и чтение из пода.
 
@@ -558,7 +560,7 @@
 ### 4. Предоставить манифесты, а также скриншоты или вывод необходимых команд.
 
 
-- Удалим развёрнутый deployment, persistentvolumeclaim и storageclass
+- Удалим развёрнутый deployment, persistent volume claim и storage class
 
     ```
     kubectl delete -f deployment-2.yml -f persistentvolumeclaim-2.yml -f storageclass-2.yml
@@ -577,7 +579,7 @@
     Увидим, что том удалился автоматически (потому что мы удалили заявку на том, по которой он был создан)
 
 
-- Проверим файл на локальном диске после удаления persistentvolume
+- Проверим файл на локальном диске после удаления persistent volume
     ```
     ls -lah /node/nfsserver-1/
 
