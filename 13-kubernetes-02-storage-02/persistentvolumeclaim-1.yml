@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: persistentvolumeclaim-1
+  labels:
+    app: persistentvolumeclaim-1
+  namespace: default
+spec:
+  storageClassName: storageclass-1
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
