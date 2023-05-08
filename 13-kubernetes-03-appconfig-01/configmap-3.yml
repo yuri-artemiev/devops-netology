@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-3
+data:
+  index.html:  |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Nginx Version</title>
+    </head>
+    <body>
+      <h1>Nginx Version</h1>
+      <div id="nginx-version"></div>
+      <script>
+        function getNginxVersion() {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.onreadystatechange = function() {
+            if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+              if (xmlhttp.status == 200) {
+                var serverHeader = xmlhttp.getResponseHeader("Server");
+                if (serverHeader) {
+                  document.getElementById("nginx-version").innerHTML = "Nginx Server version: " + serverHeader;
+                } else {
+                  document.getElementById("nginx-version").innerHTML = "Error: The Server header couldn't be retrieved.";
+                }
+              } else {
+                document.getElementById("nginx-version").innerHTML = "Error: The request to the server failed.";
+              }
+            }
+          };
+          xmlhttp.open("HEAD", window.location.href, true);
+          xmlhttp.send();
+        }
+        getNginxVersion();
+      </script>
+    </body>
+    </html>

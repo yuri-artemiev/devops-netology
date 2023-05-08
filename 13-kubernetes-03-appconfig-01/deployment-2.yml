@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: deployment-2
+  name: deployment-2
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-2
+  template:
+    metadata:
+      labels:
+        app: deployment-2
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+        - name: multitool
+          image: wbitt/network-multitool
+          ports:
+            - name: http-8080
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: HTTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-1
+                  key: http-port
+            - name: HTTPS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: configmap-1
+                  key: https-port

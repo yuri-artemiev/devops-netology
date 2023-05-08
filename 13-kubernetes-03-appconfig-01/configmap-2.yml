@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-2
+data:
+  http-port: "8080"
+  https-port: "11443"
+  index.html:  |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Nginx Version</title>
+        <script>
+            // Fetch the current page headers and check for the 'Server' header
+            async function getNginxVersion() {
+                const response = await fetch(document.location.href);
+                const serverHeader = response.headers.get('Server');
+                if (serverHeader && serverHeader.includes('nginx')) {
+                    const nginxVersion = serverHeader.replace('nginx/', '');
+                    document.getElementById('nginx-version').textContent = nginxVersion;
+                } else {
+                    document.getElementById('nginx-version').textContent = 'Nginx version not available';
+                }
+            }
+        </script>
+    </head>
+    <body onload="getNginxVersion()">
+        <h1>Nginx Version</h1>
+        <p>Running Nginx Server: <span id="nginx-version"></span></p>
+    </body>
+    </html>
