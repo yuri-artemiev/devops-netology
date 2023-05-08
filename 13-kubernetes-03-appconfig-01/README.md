@@ -264,7 +264,7 @@
     pod/deployment-2-64d75df6dc-clmv9   2/2     Running   0          28s
     ```
 
-    ![](12-03-02.png)
+    ![](13-03-02.png)
 
 - Проверим работу контейнеров через проброс портов до сервиса
 
@@ -273,7 +273,7 @@
     - `kubectl port-forward service/service-1 :8080`
     - `curl --silent -i 127.0.0.1:41983 | grep Server`
 
-    ![](12-03-03.png)
+    ![](13-03-03.png)
 
 
 - Удалим развёрнутые ресурсы командой `kubectl delete`
@@ -430,7 +430,7 @@
     pod/deployment-3-6c8b5b8564-fsnpn   2/2     Running   0          25s
     ```
 
-    ![](12-03-04.png)
+    ![](13-03-04.png)
 
 - Проверим работу контейнеров через проброс портов до сервиса
 
@@ -439,7 +439,7 @@
     - `kubectl port-forward service/service-2 :8080`
     - `curl --silent -i 127.0.0.1:38041 | grep Server`
 
-    ![](12-03-05.png)
+    ![](13-03-05.png)
 
 
 - Удалим развёрнутые ресурсы командой `kubectl delete`
@@ -670,7 +670,7 @@
     pod/deployment-4-778447ff46-tssqx   1/1     Running   0          6m31s
     ```
 
-    ![](12-03-06.png)
+    ![](13-03-06.png)
 
 - Проверим работу приложения запросив сертификат через входящее правило
 
@@ -678,8 +678,8 @@
     echo | openssl s_client -servername 13-03.netology -connect 13-03.netology:443 2>/dev/null | openssl x509 -noout -subject
     ```
 
-    ![](12-03-07.png)
-    ![](12-03-08.png)
+    ![](13-03-07.png)
+    ![](13-03-08.png)
 
 
 - Удалим развёрнутые ресурсы командой `kubectl delete`
