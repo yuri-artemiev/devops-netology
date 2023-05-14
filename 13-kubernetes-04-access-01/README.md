@@ -293,7 +293,7 @@
 
     Увидим, что пользователь `devuser` может подключиться, посмотреть под и прочитать логи
 
-- Проверим уровень доступа пользователе `devuser` командой `kubectl`
+- Проверим уровень доступа пользователя `devuser` командой `kubectl`
     ```
     kubectl delete pod pod-1 --kubeconfig="/vagrant/13-04/kubeconfig-devuser"
 
