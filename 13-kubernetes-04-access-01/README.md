@@ -72,17 +72,7 @@
     13-kubernetes   Ready    <none>   16m   v1.26.3
     ```
 
-## Задание 1.
-
-### 1. Создайте и подпишите SSL-сертификат для подключения к кластеру.
-### 2. Настройте конфигурационный файл kubectl для подключения.
-### 3. Создайте роли и все необходимые настройки для пользователя.
-### 4. Предусмотрите права пользователя. Пользователь может просматривать логи подов и их конфигурацию (`kubectl logs pod <pod_id>`, `kubectl describe pod <pod_id>`).
-### 5. Предоставьте манифесты и скриншоты и/или вывод необходимых команд.
-
-
-
-- Включаем поддержку RBAC в MicroK8S командой `microk8s enable rbac`
+- Включим поддержку RBAC в MicroK8S командой `microk8s enable rbac`
 
 - Создадим запрос сертификата `devuser.csr` для пользователя
 
@@ -92,6 +82,7 @@
     ```
 
     ![devuser.key](devuser.key)
+
     ![devuser.csr](devuser.csr)
 
 - Получим base64 от созданного запроса на сертификат командой `base64 < devuser.csr`
@@ -152,8 +143,10 @@
 
 - Запускаем развёртывание командой `kubectl apply -f role-1.yml`
 
-- Подтвердим запрос сертифаката командой `kubectl get role`
+- Подтвердим создадние роли командой `kubectl get role`
     ```
+    kubectl get role
+
     NAME     CREATED AT
     role-1   2023-05-14T17:06:11Z
     ```
@@ -181,8 +174,11 @@
 
 - Запускаем развёртывание командой `kubectl apply -f rolebinding-1.yml`
 
-- Подтвердим запрос сертификата командой `kubectl get rolebinding`
+- Подтвердим создание привязки роли командой `kubectl get rolebinding`
+
     ```
+    kubectl get rolebinding
+
     NAME            ROLE          AGE
     rolebinding-1   Role/role-1   8s
     ```
@@ -253,8 +249,8 @@
     ```
 
     Добавим данные в файл `kubeconfig-devuser`:
-        - `certificate-authority-data` и `server` из вывода в прошлом пункте
-        - `client-certificate` и `client-key` пути к файлам `devuser.crt` и `devuser.key`
+    - `certificate-authority-data` и `server` из вывода в прошлом пункте
+    - `client-certificate` и `client-key` пути к файлам `devuser.crt` и `devuser.key`
 
     ![kubeconfig-devsuer](kubeconfig-devuser)
 
