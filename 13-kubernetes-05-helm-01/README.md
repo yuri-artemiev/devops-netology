@@ -126,7 +126,7 @@
                   protocol: TCP
     ```
 
-    ![](chart1/templates/deployment1.yml)
+    ![deployment1.yml](chart1/templates/deployment1.yml)
 
 - Создадим файл `chart1/templates/deployment2.yml` для развёртывания приложения 2
 
