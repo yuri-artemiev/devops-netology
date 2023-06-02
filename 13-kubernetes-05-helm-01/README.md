@@ -163,7 +163,7 @@
                   value: "11443"
     ```
 
-    ![](chart1/templates/deployment2.yml)
+    ![deployment2.yml](chart1/templates/deployment2.yml)
 
 - Создадим файл `chart1/templates/service1.yml` для развёртывания сервиса 1
 
@@ -186,7 +186,7 @@
 
     ```
 
-    ![](chart1/templates/service1.yml)
+    ![service1.yml](chart1/templates/service1.yml)
 
 - Создадим файл `chart1/templates/service2.yml` для развёртывания сервиса 2
 
@@ -212,7 +212,7 @@
           targetPort: 11443
     ```
 
-    ![](chart1/templates/service2.yml)
+    ![service2.yml](chart1/templates/service2.yml)
 
 - Создадим файл `chart1/Chart.yaml` для информации о чарте
 
@@ -227,7 +227,7 @@
     appVersion: "1"
     ```
 
-    ![](chart1/Chart.yaml)
+    ![Chart.yaml](chart1/Chart.yaml)
 
 - Создадим файл `chart1/values.yaml` для переменных чарта
 
@@ -252,7 +252,7 @@
       servicePort: 8080
     ```
 
-    ![](chart1/values.yaml)
+    ![values.yaml](chart1/values.yaml)
 
 
 - Проверим конструктор чарта запустив команду `helm template`
@@ -345,7 +345,7 @@
       servicePort: 8080
     ```
 
-    ![](chart1/values2.yaml)
+    ![values2.yaml](chart1/values2.yaml)
 
 - Изменим файл `chart1/Chart.yaml`  для изменения версии чарта и приложения
 
@@ -473,7 +473,7 @@
                   protocol: TCP
     ```
 
-    ![](chart2/templates/deployment1.yml)
+    ![deployment1.yml](chart2/templates/deployment1.yml)
 
 - Создадим файл `chart2/templates/deployment2.yml` для развёртывания приложения 2
 
@@ -510,7 +510,7 @@
                   value: "11443"
     ```
 
-    ![](chart2/templates/deployment2.yml)
+    ![deployment2.yml](chart2/templates/deployment2.yml)
 
 - Создадим файл `chart2/templates/service1.yml` для развёртывания сервиса 1
 
@@ -534,7 +534,7 @@
 
     ```
 
-    ![](chart2/templates/service1.yml)
+    ![service1.yml](chart2/templates/service1.yml)
 
 - Создадим файл `chart2/templates/service2.yml` для развёртывания сервиса 2
 
@@ -561,7 +561,7 @@
           targetPort: 11443
     ```
 
-    ![](chart2/templates/service2.yml)
+    ![service2.yml](chart2/templates/service2.yml)
 
 - Создадим файл `chart2/Chart.yaml` для информации о чарте
 
@@ -576,7 +576,7 @@
     appVersion: "1"
     ```
 
-    ![](chart2/Chart.yaml)
+    ![Chart.yaml](chart2/Chart.yaml)
 
 - Создадим файл `chart2/values.yaml` для переменных чарта
 
@@ -601,7 +601,7 @@
       servicePort: 8080
     ```
 
-    ![](chart2/values.yaml)
+    ![values.yaml](chart2/values.yaml)
 
 - Создадим файл `chart2/values2.yaml` для переменных чарта
 
@@ -626,7 +626,7 @@
       servicePort: 8080
     ```
 
-    ![](chart2/values2.yaml)
+    ![values2.yaml](chart2/values2.yaml)
 
 - Создадим файл `chart2/values3.yaml` для переменных чарта
 
@@ -651,7 +651,7 @@
       servicePort: 8080
     ```
 
-    ![](chart2/values3.yaml)
+    ![values3.yaml](chart2/values3.yaml)
 
 - Запустим развёртывание чарта командой `helm install`
 
