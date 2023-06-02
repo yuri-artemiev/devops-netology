@@ -1,0 +1,18 @@
+---
+chartVersion: "v1n1"
+
+deployment1:
+  replicaCount: 1
+  imageVersion: "1.23"
+  containerPort: 80
+
+deployment2:
+  replicaCount: 1
+  imageVersion: "openshift"
+  containerPort: 8080
+
+service1:
+  servicePort: 80
+
+service2:
+  servicePort: 8080

@@ -1,0 +1,18 @@
+---
+chartVersion: "v2n1"
+
+deployment1:
+  replicaCount: 1
+  imageVersion: "1.24"
+  containerPort: 80
+
+deployment2:
+  replicaCount: 1
+  imageVersion: "fedora-minimal"
+  containerPort: 8080
+
+service1:
+  servicePort: 80
+
+service2:
+  servicePort: 8080

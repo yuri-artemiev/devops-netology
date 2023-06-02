@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: deployment1{{ .Values.chartVersion }}
+  name: deployment1{{ .Values.chartVersion }}
+  namespace: default
+spec:
+  replicas: {{ .Values.deployment1.replicaCount }}
+  selector:
+    matchLabels:
+      app: deployment1{{ .Values.chartVersion }}
+  template:
+    metadata:
+      labels:
+        app: deployment1{{ .Values.chartVersion }}
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:{{ .Values.deployment1.imageVersion }}
+          ports:
+            - name: http-{{ .Values.deployment1.containerPort }}
+              containerPort: {{ .Values.deployment1.containerPort }}
+              protocol: TCP

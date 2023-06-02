@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: deployment2{{ .Values.chartVersion }}
+  name: deployment2{{ .Values.chartVersion }}
+  namespace: default
+spec:
+  replicas: {{ .Values.deployment2.replicaCount }}
+  selector:
+    matchLabels:
+      app: deployment2{{ .Values.chartVersion }}
+  template:
+    metadata:
+      labels:
+        app: deployment2{{ .Values.chartVersion }}
+    spec:
+      containers:
+        - name: multitool
+          image: wbitt/network-multitool:{{ .Values.deployment2.imageVersion }}
+          ports:
+            - name: http-{{ .Values.deployment2.containerPort }}
+              containerPort: {{ .Values.deployment2.containerPort }}
+              protocol: TCP
+          env:
+            - name: HTTP_PORT
+              value: "{{ .Values.deployment2.containerPort }}"
+            - name: HTTPS_PORT
+              value: "11443"

@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service2{{ .Values.chartVersion }}
+  labels:
+    app: deployment2{{ .Values.chartVersion }}
+spec:
+  selector:
+    app: deployment2{{ .Values.chartVersion }}
+  ports:
+    - name: http-{{ .Values.service2.servicePort }}
+      port: {{ .Values.service2.servicePort }}
+      protocol: TCP
+      targetPort: {{ .Values.deployment2.containerPort }}
+    - name: multitool-https
+      port: 11443
+      protocol: TCP
+      targetPort: 11443

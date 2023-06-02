@@ -1,0 +1,18 @@
+---
+chartVersion: "v3n2"
+
+deployment1:
+  replicaCount: 1
+  imageVersion: "1.25"
+  containerPort: 80
+
+deployment2:
+  replicaCount: 1
+  imageVersion: "alpine-minimal"
+  containerPort: 8080
+
+service1:
+  servicePort: 80
+
+service2:
+  servicePort: 8080
