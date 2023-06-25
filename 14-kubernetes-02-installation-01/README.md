@@ -187,6 +187,13 @@
         kubeadm config images pull
         kubeadm init --apiserver-advertise-address=10.129.0.5 --pod-network-cidr 10.244.0.0/16  --apiserver-cert-extra-sans=158.160.22.66,master-01.ru-central1.internal
         ```
+
+        где:
+
+            - `apiserver-advertise-address` - адрес API сервера (мастер ноды)
+            - `pod-network-cidr` - подсеть для подов
+            - `apiserver-cert-extra-sans` - дополнительные именя в сертификате API сервера. Нужно указать те, по которым будет подключаться клиенты kubectl
+
         ```
         Your Kubernetes control-plane has initialized successfully!
 
@@ -210,7 +217,7 @@
                 --discovery-token-ca-cert-hash sha256:02602dda39f237e1d93fcd24c74d54cbdff7af6896d376d1180389f86b53b856
         ```
 
-    ![](14-02-02.png)
+        ![](14-02-02.png)
 
 
     - Создадим kubeconfig на мастер ноде
@@ -242,6 +249,8 @@
     ```
     ssh -i ~/.ssh/id_rsa netology@158.160.7.7
     ```
+
+    Используем эту инструкцию для настройки на всех рабочих нодах.
 
     - Установим kubeadm, kubelet, kubectl
 
@@ -315,6 +324,8 @@
         Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
         ```
 
+        Команду взяли из вывода команды при создании мастер ноды.
+
         ![](14-02-04.png)
 
 - Установим kubectl на локальную машину
@@ -339,7 +350,7 @@
     chown $(id -u):$(id -g) $HOME/.kube/config
     ```
 
-- Поменяем адрес подключения на внешний IP мастер ноды в kubeconfig
+- Поменяем адрес подключения на внешний IP мастер ноды в kubeconfig на локальной машине
 
     ```
     nano /root/.kube/config
@@ -349,7 +360,7 @@
           name: kubernetes
     ```
 
-- Посмотрим состояния нод в кластере Kubernetes
+- Посмотрим состояния нод в кластере Kubernetes с помощью команды `kubectl`
 
     ```
     kubectl get nodes
@@ -363,6 +374,8 @@
     ```
 
     ![](14-02-05.png)
+
+    Увидим, что все 5 нод готовы к работе.
 
     ```
     kubectl get pods --all-namespaces -o wide
