@@ -190,9 +190,9 @@
 
         где:
 
-            - `apiserver-advertise-address` - адрес API сервера (мастер ноды)
-            - `pod-network-cidr` - подсеть для подов
-            - `apiserver-cert-extra-sans` - дополнительные именя в сертификате API сервера. Нужно указать те, по которым будет подключаться клиенты kubectl
+        - `apiserver-advertise-address` - адрес API сервера (мастер ноды)
+        - `pod-network-cidr` - подсеть для подов
+        - `apiserver-cert-extra-sans` - дополнительные именя в сертификате API сервера. Нужно указать те, по которым будет подключаться клиенты kubectl
 
         ```
         Your Kubernetes control-plane has initialized successfully!
