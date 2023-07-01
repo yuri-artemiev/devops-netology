@@ -118,64 +118,64 @@
     - Включим IP forward
 
         ```
-modprobe br_netfilter
-modprobe overlay
-echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-arptables=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
-cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
-overlay
-br_netfilter
-EOF
+        modprobe br_netfilter
+        modprobe overlay
+        echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-arptables=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
+        sysctl -p /etc/sysctl.conf
+        cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+        overlay
+        br_netfilter
+        EOF
         ```
 
     - Установим kubeadm, kubelet, kubectl
 
         ```
-apt-get update
-apt-get install -y apt-transport-https ca-certificates curl
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
+        apt-get update
+        apt-get install -y apt-transport-https ca-certificates curl
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+        apt-get update
+        apt-get install -y kubelet kubeadm kubectl
+        apt-mark hold kubelet kubeadm kubectl
         ```
 
     - Установим containerd среду выполнения контейнеров
 
         ```
-apt-get update
-apt-get install ca-certificates curl gnupg
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
-echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
-apt-get install containerd.io
-mkdir -p /etc/containerd
-containerd config default | tee /etc/containerd/config.toml
-sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
-systemctl restart containerd
-systemctl enable kubelet
+        apt-get update
+        apt-get install ca-certificates curl gnupg
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        apt-get update
+        apt-get install containerd.io
+        mkdir -p /etc/containerd
+        containerd config default | tee /etc/containerd/config.toml
+        sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+        systemctl restart containerd
+        systemctl enable kubelet
         ```
 
     - Установим мастер ноду
 
         ```
-kubeadm config images pull
-kubeadm init --apiserver-advertise-address=10.129.0.27 --pod-network-cidr 10.244.0.0/16  --apiserver-cert-extra-sans=51.250.110.232,master-01.ru-central1.internal
+        kubeadm config images pull
+        kubeadm init --apiserver-advertise-address=10.129.0.27 --pod-network-cidr 10.244.0.0/16  --apiserver-cert-extra-sans=51.250.110.232,master-01.ru-central1.internal
         ```
 
-Получим команду для подключения рабочих нод в кластер:
+        Получим команду для подключения рабочих нод в кластер:
 
-```
-Then you can join any number of worker nodes by running the following on each as root:
+        ```
+        Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
-```
+        kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
+        ```
 
         где:
 
@@ -186,19 +186,19 @@ kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-
     - Создадим kubeconfig на мастер ноде
 
         ```
-mkdir -p $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown $(id -u):$(id -g) $HOME/.kube/config
+        mkdir -p $HOME/.kube
+        cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        chown $(id -u):$(id -g) $HOME/.kube/config
         ```
 
     - Устанавливаем сетевой плагин Calico на мастер ноде
 
-```
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O --silent
-sed -i 's/192\.168\.0\.0/10\.244\.0\.0/g' custom-resources.yaml
-kubectl create -f custom-resources.yaml
-```
+        ```
+        kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+        curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O --silent
+        sed -i 's/192\.168\.0\.0/10\.244\.0\.0/g' custom-resources.yaml
+        kubectl create -f custom-resources.yaml
+        ```
 
     указали подсеть для подов, должна соответствовать той при создании кластера
 
@@ -222,30 +222,30 @@ kubectl create -f custom-resources.yaml
     - Включим IP forward
 
         ```
-modprobe br_netfilter
-modprobe overlay
-echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-arptables=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
-sysctl -p /etc/sysctl.conf
-cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
-overlay
-br_netfilter
-EOF
+        modprobe br_netfilter
+        modprobe overlay
+        echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-arptables=1" >> /etc/sysctl.conf
+        echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
+        sysctl -p /etc/sysctl.conf
+        cat <<EOF | sudo tee /etc/modules-load.d/containerd.conf
+        overlay
+        br_netfilter
+        EOF
         ```
 
     - Установим kubeadm, kubelet, kubectl
 
         ```
-apt-get update
-apt-get install -y apt-transport-https ca-certificates curl
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-apt-mark hold kubelet kubeadm kubectl
+        apt-get update
+        apt-get install -y apt-transport-https ca-certificates curl
+        mkdir -p /etc/apt/keyrings
+        curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+        apt-get update
+        apt-get install -y kubelet kubeadm kubectl
+        apt-mark hold kubelet kubeadm kubectl
         ```
 
 
@@ -253,26 +253,27 @@ apt-mark hold kubelet kubeadm kubectl
     - Установим containerd среду выполнения контейнеров
 
         ```
-apt-get update
-apt-get install ca-certificates curl gnupg
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
-echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
-apt-get install containerd.io
-mkdir -p /etc/containerd
-containerd config default | tee /etc/containerd/config.toml
-sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
-systemctl restart containerd
-systemctl enable kubelet
+        apt-get update
+        apt-get install ca-certificates curl gnupg
+        install -m 0755 -d /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        apt-get update
+        apt-get install containerd.io
+        mkdir -p /etc/containerd
+        containerd config default | tee /etc/containerd/config.toml
+        sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+        systemctl restart containerd
+        systemctl enable kubelet
         ```
 
     - На рабочей ноде введём в кластер
 
         ```
-kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
+        kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
         ```
+
     Возьмём команду из вывода при создании кластера
 
 
@@ -334,17 +335,20 @@ kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-
 
 - Создадим файл `namespace.yml`
 
-```
-
-```
+    ```
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: app
+    ```
 
     ![namespace.yml](namespace.yml)
 
 - Применим конфигурацию с помощью команды `kubectl`
 
-```
-kubectl create -f namespace.yml
-```
+    ```
+    kubectl create -f namespace.yml
+    ```
 
     ![](14-03-01.png)
 
@@ -352,25 +356,67 @@ kubectl create -f namespace.yml
 
 - Создадим файл `deployment-frontend.yml`
 
-```
-
-```
+    ```
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: deployment-frontend
+      name: deployment-frontend
+      namespace: app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: frontend
+      template:
+        metadata:
+          labels:
+            app: frontend
+        spec:
+          containers:
+            - name: frontend-multitool
+              image: wbitt/network-multitool
+              ports:
+                - name: port-80
+                  containerPort: 80
+                  protocol: TCP
+              env:
+                - name: HTTP_PORT
+                  value: "80"
+                - name: HTTPS_PORT
+                  value: "443"
+    ```
 
     ![deployment-frontend.yml](deployment-frontend.yml)
 
 - Создадим файл `service-frontend.yml`
 
-```
-
-```
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-frontend
+      namespace: app
+    spec:
+      selector:
+        app: frontend
+      ports:
+        - name: port-80
+          port: 80
+          protocol: TCP
+          targetPort: 80
+    ```
 
     ![service-frontend.yml](service-frontend.yml)
 
 - Применим конфигурацию с помощью команды `kubectl`
 
-```
-kubectl create -f deployment-frontend.yml -f service-frontend.yml
-```
+    ```
+    kubectl create -f deployment-frontend.yml -f service-frontend.yml
+    ```
 
     ![](14-03-02.png)
 
