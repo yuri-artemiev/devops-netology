@@ -325,19 +325,10 @@
 
 
 
-
-# Задание 1.
-
-
-1. Создать deployment'ы приложений frontend, backend и cache и соответсвующие сервисы.
-2. В качестве образа использовать network-multitool.
-3. Разместить поды в namespace App.
-4. Создать политики, чтобы обеспечить доступ frontend -> backend -> cache. Другие виды подключений должны быть запрещены.
-5. Продемонстрировать, что трафик разрешён и запрещён.
-
-
-
 ## Calico не заработало в kube-dns
+
+Что-то пошло не так с кластером kubeadm и calico, и сетевое подключение не работает.
+
 ```
 kubectl get services -A
 NAMESPACE          NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)
@@ -351,6 +342,15 @@ default            kubernetes                        ClusterIP   10.96.0.1      
 kube-system        kube-dns                          ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP
 
 kubectl run -it busybox --image=busybox -- sh
+/ # nslookup kubernetes.default
+Server:    10.96.0.10
+Address 1: 10.96.0.10
+nslookup: can't resolve 'kubernetes.default'
+/ # ping 10.96.0.10
+PING 10.96.0.10 (10.96.0.10): 56 data bytes
+^C
+--- 10.96.0.10 ping statistics ---
+22 packets transmitted, 0 packets received, 100% packet loss
 / # nc -vz 10.102.118.183 80
 10.102.118.183 (10.102.118.183:80) open
 / # nc -vz 10.96.0.1 443
@@ -361,221 +361,7 @@ nc: 10.96.0.10 (10.96.0.10:53): Connection timed out
 nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
 ```
 
-Следующие манифесты были проиграны, но из-за не работающего кластера нельзя было проверить.
 
-## Namespace
-
-- Создадим файл `namespace.yml`
-
-    ```
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: app
-    ```
-
-    ![namespace.yml](namespace.yml)
-
-- Применим конфигурацию с помощью команды `kubectl`
-
-    ```
-    kubectl create -f namespace.yml
-    ```
-
-    ![](14-03-01.png)
-
-## Frontend
-
-- Создадим файл `deployment-frontend.yml`
-
-    ```
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app: deployment-frontend
-      name: deployment-frontend
-      namespace: app
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: frontend
-      template:
-        metadata:
-          labels:
-            app: frontend
-        spec:
-          containers:
-            - name: frontend-multitool
-              image: wbitt/network-multitool
-    ```
-
-    ![deployment-frontend.yml](deployment-frontend.yml)
-
-- Создадим файл `service-frontend.yml`
-
-    ```
-    ---
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: service-frontend
-      namespace: app
-    spec:
-      selector:
-        app: frontend
-      ports:
-        - name: port-80
-          port: 80
-          protocol: TCP
-          targetPort: 80
-    ```
-
-    ![service-frontend.yml](service-frontend.yml)
-
-- Применим конфигурацию с помощью команды `kubectl`
-
-    ```
-    kubectl create -f deployment-frontend.yml -f service-frontend.yml
-    ```
-
-    ![](14-03-02.png)
-
-## Backend
-
-- Создадим файл `deployment-backend.yml`
-
-    ```
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app: deployment-backend
-      name: deployment-backend
-      namespace: app
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: backend
-      template:
-        metadata:
-          labels:
-            app: backend
-        spec:
-          containers:
-            - name: backend-multitool
-              image: wbitt/network-multitool
-    ```
-
-    ![deployment-backend.yml](deployment-backend.yml)
-
-- Создадим файл `service-backend.yml`
-
-    ```
-    ---
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: service-backend
-      namespace: app
-    spec:
-      selector:
-        app: backend
-      ports:
-        - name: port-80
-          port: 80
-          protocol: TCP
-          targetPort: 80
-    ```
-
-    ![service-backend.yml](service-backend.yml)
-
-- Применим конфигурацию с помощью команды `kubectl`
-
-    ```
-    kubectl create -f deployment-backend.yml -f service-backend.yml
-    ```
-
-    ![](14-03-03.png)
-
-
-## Cache
-
-- Создадим файл `deployment-cache.yml`
-
-    ```
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app: deployment-cache
-      name: deployment-cache
-      namespace: app
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: cache
-      template:
-        metadata:
-          labels:
-            app: cache
-        spec:
-          containers:
-            - name: cache-multitool
-              image: wbitt/network-multitool
-    ```
-
-    ![deployment-cache.yml](deployment-cache.yml)
-
-- Создадим файл `service-cache.yml`
-
-    ```
-    ---
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: service-cache
-      namespace: app
-    spec:
-      selector:
-        app: cache
-      ports:
-        - name: port-80
-          port: 80
-          protocol: TCP
-          targetPort: 80
-    ```
-
-    ![service-cache.yml](service-cache.yml)
-
-- Применим конфигурацию с помощью команды `kubectl`
-
-    ```
-    kubectl create -f deployment-cache.yml -f service-cache.yml
-    ```
-
-    ![](14-03-04.png)
-
-
-
-Отметим, что каждое развёртывание это один под. Каждый под имеет свой IP адрес. Поэтому не возникает конфликтов с портами потому что каждое приложение в своём поде.
-
-## Network policy
-
-
-
-Проверим запуск curl из сервисов
-
-kubectl exec -it service/service-frontend -n app -- curl --silent -i service-backend.default.svc.cluster.local:80 | grep Server
-kubectl exec -it service/service-backend -- curl --silent -i service-cache.default.svc.cluster.local:9001 | grep Server
-
-Увидим, что доступ по относительному и абсолютному DNS имени сервиса возможен из другого сервиса.
 
 
 
