@@ -225,7 +225,7 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
     sed -i 's/# supplementary_addresses_in_ssl_keys: \[10\.0\.0\.1, 10\.0\.0\.2, 10\.0\.0\.3\]/supplementary_addresses_in_ssl_keys: \[51\.250\.101\.92, master-01\.ru-central1\.internal\]/g' inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
     ```
 
-    Добавим имя и внеший адрес в сертификат
+    Добавим имя и внешний адрес мастер ноды в сертификат кластера
 
 
 # Локальная машина
@@ -495,7 +495,7 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
 
 
 
-Отметим, что каждое развёртывание это один под. Каждый под имеет свой IP адрес. Поэтому не возникает конфликтов с портами, потому что каждое приложение в своём поде.
+Отметим, что каждое развёртывание это один под. Каждый под имеет свой IP адрес. Поэтому не возникает конфликтов с портами (как это было в случае нескольких контейнеров в одном развёртывании), потому что каждое приложение в своём поде.
 
 ## Network policy
 
@@ -529,6 +529,8 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
 
     ![networkpolicy-default.yml](networkpolicy-default.yml)
 
+    Политика, запрещающая подключения, не разрешённые специально
+
 - Создадим файл `networkpolicy-backend.yml`
 
     ```
@@ -558,6 +560,8 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
 
     ![networkpolicy-backend.yml](networkpolicy-backend.yml)
 
+    Политика, разрешающая подключения от frontend на backend по портам
+
 - Создадим файл `networkpolicy-cache.yml`
 
     ```
@@ -565,19 +569,19 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
     apiVersion: networking.k8s.io/v1
     kind: NetworkPolicy
     metadata:
-      name: frontend-to-backend-policy
+      name: backend-to-cache-policy
       namespace: app
     spec:
       podSelector:
         matchLabels:
-          app: backend
+          app: cache
       policyTypes:
         - Ingress
       ingress:
         - from:
           - podSelector:
               matchLabels:
-                app: frontend
+                app: backend
           ports:
             - protocol: TCP
               port: 80
@@ -585,7 +589,9 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
               port: 443
     ```
 
-    ![networkpolicy-cache.yml](networkpolicy-cache.ymll)
+    ![networkpolicy-cache.yml](networkpolicy-cache.yml)
+
+    Политика, разрешающая подключения от backend на cache по портам
 
 - Применим конфигурацию с помощью команды `kubectl`
 
