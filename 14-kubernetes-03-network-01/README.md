@@ -217,7 +217,7 @@ nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
           hosts: {}
     ```
 
-    ![hosts.yaml]hosts.yaml
+    ![hosts.yaml](hosts.yaml)
 
 
 - Отредактируем inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
