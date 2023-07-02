@@ -157,8 +157,9 @@
         apt-get install containerd.io
         mkdir -p /etc/containerd
         containerd config default | tee /etc/containerd/config.toml
-        sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+        sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
         systemctl restart containerd
+        systemctl restart kubelet
         systemctl enable kubelet
         ```
 
@@ -166,7 +167,8 @@
 
         ```
         kubeadm config images pull
-        kubeadm init --apiserver-advertise-address=10.129.0.27 --pod-network-cidr 10.244.0.0/16  --apiserver-cert-extra-sans=51.250.110.232,master-01.ru-central1.internal
+        ## kubeadm init --apiserver-advertise-address=10.129.0.27 --pod-network-cidr 10.244.0.0/16  --apiserver-cert-extra-sans=51.250.110.232,master-01.ru-central1.internal
+        kubeadm init --pod-network-cidr 192.168.0.0/16 --apiserver-cert-extra-sans=158.160.21.113,master-01.ru-central1.internal
         ```
 
         Получим команду для подключения рабочих нод в кластер:
@@ -174,7 +176,7 @@
         ```
         Then you can join any number of worker nodes by running the following on each as root:
 
-        kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
+        kubeadm join 10.129.0.14:6443 --token oosxde.etovgnqgmvvne09v --discovery-token-ca-cert-hash sha256:eab55833b793ecda54cf74f212a968b6703d94fae053f657d5f917041e8fd1e6
         ```
 
         где:
@@ -194,13 +196,16 @@
     - Устанавливаем сетевой плагин Calico на мастер ноде
 
         ```
-        kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
-        curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml -O --silent
-        sed -i 's/192\.168\.0\.0/10\.244\.0\.0/g' custom-resources.yaml
+        kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+        curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml -O --silent
+        ## sed -i 's/192\.168\.0\.0/10\.244\.0\.0/g' custom-resources.yaml
         kubectl create -f custom-resources.yaml
         ```
 
         Укажем подсеть для подов, должна соответствовать той при создании кластера.
+        https://www.linkedin.com/pulse/kubernetes-cluster-setup-ubuntu-2204-using-kubeadm-calico-md-sajjad/
+        https://serverfault.com/questions/1059759/bare-metal-kubernetes-dns-not-forwarding
+        https://stackoverflow.com/questions/66922204/k8-dns-not-resolving
 
 
 
@@ -263,18 +268,19 @@
         apt-get install containerd.io
         mkdir -p /etc/containerd
         containerd config default | tee /etc/containerd/config.toml
-        sed -i 's/            SystemdCgroup = false/            SystemdCgroup = true/' /etc/containerd/config.toml
+        sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
         systemctl restart containerd
+        systemctl restart kubelet
         systemctl enable kubelet
         ```
 
     - На рабочей ноде введём в кластер
 
         ```
-        kubeadm join 10.129.0.27:6443 --token j0huz0.3x5cm2etbrghilcv --discovery-token-ca-cert-hash sha256:0e0c02bdabd79828103ca0f798b562d2f50948f474135e92709301495ca0468e
+        kubeadm join 10.129.0.14:6443 --token oosxde.etovgnqgmvvne09v --discovery-token-ca-cert-hash sha256:eab55833b793ecda54cf74f212a968b6703d94fae053f657d5f917041e8fd1e6
         ```
 
-    Возьмём команду из вывода при создании кластера
+        Возьмём команду из вывода при создании кластера.
 
 
 
@@ -284,8 +290,7 @@
 
     ```
     apt-get update
-    apt-get install -y ca-certificates curl
-    apt-get install -y apt-transport-https
+    apt-get install -y ca-certificates curl apt-transport-https
     mkdir -p /etc/apt/keyrings
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
     echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
@@ -330,6 +335,33 @@
 4. Создать политики, чтобы обеспечить доступ frontend -> backend -> cache. Другие виды подключений должны быть запрещены.
 5. Продемонстрировать, что трафик разрешён и запрещён.
 
+
+
+## Calico не заработало в kube-dns
+```
+kubectl get services -A
+NAMESPACE          NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)
+calico-apiserver   calico-api                        ClusterIP   10.97.58.14      <none>        443/TCP
+calico-system      calico-kube-controllers-metrics   ClusterIP   None             <none>        9094/TCP
+calico-system      calico-typha                      ClusterIP   10.104.112.44    <none>        5473/TCP
+default            backend                           ClusterIP   10.102.129.160   <none>        80/TCP
+default            cache                             ClusterIP   10.98.209.211    <none>        80/TCP
+default            frontend                          ClusterIP   10.102.118.183   <none>        80/TCP
+default            kubernetes                        ClusterIP   10.96.0.1        <none>        443/TCP
+kube-system        kube-dns                          ClusterIP   10.96.0.10       <none>        53/UDP,53/TCP,9153/TCP
+
+kubectl run -it busybox --image=busybox -- sh
+/ # nc -vz 10.102.118.183 80
+10.102.118.183 (10.102.118.183:80) open
+/ # nc -vz 10.96.0.1 443
+10.96.0.1 (10.96.0.1:443) open
+/ # nc -vz 10.96.0.10 53
+nc: 10.96.0.10 (10.96.0.10:53): Connection timed out
+/ # nc -vz 10.97.58.14 443
+nc: 10.97.58.14 (10.97.58.14:443): Connection timed out
+```
+
+Следующие манифесты были проиграны, но из-за не работающего кластера нельзя было проверить.
 
 ## Namespace
 
@@ -378,15 +410,6 @@
           containers:
             - name: frontend-multitool
               image: wbitt/network-multitool
-              ports:
-                - name: port-80
-                  containerPort: 80
-                  protocol: TCP
-              env:
-                - name: HTTP_PORT
-                  value: "80"
-                - name: HTTPS_PORT
-                  value: "443"
     ```
 
     ![deployment-frontend.yml](deployment-frontend.yml)
@@ -422,11 +445,126 @@
 
 ## Backend
 
+- Создадим файл `deployment-backend.yml`
+
+    ```
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: deployment-backend
+      name: deployment-backend
+      namespace: app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: backend
+      template:
+        metadata:
+          labels:
+            app: backend
+        spec:
+          containers:
+            - name: backend-multitool
+              image: wbitt/network-multitool
+    ```
+
+    ![deployment-backend.yml](deployment-backend.yml)
+
+- Создадим файл `service-backend.yml`
+
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-backend
+      namespace: app
+    spec:
+      selector:
+        app: backend
+      ports:
+        - name: port-80
+          port: 80
+          protocol: TCP
+          targetPort: 80
+    ```
+
+    ![service-backend.yml](service-backend.yml)
+
+- Применим конфигурацию с помощью команды `kubectl`
+
+    ```
+    kubectl create -f deployment-backend.yml -f service-backend.yml
+    ```
+
+    ![](14-03-03.png)
+
 
 ## Cache
 
+- Создадим файл `deployment-cache.yml`
 
-    Отметим, что каждое развёртывание это один под. Каждый под имеет свой IP адрес. Поэтому не возникает конфликтов с портами.
+    ```
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: deployment-cache
+      name: deployment-cache
+      namespace: app
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: cache
+      template:
+        metadata:
+          labels:
+            app: cache
+        spec:
+          containers:
+            - name: cache-multitool
+              image: wbitt/network-multitool
+    ```
+
+    ![deployment-cache.yml](deployment-cache.yml)
+
+- Создадим файл `service-cache.yml`
+
+    ```
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: service-cache
+      namespace: app
+    spec:
+      selector:
+        app: cache
+      ports:
+        - name: port-80
+          port: 80
+          protocol: TCP
+          targetPort: 80
+    ```
+
+    ![service-cache.yml](service-cache.yml)
+
+- Применим конфигурацию с помощью команды `kubectl`
+
+    ```
+    kubectl create -f deployment-cache.yml -f service-cache.yml
+    ```
+
+    ![](14-03-04.png)
+
+
+
+Отметим, что каждое развёртывание это один под. Каждый под имеет свой IP адрес. Поэтому не возникает конфликтов с портами потому что каждое приложение в своём поде.
 
 ## Network policy
 
@@ -434,8 +572,8 @@
 
 Проверим запуск curl из сервисов
 
-kubectl exec -it service/service-frontend -- curl --silent -i service-backend:9002 | grep Server
-kubectl exec -it service/service-backend -- curl --silent -i service-frontend.default.svc.cluster.local:9001 | grep Server
+kubectl exec -it service/service-frontend -n app -- curl --silent -i service-backend.default.svc.cluster.local:80 | grep Server
+kubectl exec -it service/service-backend -- curl --silent -i service-cache.default.svc.cluster.local:9001 | grep Server
 
 Увидим, что доступ по относительному и абсолютному DNS имени сервиса возможен из другого сервиса.
 
