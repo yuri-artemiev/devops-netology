@@ -294,6 +294,8 @@ kubectl apply -f https://raw.githubusercontent.com/netology-code/kuber-homeworks
     service/auth-db created
     ```
 
+    Увидим, что развёртывание прошло успешно.
+
 - Проверим созданные артефакты в пространствах имён
 
     ```
@@ -328,7 +330,7 @@ kubectl apply -f https://raw.githubusercontent.com/netology-code/kuber-homeworks
     ![](14-05-03.png)
 
 
-- Проверим логи
+- Проверим логи подов в развёртывании `web-consumer`
 
     ```
     kubectl logs deployment/web-consumer -n web
@@ -369,14 +371,15 @@ kubectl apply -f https://raw.githubusercontent.com/netology-code/kuber-homeworks
 
     Увидим, что разрешение по полному имени работает. Полное имя включает в себя пространство имён `data` для пода `auth-db`. 
 
-    - Отредактируем манифест для пода развёртывания `web-condumer`
+- Отредактируем манифест для пода развёртывания `web-condumer`
+
     ```
     kubectl edit -n web deployments/web-consumer
     ```
 
     ![](14-05-06.png)
 
-    Добавим полное имя до пода `auth-db`
+    Добавим полное имя до пода `auth-db`. После сохранения поды пересоздадутся.
 
 - Проверим логи
 
@@ -409,7 +412,7 @@ kubectl apply -f https://raw.githubusercontent.com/netology-code/kuber-homeworks
     10.233.75.10 - - [09/Jul/2023:11:53:37 +0000] "GET / HTTP/1.1" 200 612 "-" "curl/7.35.0" "-"
     ```
 
-    ![](14-05-06.png)
+    ![](14-05-07.png)
 
     Увидим, что доступ из `web-consumer` в `auth-db` появился. Проблема устранена.
 
