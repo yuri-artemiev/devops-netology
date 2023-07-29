@@ -48,7 +48,7 @@ Resource terraform
 - [Subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet)
 - [Internet Gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway)
 
-
+-----
 
 # Ответ
 
@@ -95,10 +95,8 @@ Resource terraform
     ```
 
 
-- Настроем провайдер terraform  
+- Настроем провайдер Terraform добавив файл `~/.terraformrc`
     ```
-    ~/.terraformrc
-
     provider_installation {
       network_mirror {
         url = "https://terraform-mirror.yandexcloud.net/"
@@ -113,7 +111,7 @@ Resource terraform
     ```
     ssh-keygen
     ```
-- Создадим файл `main.tf`
+- Создадим файл `main.tf` для Terraform
     ```
     terraform {
       required_providers {
@@ -136,7 +134,7 @@ Resource terraform
 
 ## Задание 1.
 
-- Отредактируем файл `main.tf`
+- Отредактируем файл `main.tf` для Terraform
 
     ```
     # Variables
@@ -286,11 +284,11 @@ Resource terraform
 
     ![main.tf](main.tf)
 
-- Проверим конфигурацию terraform  
+- Проверим конфигурацию Terraform  
     ```
     terraform validate
     ```
-- Подготовим план terraform  
+- Подготовим план Terraform  
     ```
     terraform plan
     ```
@@ -361,18 +359,9 @@ Resource terraform
     ssh ubuntu@192.168.20.27
     ```
 
-    ![](15-01-05.png)
+    ![](15-01-06.png)
 
     Увидим, что доступ с Private инстанса в Интернет проходит.
-
-- Создать в этой публичной подсети виртуалку с публичным IP и подключиться к ней, убедиться что есть доступ к интернету.
-
-- Создать в этой приватной подсети виртуалку с внутренним IP, подключиться к ней через виртуалку, созданную ранее и убедиться что есть доступ к интернету
-
-
-
-
-
 
 - Удалим ресурсы в Яндекс Облаке  
     ```
