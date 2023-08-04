@@ -301,7 +301,7 @@ resource "yandex_lb_network_load_balancer" "loadbalacner-networklb" {
     terraform plan
     ```
 
-    ![](15-01-01.png)
+    ![](15-02-01.png)
 
 - Создадим ресурсы в Яндекс Облаке  
     ```
@@ -321,7 +321,7 @@ resource "yandex_lb_network_load_balancer" "loadbalacner-networklb" {
     pic_url = "https://yuri-artemiev-devops19.storage.yandexcloud.net/logo.png"
     ```
 
-    ![](15-01-02.png)
+    ![](15-02-02.png)
 
 
 - Подключимся к балансировщику по IP
@@ -330,13 +330,13 @@ resource "yandex_lb_network_load_balancer" "loadbalacner-networklb" {
     http://158.160.55.49
     ```
 
-    ![](15-01-03.png)
+    ![](15-02-03.png)
 
     Увидим, что страница с картинкой отображается
 
 - Посмотрим на список виртуальных машин в группе
 
-    ![](15-01-04.png)
+    ![](15-02-04.png)
 
 - Удалим ресурсы в Яндекс Облаке  
     ```
