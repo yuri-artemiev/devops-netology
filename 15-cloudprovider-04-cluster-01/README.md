@@ -115,8 +115,22 @@
     sudo apt update && sudo apt install terraform
     ```
 
+- Установим kubectl на локальную машину
+
+    ```
+    apt-get update
+    apt-get install -y ca-certificates curl
+    apt-get install -y apt-transport-https
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    apt-get install -y kubectl
+    apt-mark hold kubectl
+    ```
 
 - Настроем провайдер Terraform добавив файл `~/.terraformrc`
+
     ```
     provider_installation {
       network_mirror {
@@ -129,10 +143,13 @@
     }
     ```
 - Сгенерируем SSH ключи на локальной машине  
+
     ```
     ssh-keygen
     ```
+
 - Создадим файл `main.tf` для Terraform
+
     ```
     terraform {
       required_providers {
@@ -147,7 +164,9 @@
       zone = "ru-central1-a"
     }
     ```
-- Инициализируем провайдер  
+
+- Инициализируем провайдер
+
     ```
     terraform init
     ```
@@ -527,18 +546,18 @@
 
 - Развернём образ phpMyAdmin на кластере Kubernetes
 
-```
-kubectl run phpmyadmin --image=phpmyadmin/phpmyadmin --port=80 --env="PMA_HOST=c-c9qscsphch9js62tn0g0.rw.mdb.yandexcloud.net"
-kubectl expose pod phpmyadmin --type=LoadBalancer --port=80 --target-port=80
-```
+    ```
+    kubectl run phpmyadmin --image=phpmyadmin/phpmyadmin --port=80 --env="PMA_HOST=c-c9qscsphch9js62tn0g0.rw.mdb.yandexcloud.net"
+    kubectl expose pod phpmyadmin --type=LoadBalancer --port=80 --target-port=80
+    ```
 
     Возьмём адрес мастера MySQL из вывода Terraform
 
 - Посмотрим сервис Kubernetes с помощью команды 
 
-```
-kubectl get services
-```
+    ```
+    kubectl get services
+    ```
 
     ![](15-04-08.png)
 
