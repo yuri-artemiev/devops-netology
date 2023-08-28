@@ -18,7 +18,7 @@
 
 Да
 
-Дипломный руководитель - [Булат Замилов|https://docs.google.com/spreadsheets/d/1aqGA0uUx_Mcka0eHk7VVEKyof8TKxBjHQAsGDtRQSus/edit#gid=0].
+Дипломный руководитель - [Булат Замилов](https://docs.google.com/spreadsheets/d/1aqGA0uUx_Mcka0eHk7VVEKyof8TKxBjHQAsGDtRQSus/edit#gid=0).
 
 
 
