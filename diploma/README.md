@@ -1623,11 +1623,11 @@ kubectl get all
 ⚠![](img/38.png)  
 Увидим что развернулись ресурсы на Kubernetes кластере
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`  
-```
-http://158.160.118.254:31080/
-```
-⚠![](img/39.png)  
-Увидим, что приложение доступно
+    ```
+    http://158.160.118.254:31080/
+    ```
+    ⚠![](img/39.png)  
+    Увидим, что приложение доступно
 
 
 
@@ -1650,10 +1650,10 @@ http://158.160.118.254:31080/
     - ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html) - простое веб приложение  
 
 - Репозиторий рабочих файлов diploma
-```
-https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
-```
-⚠![](img/41.png)
+    ```
+    https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
+    ```
+    ⚠![](img/41.png)
     - ⚠![ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) - инвентарий для Ansible  
     - ⚠![ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) - инвентарий для Ansible  
     - ⚠![ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) - скрипт для установки Kubernetes с помощью Kubespray  
@@ -1677,15 +1677,15 @@ https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
 <a id="6-2"></a>
 ### Docker Hub 
 - Репозиторий приложения
-```
-https://hub.docker.com/r/yuriartemiev/webapp-stage/tags
-```
-⚠![](img/42.png)
+    ```
+    https://hub.docker.com/r/yuriartemiev/webapp-stage/tags
+    ```
+    ⚠![](img/42.png)
 <a id="6-3"></a>
 ### Terraform Cloud 
 - Репозиторий приложения
-```
-https://app.terraform.io/app/yuri-artemiev/workspaces
-```
-⚠![](img/43.png)
+    ```
+    https://app.terraform.io/app/yuri-artemiev/workspaces
+    ```
+    ⚠![](img/43.png)
 
