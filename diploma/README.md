@@ -812,7 +812,7 @@ apt install ansible
 ```
 kubectl get pods --all-namespaces
 ```
-⚠![](img/10.png.png)  
+⚠![](img/10.png)  
 Увидим, что Kubernetes кластер запущен и доступен с локальной машины.
 
 
