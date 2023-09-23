@@ -1597,31 +1597,31 @@ git push origin v1.0
 ```
 - Зайдём на GitHub
     - Для stage
-    Repository / Actions / Deploy with Helm
-    ```
-    https://github.com/yuri-artemiev/webapp-stage/actions/workflows/helm.yml
-    ```
-    ⚠![](img/36.png)  
-    Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере c помощью Helm  
+        Repository / Actions / Deploy with Helm
+        ```
+        https://github.com/yuri-artemiev/webapp-stage/actions/workflows/helm.yml
+        ```
+        ⚠![](img/36.png)  
+        Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере c помощью Helm  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Зайдём на Docker Hub
     - Для stage
-    ```
-    https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
-    ```
-    ⚠![](img/37.png)  
-    Увидим, что новый образ добавился в Docker Hub репозиторий
+        ```
+        https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
+        ```
+        ⚠![](img/37.png)  
+        Увидим, что новый образ добавился в Docker Hub репозиторий
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Посмотрим развёрнутые ресурсы Kubernetes кластера
-```
-kubectl get all
-```
-⚠![](img/38.png)  
-Увидим что развернулись ресурсы на Kubernetes кластере
+    ```
+    kubectl get all
+    ```
+    ⚠![](img/38.png)  
+    Увидим что развернулись ресурсы на Kubernetes кластере
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`  
     ```
     http://158.160.118.254:31080/
