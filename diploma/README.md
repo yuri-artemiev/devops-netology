@@ -1419,182 +1419,182 @@ git push -u origin main
 <a id="5-3"></a>
 ### Подготовим GitHub
 - В свойствах репозитория Github добавим секрет для kuberconfig  
-Укажем содержание kubeconfig файла для подключения к Kubernetes кластеру
+    Укажем содержание kubeconfig файла для подключения к Kubernetes кластеру
     - Name: KUBECONFIG_FILE  
-    Secret: содержание файла `~/.kube/config` на локальной машине  
-    ⚠![](img/30.png) 
+        Secret: содержание файла `~/.kube/config` на локальной машине  
+        ⚠![](img/30.png) 
 
 
 <a id="5-4"></a>
 ### Коммит с тегом v1.0.0 разворачивает приложение в Kubernetes кластере
 - Создадим файл для описания процесса развёртывания в GitHub
     - `docker/workspace-stage/deploy.yml` для stage 
-    ```
-    name: Deploy CI/CD
-    on:
-      push:
-        tags:
-        - "v*"
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@v2
-        - name: Build and push Docker image
-          uses: docker/build-push-action@v2
-          with:
-            context: .
-            push: true
-            tags: yuriartemiev/webapp-stage:${{ github.ref_name }}
-        - name: Setup kubeconfig
-          run: echo '${{ secrets.KUBECONFIG_FILE }}' > kubeconfig
-        - name: Install Kubernetes CLI
-          run: |
-            curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            sudo mv kubectl /usr/local/bin/
-        - name: Delete old deployment
-          run: |
-            export KUBECONFIG=kubeconfig
-            kubectl delete deploy webapp-stage || true
-        - name: Deploy to Kubernetes
-          run: |
-            export KUBECONFIG=kubeconfig
-            kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:${{ github.ref_name }}
-    ```
-    ⚠![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml)  
-    Используем имя нашего Docker репозитория  
-    Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере
+        ```
+        name: Deploy CI/CD
+        on:
+          push:
+            tags:
+            - "v*"
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                context: .
+                push: true
+                tags: yuriartemiev/webapp-stage:${{ github.ref_name }}
+            - name: Setup kubeconfig
+              run: echo '${{ secrets.KUBECONFIG_FILE }}' > kubeconfig
+            - name: Install Kubernetes CLI
+              run: |
+                curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+                chmod +x kubectl
+                sudo mv kubectl /usr/local/bin/
+            - name: Delete old deployment
+              run: |
+                export KUBECONFIG=kubeconfig
+                kubectl delete deploy webapp-stage || true
+            - name: Deploy to Kubernetes
+              run: |
+                export KUBECONFIG=kubeconfig
+                kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:${{ github.ref_name }}
+        ```
+        ⚠![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml)  
+        Используем имя нашего Docker репозитория  
+        Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере
     - `docker/workspace-prod/deploy.yml` для prod  
-    Аналогично
+        Аналогично
 
 - Отправим изменения на GitHub
-```
-git add .
-git commit -m "added github workflow"
-git push -u origin main
-```
+    ```
+    git add .
+    git commit -m "added github workflow"
+    git push -u origin main
+    ```
 
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
-    `docker/workspace-prod/index.html`  
-    ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        `docker/workspace-prod/index.html`  
+        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Отправим изменения на GitHub
-```
-git add .
-git commit -m "changed index.html"
-git push -u origin main
-```
+    ```
+    git add .
+    git commit -m "changed index.html"
+    git push -u origin main
+    ```
 - Поставим тег на последний коммит 
-```
-git tag v0.3
-git push origin v0.3
-```
-⚠![](img/31.png)  
+    ```
+    git tag v0.3
+    git push origin v0.3
+    ```
+    ⚠![](img/31.png)  
 - Зайдём на GitHub
     - Для stage
-    Repository / Actions / Deploy CI/CD
-    ```
-    https://github.com/yuri-artemiev/webapp-stage/actions/workflows/deploy.yml
-    ```
-    ⚠![](img/32.png)  
-    Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере  
+        Repository / Actions / Deploy CI/CD
+        ```
+        https://github.com/yuri-artemiev/webapp-stage/actions/workflows/deploy.yml
+        ```
+        ⚠![](img/32.png)  
+        Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Зайдём на Docker Hub
     - Для stage
-    ```
-    https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
-    ```
-    Увидим, что новый образ добавился в Docker Hub репозиторий  
-    ⚠![](img/33.png)
+        ```
+        https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
+        ```
+        Увидим, что новый образ добавился в Docker Hub репозиторий  
+        ⚠![](img/33.png)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Посмотрим развёрнутые ресурсы Kubernetes кластера
-```
-kubectl get all
-```
-⚠![](img/34.png)  
-Увидим что развернулись ресурсы на Kubernetes кластере  
+    ```
+    kubectl get all
+    ```
+    ⚠![](img/34.png)  
+    Увидим что развернулись ресурсы на Kubernetes кластере  
 
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`  
-```
-http://158.160.118.254:31080/
-```
-⚠![](img/35.png)  
-Увидим, что приложение доступно
+    ```
+    http://158.160.118.254:31080/
+    ```
+    ⚠![](img/35.png)  
+    Увидим, что приложение доступно
 
 - Создадим файл для описания процесса развёртывания в GitHub c помощью Helm
     - `docker/workspace-stage/.github/workflows/helm.yml` для stage 
-    ```
-    name: Deploy with Helm
-    on:
-      push:
-        tags:
-        - "v*"
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v2
-        - name: Login to DockerHub
-          uses: docker/login-action@v1
-          with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
-        - name: Build and push Docker image
-          uses: docker/build-push-action@v2
-          with:
-            context: .
-            push: true
-            tags: yuriartemiev/webapp-stage:${{ github.ref_name }}
-        - name: Setup kubeconfig
-          run: echo '${{ secrets.KUBECONFIG_FILE }}' > kubeconfig
-        - name: Setup Helm
-          uses: azure/setup-helm@v1
-        - name: Deploy
-          run: |
-            export KUBECONFIG=kubeconfig
-            helm upgrade --install webapp-stage ./helm/webapp-stage --set image.tag=${{ github.ref_name }}
-    ```
-    ⚠![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml)  
-    Укажем путь до Helm чарта из корня репозитория  
-    Используем имя нашего Docker репозитория  
-    Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере с помощью Helm  
+        ```
+        name: Deploy with Helm
+        on:
+          push:
+            tags:
+            - "v*"
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            steps:
+            - uses: actions/checkout@v2
+            - name: Login to DockerHub
+              uses: docker/login-action@v1
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_PASSWORD }}
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                context: .
+                push: true
+                tags: yuriartemiev/webapp-stage:${{ github.ref_name }}
+            - name: Setup kubeconfig
+              run: echo '${{ secrets.KUBECONFIG_FILE }}' > kubeconfig
+            - name: Setup Helm
+              uses: azure/setup-helm@v1
+            - name: Deploy
+              run: |
+                export KUBECONFIG=kubeconfig
+                helm upgrade --install webapp-stage ./helm/webapp-stage --set image.tag=${{ github.ref_name }}
+        ```
+        ⚠![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml)  
+        Укажем путь до Helm чарта из корня репозитория  
+        Используем имя нашего Docker репозитория  
+        Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере с помощью Helm  
     - `docker/workspace-prod/helm.yml` для prod 
-    Аналогично
+        Аналогично
 
 - Отправим изменения на GitHub
-```
-git add .
-git commit -m "added github workflow"
-git push -u origin main
-```
+    ```
+    git add .
+    git commit -m "added github workflow"
+    git push -u origin main
+    ```
 
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
-    `docker/workspace-prod/index.html`  
-    ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        `docker/workspace-prod/index.html`  
+        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Отправим изменения на GitHub
-```
-git add .
-git commit -m "changed index.html"
-git push -u origin main
-```
+    ```
+    git add .
+    git commit -m "changed index.html"
+    git push -u origin main
+    ```
 - Поставим тег на последний коммит 
-```
-git tag v1.0
-git push origin v1.0
-```
+    ```
+    git tag v1.0
+    git push origin v1.0
+    ```
 - Зайдём на GitHub
     - Для stage
         Repository / Actions / Deploy with Helm
