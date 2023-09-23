@@ -1068,7 +1068,7 @@ http://158.160.118.254/:31080/
       port: 80
       nodePort: 31080
     ```
-    ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml  
+    ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/values.yaml` для prod  
     Аналогично
 
@@ -1374,7 +1374,7 @@ https://github.com/yuri-artemiev/
     git remote add origin git@github.com:yuri-artemiev/webapp-stage.git
     git push -u origin main
     ```
-    ⚠![](img/27.png)
+    ⚠![](img/27.png)  
     Укажем адрес нашего репозитория  
     Аутентификация произойдёт с помощью  публичного SSH ключа из  ~/.ssh/id_rsa.pub
     - Для prod  
@@ -1638,10 +1638,10 @@ http://158.160.118.254:31080/
 <a id="6-1"></a>
 ### GitHub
 - Репозиторий простого веб приложения web-stage
-```
-https://github.com/yuri-artemiev/webapp-stage
-```
-⚠![](img/40.png)
+    ```
+    https://github.com/yuri-artemiev/webapp-stage
+    ```
+    ⚠![](img/40.png)
     - ⚠![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер  
     - ⚠![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml) - GitHub Action для отправки образа в Docker Hub  
     - ⚠![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер с помощью Helm  
