@@ -233,265 +233,265 @@
 - Запустим утилиту `yc`:    
     - `yc init`  
     - Получим OAuth токен по адресу в браузере
-    ```
-    https://oauth.yandex.ru/authorize?response_type=token&client_id=1a6990aa636648e9b2ef855fa7bec2fb
-    ```
+        ```
+        https://oauth.yandex.ru/authorize?response_type=token&client_id=1a6990aa636648e9b2ef855fa7bec2fb
+        ```
     - В утилите `yc`    
         - Вставим токен из браузера
         - Выберем папку в Яндекс Облаке  
         - Выберем создание Compute по-умолчанию  
         - Выберем зону в Яндекс Облаке  
     - Проверим созданные настройки Яндекс Облака    
-    ```
-    yc config list
-    
-    token: y0_A...
-    cloud-id: b1gjd8gta6ntpckrp97r
-    folder-id: b1gcthk9ak11bmpnbo7d
-    compute-default-zone: ru-central1-a
-    ```
+        ```
+        yc config list
+        
+        token: y0_A...
+        cloud-id: b1gjd8gta6ntpckrp97r
+        folder-id: b1gcthk9ak11bmpnbo7d
+        compute-default-zone: ru-central1-a
+        ```
 - Получим IAM-токен  
-```
-yc iam create-token
-```
+    ```
+    yc iam create-token
+    ```
 - Сохраним токен и параметры в переменную окружения  
-```
-export YC_TOKEN=$(yc iam create-token)
-export YC_CLOUD_ID=$(yc config get cloud-id)
-export YC_FOLDER_ID=$(yc config get folder-id)
-export YC_ZONE=$(yc config get compute-default-zone)
-export TF_VAR_yc_token=$(yc iam create-token)
-```
+    ```
+    export YC_TOKEN=$(yc iam create-token)
+    export YC_CLOUD_ID=$(yc config get cloud-id)
+    export YC_FOLDER_ID=$(yc config get folder-id)
+    export YC_ZONE=$(yc config get compute-default-zone)
+    export TF_VAR_yc_token=$(yc iam create-token)
+    ```
 
 - Установим последнюю версию Terraform на локальную машину:
-```
-wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt update && sudo apt install terraform
-```
+    ```
+    wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+    sudo apt update && sudo apt install terraform
+    ```
 
 <a id="1-2"></a>
 ### Начальная настройка Terraform
 
 - Настроем провайдер Terraform добавив файл `~/.terraformrc`
-```
-provider_installation {
-  network_mirror {
-    url = "https://terraform-mirror.yandexcloud.net/"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-```
+    ```
+    provider_installation {
+      network_mirror {
+        url = "https://terraform-mirror.yandexcloud.net/"
+        include = ["registry.terraform.io/*/*"]
+      }
+      direct {
+        exclude = ["registry.terraform.io/*/*"]
+      }
+    }
+    ```
 - Создадим папки для workspace для Terraform
-```
-mkdir -p terraform/workspace-stage
-mkdir -p terraform/workspace-prod
-```
+    ```
+    mkdir -p terraform/workspace-stage
+    mkdir -p terraform/workspace-prod
+    ```
 
 <a id="1-3"></a>
 ### Подготовим подключение к Яндекс Облаку в Terraform
 - Создадим файл `main.tf` в двух папках `workspace-stage` и `workspace-prod` для Terraform и добавим провайдер Яндекс Облако
-```
-# Variables
-variable "yc_token" {
-  default = "t1.9..."
-}
-variable "yc_cloud_id" {
-  default = "b1gjd8gta6ntpckrp97r"
-}
-variable "yc_folder_id" {
-  default = "b1gcthk9ak11bmpnbo7d"
-}
-variable "yc_region" {
-  default = "ru-central1-a"
-}
-# Terraform providers
-terraform {
-  required_providers {
-    yandex = {
-      source = "yandex-cloud/yandex"
+    ```
+    # Variables
+    variable "yc_token" {
+      default = "t1.9..."
     }
-  }
-  required_version = ">= 0.13"
-}
-provider "yandex" {
-  token     = var.yc_token
-  cloud_id  = var.yc_cloud_id
-  folder_id = var.yc_folder_id
-  zone = var.yc_region
-}
-```
+    variable "yc_cloud_id" {
+      default = "b1gjd8gta6ntpckrp97r"
+    }
+    variable "yc_folder_id" {
+      default = "b1gcthk9ak11bmpnbo7d"
+    }
+    variable "yc_region" {
+      default = "ru-central1-a"
+    }
+    # Terraform providers
+    terraform {
+      required_providers {
+        yandex = {
+          source = "yandex-cloud/yandex"
+        }
+      }
+      required_version = ">= 0.13"
+    }
+    provider "yandex" {
+      token     = var.yc_token
+      cloud_id  = var.yc_cloud_id
+      folder_id = var.yc_folder_id
+      zone = var.yc_region
+    }
+    ```
 - Добавим каталог в Яндекс Облако:
     - Отредактируем файл `terraform/workspace-stage/main.tf` для Terraform workspace stage
-    ```
-    # Folder
-    ## Folder for stage
-    resource "yandex_resourcemanager_folder" "folder-stage" {
-      cloud_id    = var.yc_cloud_id
-      name        = "folder-stage"
-    }
-    ```
+        ```
+        # Folder
+        ## Folder for stage
+        resource "yandex_resourcemanager_folder" "folder-stage" {
+          cloud_id    = var.yc_cloud_id
+          name        = "folder-stage"
+        }
+        ```
     - Отредактируем файл `terraform/workspace-prod/main.tf` для Terraform workspace prod
-    ```
-    ## Folder for prod
-    resource "yandex_resourcemanager_folder" "folder-prod" {
-      cloud_id    = var.yc_cloud_id
-      name        = "folder-prod"
-    }
-    ```
-    Далее для workspace prod будут аналогичные действия в `terraform/workspace-prod`  
+        ```
+        ## Folder for prod
+        resource "yandex_resourcemanager_folder" "folder-prod" {
+          cloud_id    = var.yc_cloud_id
+          name        = "folder-prod"
+        }
+        ```
+        Далее для workspace prod будут аналогичные действия в `terraform/workspace-prod`  
 
 - Добавим сервисный аккаунт в Яндекс Облаке
     - Отредактируем файл `terraform/workspace-stage/main.tf` для stage
-    ```
-    # Service account
-    ## Service account for stage
-    resource "yandex_iam_service_account" "serviceaccount-stage" {
-      folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
-      name = "serviceaccount-stage"
-    }
-    resource "yandex_resourcemanager_folder_iam_member" "editor" {
-      folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
-      role      = "editor"
-      member    = "serviceAccount:${yandex_iam_service_account.serviceaccount-stage.id}"
-    }
-    ```
-    ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ```
+        # Service account
+        ## Service account for stage
+        resource "yandex_iam_service_account" "serviceaccount-stage" {
+          folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
+          name = "serviceaccount-stage"
+        }
+        resource "yandex_resourcemanager_folder_iam_member" "editor" {
+          folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
+          role      = "editor"
+          member    = "serviceAccount:${yandex_iam_service_account.serviceaccount-stage.id}"
+        }
+        ```
+        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terraform/workspace-prod/main.tf` для prod  
-    Аналогично
+        Аналогично
 
 <a id="1-4"></a>
 ### Подключим Terraform Cloud и создадим workspaces
 
 - Зарегистрируемся на Terraform Cloud 
-```
-https://app.terraform.io
-```
+    ```
+    https://app.terraform.io
+    ```
 - Создадим API токен
     - Зайдём в настройки профиля Terraform Cloud и нажмём Create an API token  
-    User Settings / Tokens / Create and API token
-    ```
-    https://app.terraform.io/app/settings/tokens
-    ```
-    ⚠![](img/01.png)
+        User Settings / Tokens / Create and API token
+        ```
+        https://app.terraform.io/app/settings/tokens
+        ```
+        ⚠![](img/01.png)
 
 - Создадим новую организацию на Terraform Cloud нажав Create new organization  
-⚠![](img/02.png)
-- Добавим Terraform Cloud организацию в Terraform
+    ⚠![](img/02.png)
 
+- Добавим Terraform Cloud организацию в Terraform
     - Отредактируем файл `terraform/workspace-stage/main.tf` для stage
-    ```
-    terraform {
-      cloud {
-        organization = "yuri-artemiev"
-        workspaces {
-          name = workspace-stage
+        ```
+        terraform {
+          cloud {
+            organization = "yuri-artemiev"
+            workspaces {
+              name = workspace-stage
+            }
+          }
         }
-      }
-    }
-    ```
+        ```
     - Отредактируем файл `terraform/workspace-prod/main.tf` для prod  
-    Аналогично
+        Аналогично
 
 - Из рабочей папки Terraform подключимся к Terraform Cloud
-```
-terraform login
-```
+    ```
+    terraform login
+    ```
 - Введём ранее созданный Terraform API токен
 - Токен сохранится в файл `/root/.terraform.d/credentials.tfrc.json`
 - Создадим worspace в Terraform
     - Для stage
-    ```
-    cd terrafrom/workspace-stage
-    terraform init
-    terrafrom workspace list
-    ```
-    Увидим, что создался stage workspace
+        ```
+        cd terrafrom/workspace-stage
+        terraform init
+        terrafrom workspace list
+        ```
+        Увидим, что создался stage workspace
     - Запустим команду `terraform init` для Terraform workspace prod  
-    Аналогично
+        Аналогично
 
 - Проверим синхронизированную конфигурацию Workspaces в Terraform Cloud
-```
-https://app.terraform.io/app/yuri-artemiev/workspaces
-```
-⚠![](img/03.png)
+    ```
+    https://app.terraform.io/app/yuri-artemiev/workspaces
+    ```
+    ⚠![](img/03.png)
 - Зайдём в каждый workspace в Terraform Cloud и настроем выполнение на локальной машине. Это нужно для того чтобы Terraform мог сохранять файлы на локальной машине. Состояние Terraform будет по прежнему синхронизироваться в Terraform Cloud.  
-Workspace Settings / General / Execution Mode / Local
-```
-https://app.terraform.io/app/yuri-artemiev/workspaces
-```
-⚠![](img/04.png)
+    Workspace Settings / General / Execution Mode / Local
+    ```
+    https://app.terraform.io/app/yuri-artemiev/workspaces
+    ```
+    ⚠![](img/04.png)
 
 
 <a id="1-5"></a>
 ### Создадим ресурсы в Яндекс Облаке
 - Добавим VPC сети в Яндекс Облаке
     - Отредактируем файл `terraform/workspace-stage/main.tf` для stage
-    ```
-    # Network
-    resource "yandex_vpc_network" "network-stage" {
-      name = "network-stage"
-      folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
-    }
-    resource "yandex_vpc_subnet" "subnet-stage-a" {
-      v4_cidr_blocks = ["10.0.10.0/24"]
-      zone           = "ru-central1-a"
-      name           = "subnet-stage-a"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      network_id     = "${yandex_vpc_network.network-stage.id}"
-    }
-    resource "yandex_vpc_subnet" "subnet-stage-b" {
-      v4_cidr_blocks = ["10.0.20.0/24"]
-      zone           = "ru-central1-b"
-      name           = "subnet-stage-b"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      network_id     = "${yandex_vpc_network.network-stage.id}"
-    }
-    resource "yandex_vpc_subnet" "subnet-stage-c" {
-      v4_cidr_blocks = ["10.0.30.0/24"]
-      zone           = "ru-central1-c"
-      name           = "subnet-stage-c"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      network_id     = "${yandex_vpc_network.network-stage.id}"
-    }
-    ```
-    ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ```
+        # Network
+        resource "yandex_vpc_network" "network-stage" {
+          name = "network-stage"
+          folder_id = "${yandex_resourcemanager_folder.folder-stage.id}"
+        }
+        resource "yandex_vpc_subnet" "subnet-stage-a" {
+          v4_cidr_blocks = ["10.0.10.0/24"]
+          zone           = "ru-central1-a"
+          name           = "subnet-stage-a"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          network_id     = "${yandex_vpc_network.network-stage.id}"
+        }
+        resource "yandex_vpc_subnet" "subnet-stage-b" {
+          v4_cidr_blocks = ["10.0.20.0/24"]
+          zone           = "ru-central1-b"
+          name           = "subnet-stage-b"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          network_id     = "${yandex_vpc_network.network-stage.id}"
+        }
+        resource "yandex_vpc_subnet" "subnet-stage-c" {
+          v4_cidr_blocks = ["10.0.30.0/24"]
+          zone           = "ru-central1-c"
+          name           = "subnet-stage-c"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          network_id     = "${yandex_vpc_network.network-stage.id}"
+        }
+        ```
+        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terraform/workspace-prod/main.tf` для prod  
-    Аналогично
+        Аналогично
 
 - Развернём инфраструктуру в Яндекс Облаке с помощью Terraform
     - Для stage
-    ```
-    cd terraform/workspace-stage
-    terraform validate
-    terraform plan
-    export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
-    ```
-    Команда сгенерирует Яндекс токен и сохранит в переменную окружения, которая потом будет использована в манифесте Terraform
+        ```
+        cd terraform/workspace-stage
+        terraform validate
+        terraform plan
+        export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
+        ```
+        Команда сгенерирует Яндекс токен и сохранит в переменную окружения, которая потом будет использована в манифесте Terraform
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Посмотрим сохранённую конфигурацию в Terraform Cloud
     - Для stage
-    ⚠![](img/05.png)  
-    ⚠![](img/06.png)  
-    Увидим, что запуск в Terraform Cloud выполнен    
-    Увидим, что состояние в Terraform Cloud сохранено
+        ⚠![](img/05.png)  
+        ⚠![](img/06.png)  
+        Увидим, что запуск в Terraform Cloud выполнен    
+        Увидим, что состояние в Terraform Cloud сохранено
     - Для prod  
-    Аналогично
+        Аналогично
 
 <a id="1-6"></a>
 ### Удалим созданную инфраструктуру в Яндекс Облаке с помощью Terraform
 - Для stage
-```
-cd terraform/workspace-stage
-terraform destroy --auto-approve
-```
+    ```
+    cd terraform/workspace-stage
+    terraform destroy --auto-approve
+    ```
 - Для prod  
-Аналогично
+    Аналогично
 
 
 
@@ -516,304 +516,304 @@ terraform destroy --auto-approve
 <a id="2-1"></a>
 ### Подготовим инструменты для работы
 - Сгенерируем SSH ключи на локальной машине  
-```
-ssh-keygen
-```
+    ```
+    ssh-keygen
+    ```
 - Сохраним SSH ключ рядом с конфигурацией Terraform
     - Для stage
-    ```
-    cd terraform/workspace-stage
-    cp ~/.ssh/id_rsa.pub id_rsa.pub
-    ```
+        ```
+        cd terraform/workspace-stage
+        cp ~/.ssh/id_rsa.pub id_rsa.pub
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Сохраним SSH ключ рядом с конфигурацией Ansible
     - Для stage
-    ```
-    mkdir -p ansible/workspace-stage
-    cd ansible/workspace-stage
-    cp ~/.ssh/id_rsa.pub id_rsa.pub
-    ```
+        ```
+        mkdir -p ansible/workspace-stage
+        cd ansible/workspace-stage
+        cp ~/.ssh/id_rsa.pub id_rsa.pub
+        ```
     - Для stage  
-    Аналогично
+        Аналогично
 
 - Установим kubectl на локальную машину
-```
-apt-get update
-apt-get install -y ca-certificates curl
-apt-get install -y apt-transport-https
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-apt-get update
-apt-get install -y kubectl
-apt-mark hold kubectl
-```
+    ```
+    apt-get update
+    apt-get install -y ca-certificates curl
+    apt-get install -y apt-transport-https
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+    apt-get update
+    apt-get install -y kubectl
+    apt-mark hold kubectl
+    ```
 - Установим Ansible на локальную машину
-```
-apt install software-properties-common
-apt-add-repository ppa:ansible/ansible
-apt update
-apt install ansible
-```
+    ```
+    apt install software-properties-common
+    apt-add-repository ppa:ansible/ansible
+    apt update
+    apt install ansible
+    ```
 
 <a id="2-2"></a>
 ### Создадим ресурсы в Яндекс Облаке
 - Добавим виртуальные машины для Kubernetes в Яндекс Облаке
     - Отредактируем файл `terrafrom/workspace-stage/main.tf` для stage
-    ```
-    # Virtual machines
-    ## Kubernetes master
-    resource "yandex_compute_instance" "virtualmachine-master" {
-      name = "virtualmachine-master"
-      hostname = "virtualmachine-master.ru-central1.internal"
-      zone      = "ru-central1-a"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      resources {
-        cores  = 2
-        memory = 4
-      }
-      boot_disk {
-        initialize_params {
-          image_id = "fd8g5aftj139tv8u2mo1"
-          size = "20"
+        ```
+        # Virtual machines
+        ## Kubernetes master
+        resource "yandex_compute_instance" "virtualmachine-master" {
+          name = "virtualmachine-master"
+          hostname = "virtualmachine-master.ru-central1.internal"
+          zone      = "ru-central1-a"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          resources {
+            cores  = 2
+            memory = 4
+          }
+          boot_disk {
+            initialize_params {
+              image_id = "fd8g5aftj139tv8u2mo1"
+              size = "20"
+            }
+          }
+          network_interface {
+            subnet_id = "${yandex_vpc_subnet.subnet-stage-a.id}"
+            nat       = true
+          }
+          metadata = {
+            ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
+          }
         }
-      }
-      network_interface {
-        subnet_id = "${yandex_vpc_subnet.subnet-stage-a.id}"
-        nat       = true
-      }
-      metadata = {
-        ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
-      }
-    }
-    ## Kubernetes workers
-    resource "yandex_compute_instance" "virtualmachine-worker-a" {
-      name = "virtualmachine-worker-a"
-      hostname = "virtualmachine-worker-a.ru-central1.internal"
-      zone      = "ru-central1-a"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      resources {
-        cores  = 2
-        memory = 4
-      }
-      boot_disk {
-        initialize_params {
-          image_id = "fd8g5aftj139tv8u2mo1"
-          size = "10"
+        ## Kubernetes workers
+        resource "yandex_compute_instance" "virtualmachine-worker-a" {
+          name = "virtualmachine-worker-a"
+          hostname = "virtualmachine-worker-a.ru-central1.internal"
+          zone      = "ru-central1-a"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          resources {
+            cores  = 2
+            memory = 4
+          }
+          boot_disk {
+            initialize_params {
+              image_id = "fd8g5aftj139tv8u2mo1"
+              size = "10"
+            }
+          }
+          network_interface {
+            subnet_id = "${yandex_vpc_subnet.subnet-stage-a.id}"
+            nat       = true
+          }
+          metadata = {
+            ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
+          }
         }
-      }
-      network_interface {
-        subnet_id = "${yandex_vpc_subnet.subnet-stage-a.id}"
-        nat       = true
-      }
-      metadata = {
-        ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
-      }
-    }
-    resource "yandex_compute_instance" "virtualmachine-worker-b" {
-      name = "virtualmachine-worker-b"
-      hostname = "virtualmachine-worker-b.ru-central1.internal"
-      zone      = "ru-central1-b"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      resources {
-        cores  = 2
-        memory = 4
-      }
-      boot_disk {
-        initialize_params {
-          image_id = "fd8g5aftj139tv8u2mo1"
-          size = "10"
+        resource "yandex_compute_instance" "virtualmachine-worker-b" {
+          name = "virtualmachine-worker-b"
+          hostname = "virtualmachine-worker-b.ru-central1.internal"
+          zone      = "ru-central1-b"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          resources {
+            cores  = 2
+            memory = 4
+          }
+          boot_disk {
+            initialize_params {
+              image_id = "fd8g5aftj139tv8u2mo1"
+              size = "10"
+            }
+          }
+          network_interface {
+            subnet_id = "${yandex_vpc_subnet.subnet-stage-b.id}"
+            nat       = true
+          }
+          metadata = {
+            ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
+          }
         }
-      }
-      network_interface {
-        subnet_id = "${yandex_vpc_subnet.subnet-stage-b.id}"
-        nat       = true
-      }
-      metadata = {
-        ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
-      }
-    }
-    resource "yandex_compute_instance" "virtualmachine-worker-c" {
-      name = "virtualmachine-worker-c"
-      hostname = "virtualmachine-worker-c.ru-central1.internal"
-      zone      = "ru-central1-c"
-      folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
-      resources {
-        cores  = 2
-        memory = 4
-      }
-      boot_disk {
-        initialize_params {
-          image_id = "fd8g5aftj139tv8u2mo1"
-          size = "10"
+        resource "yandex_compute_instance" "virtualmachine-worker-c" {
+          name = "virtualmachine-worker-c"
+          hostname = "virtualmachine-worker-c.ru-central1.internal"
+          zone      = "ru-central1-c"
+          folder_id      = "${yandex_resourcemanager_folder.folder-stage.id}"
+          resources {
+            cores  = 2
+            memory = 4
+          }
+          boot_disk {
+            initialize_params {
+              image_id = "fd8g5aftj139tv8u2mo1"
+              size = "10"
+            }
+          }
+          network_interface {
+            subnet_id = "${yandex_vpc_subnet.subnet-stage-c.id}"
+            nat       = true
+          }
+          metadata = {
+            ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
+          }
         }
-      }
-      network_interface {
-        subnet_id = "${yandex_vpc_subnet.subnet-stage-c.id}"
-        nat       = true
-      }
-      metadata = {
-        ssh-keys  = "ubuntu:${file("id_rsa.pub")}"
-      }
-    }
-    ```
-    ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ```
+        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terrafrom/workspace-prod/main.tf` для prod  
-    Аналогично
+        Аналогично
 
 - Создадим задачи для Terraform по подготовке к развёртыванию Kubernetes с помощью Kuberspray
     - Для stage
         - Отредактируем файл `terrafrom/workspace-stage/main.tf` для stage
-        ```
-        # Kubespray preparation
-        ## Ansible inventory for Kuberspray
-        resource "local_file" "ansible-inventory-kubespray" {
-          content = <<EOF
-        all:
-          hosts:
-            ${yandex_compute_instance.virtualmachine-master.fqdn}:
-              ansible_host: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
-              ip: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
-              access_ip: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
-            ${yandex_compute_instance.virtualmachine-worker-a.fqdn}:
-              ansible_host: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
-              ip: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
-              access_ip: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
-            ${yandex_compute_instance.virtualmachine-worker-b.fqdn}:
-              ansible_host: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
-              ip: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
-              access_ip: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
-            ${yandex_compute_instance.virtualmachine-worker-c.fqdn}:
-              ansible_host: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
-              ip: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
-              access_ip: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
-          children:
-            kube_control_plane:
+            ```
+            # Kubespray preparation
+            ## Ansible inventory for Kuberspray
+            resource "local_file" "ansible-inventory-kubespray" {
+              content = <<EOF
+            all:
               hosts:
                 ${yandex_compute_instance.virtualmachine-master.fqdn}:
-            kube_node:
-              hosts:
+                  ansible_host: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
+                  ip: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
+                  access_ip: ${yandex_compute_instance.virtualmachine-master.network_interface.0.ip_address}
                 ${yandex_compute_instance.virtualmachine-worker-a.fqdn}:
+                  ansible_host: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
+                  ip: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
+                  access_ip: ${yandex_compute_instance.virtualmachine-worker-a.network_interface.0.ip_address}
                 ${yandex_compute_instance.virtualmachine-worker-b.fqdn}:
+                  ansible_host: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
+                  ip: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
+                  access_ip: ${yandex_compute_instance.virtualmachine-worker-b.network_interface.0.ip_address}
                 ${yandex_compute_instance.virtualmachine-worker-c.fqdn}:
-            etcd:
-              hosts:
-                ${yandex_compute_instance.virtualmachine-master.fqdn}:
-            k8s_cluster:
+                  ansible_host: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
+                  ip: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
+                  access_ip: ${yandex_compute_instance.virtualmachine-worker-c.network_interface.0.ip_address}
               children:
                 kube_control_plane:
+                  hosts:
+                    ${yandex_compute_instance.virtualmachine-master.fqdn}:
                 kube_node:
-            calico_rr:
-              hosts: {}
-          EOF
-          filename = "../../ansible/workspace-stage/ansible-inventory-kubespray"
-          depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
-        }
+                  hosts:
+                    ${yandex_compute_instance.virtualmachine-worker-a.fqdn}:
+                    ${yandex_compute_instance.virtualmachine-worker-b.fqdn}:
+                    ${yandex_compute_instance.virtualmachine-worker-c.fqdn}:
+                etcd:
+                  hosts:
+                    ${yandex_compute_instance.virtualmachine-master.fqdn}:
+                k8s_cluster:
+                  children:
+                    kube_control_plane:
+                    kube_node:
+                calico_rr:
+                  hosts: {}
+              EOF
+              filename = "../../ansible/workspace-stage/ansible-inventory-kubespray"
+              depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
+            }
 
-        ## Ansible inventory for virtualmachine-master
-        resource "local_file" "ansible-inventory-virtualmachine-master" {
-          content = <<-DOC
-            kuber:
-              hosts:
-                ${yandex_compute_instance.virtualmachine-master.fqdn}:
-                  ansible_host: ${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address}
-            DOC
-          filename = "../../ansible/workspace-stage/ansible-inventory-virtualmachine-master"
-          depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
-        }
+            ## Ansible inventory for virtualmachine-master
+            resource "local_file" "ansible-inventory-virtualmachine-master" {
+              content = <<-DOC
+                kuber:
+                  hosts:
+                    ${yandex_compute_instance.virtualmachine-master.fqdn}:
+                      ansible_host: ${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address}
+                DOC
+              filename = "../../ansible/workspace-stage/ansible-inventory-virtualmachine-master"
+              depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
+            }
 
-        ## Ansible inventory for Kubespray configuration
-        resource "null_resource" "ansible-kubespray-k8s-config" {
-          provisioner "local-exec" {
-            command = "wget --quiet https://raw.githubusercontent.com/kubernetes-sigs/kubespray/master/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml -O ../../ansible/workspace-stage/k8s-cluster.yml"
-          }
-          depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
-        }
-        resource "null_resource" "ansible-kubespray-k8s-config-add" {
-          provisioner "local-exec" {
-            command = "echo 'supplementary_addresses_in_ssl_keys: [ ${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address} ]' >> ../../ansible/workspace-stage/k8s-cluster.yml"
-          }
-          depends_on = [null_resource.ansible-kubespray-k8s-config]
-        }
-        ```
-    ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+            ## Ansible inventory for Kubespray configuration
+            resource "null_resource" "ansible-kubespray-k8s-config" {
+              provisioner "local-exec" {
+                command = "wget --quiet https://raw.githubusercontent.com/kubernetes-sigs/kubespray/master/inventory/sample/group_vars/k8s_cluster/k8s-cluster.yml -O ../../ansible/workspace-stage/k8s-cluster.yml"
+              }
+              depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
+            }
+            resource "null_resource" "ansible-kubespray-k8s-config-add" {
+              provisioner "local-exec" {
+                command = "echo 'supplementary_addresses_in_ssl_keys: [ ${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address} ]' >> ../../ansible/workspace-stage/k8s-cluster.yml"
+              }
+              depends_on = [null_resource.ansible-kubespray-k8s-config]
+            }
+            ```
+            ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Создадим задачи для Terraform по сохранению скрипта, который развернёт Kubernetes с помощью Kuberspray
     - Для stage
         - Отредактируем файл `terrafrom/workspace-stage/main.tf` для stage
-        ```
-        ## Script for installation of Kubernetes with Kubespray
-        resource "local_file" "install-kubernetes-with-kubespray" {
-          content = <<-DOC
-            #!/bin/bash
-            set -euxo pipefail
-            export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i ansible-inventory-virtualmachine-master prepare-master.yml
-            sleep 20
-            ssh ubuntu@${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address} 'export ANSIBLE_HOST_KEY_CHECKING=False; export ANSIBLE_ROLES_PATH=/home/ubuntu/kubespray/roles:/home/ubuntu/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles; ansible-playbook -i /home/ubuntu/kubespray/inventory/mycluster/hosts.yaml -u ubuntu -b -v --private-key=/home/ubuntu/.ssh/id_rsa /home/ubuntu/kubespray/cluster.yml'
-            sleep 20
-            export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i ansible-inventory-virtualmachine-master get-kubeconfig.yml
-            sleep 5
-            sed -i -e 's,server: https://127.0.0.1:6443,server: https://${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address}:6443,g'  ~/.kube/config
-            DOC
-          filename = "../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh"
-          depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
-        }
+            ```
+            ## Script for installation of Kubernetes with Kubespray
+            resource "local_file" "install-kubernetes-with-kubespray" {
+              content = <<-DOC
+                #!/bin/bash
+                set -euxo pipefail
+                export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i ansible-inventory-virtualmachine-master prepare-master.yml
+                sleep 20
+                ssh ubuntu@${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address} 'export ANSIBLE_HOST_KEY_CHECKING=False; export ANSIBLE_ROLES_PATH=/home/ubuntu/kubespray/roles:/home/ubuntu/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles; ansible-playbook -i /home/ubuntu/kubespray/inventory/mycluster/hosts.yaml -u ubuntu -b -v --private-key=/home/ubuntu/.ssh/id_rsa /home/ubuntu/kubespray/cluster.yml'
+                sleep 20
+                export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i ansible-inventory-virtualmachine-master get-kubeconfig.yml
+                sleep 5
+                sed -i -e 's,server: https://127.0.0.1:6443,server: https://${yandex_compute_instance.virtualmachine-master.network_interface.0.nat_ip_address}:6443,g'  ~/.kube/config
+                DOC
+              filename = "../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh"
+              depends_on = [yandex_compute_instance.virtualmachine-master, yandex_compute_instance.virtualmachine-worker-a, yandex_compute_instance.virtualmachine-worker-b, yandex_compute_instance.virtualmachine-worker-c]
+            }
 
-        ## Set execution bit on install script
-        resource "null_resource" "chmod" {
-          provisioner "local-exec" {
-            command = "chmod 755 ../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh"
-          }
-          depends_on = [local_file.install-kubernetes-with-kubespray]
-        }
-        ```
-    ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+            ## Set execution bit on install script
+            resource "null_resource" "chmod" {
+              provisioner "local-exec" {
+                command = "chmod 755 ../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh"
+              }
+              depends_on = [local_file.install-kubernetes-with-kubespray]
+            }
+            ```
+            ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Развернём инфраструктуру в Яндекс Облаке с помощью Terraform
     - Для stage
-    ```
-    cd terraform/workspace-stage
-    terraform validate
-    terraform plan
-    export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
-    ```
-    ⚠![](img/07.png)  
+        ```
+        cd terraform/workspace-stage
+        terraform validate
+        terraform plan
+        export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
+        ```
+        ⚠![](img/07.png)  
     По результатам команды у нас должно получится следующее:  
     - Созданные ресурсы в Яндекс Облаке  
-    ```
-    https://console.cloud.yandex.ru
-    ```
-    ⚠![](img/08.png)
+        ```
+        https://console.cloud.yandex.ru
+        ```
+        ⚠![](img/08.png)
     - Ansible инвернторий для Kuberspray ⚠![../../ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) на локальной машине  
     - Ansible инвенторий для виртуальной машины мастера Kubernetes ⚠![../../ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) на локальной машине  
     - Ansible инвернотрий для Kuberspray ⚠![../../ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) на локальной машине  
     - Bash скрипт для установки Kubernetes с помощью Kuberspray ⚠![../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) на локальной машине  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Установим Kubernetes с помощью подготовленного ранее скрипта
     - Для stage
-    ```
-    cd ansible/workspace-stage
-    ./install-kubernetes-with-kubespray.sh
-    ```
-    ⚠![](img/09.png)  
-    По результатам команды на виртуальных машинах развернётся Kubernetes кластер
+        ```
+        cd ansible/workspace-stage
+        ./install-kubernetes-with-kubespray.sh
+        ```
+        ⚠![](img/09.png)  
+        По результатам команды на виртуальных машинах развернётся Kubernetes кластер
     - Дла prod  
-    Аналогично
+        Аналогично
 
 - Выведем список подов Kubernetes
-```
-kubectl get pods --all-namespaces
-```
-⚠![](img/10.png)  
-Увидим, что Kubernetes кластер запущен и доступен с локальной машины.
+    ```
+    kubectl get pods --all-namespaces
+    ```
+    ⚠![](img/10.png)  
+    Увидим, что Kubernetes кластер запущен и доступен с локальной машины.
 
 
 
@@ -843,102 +843,102 @@ kubectl get pods --all-namespaces
 <a id="3-1"></a>
 ### Подготовим инструменты для работы
 - Установим Docker на локальную машину
-```
-apt-get install ca-certificates curl gnupg lsb-release
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt-get update
-apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
-```
+    ```
+    apt-get install ca-certificates curl gnupg lsb-release
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
+    ```
 - Установим Helm на локальной машине
-```
-curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null
-apt-get install apt-transport-https --yes
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
-apt-get update
-apt-get install helm
-```
+    ```
+    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null
+    apt-get install apt-transport-https --yes
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+    apt-get update
+    apt-get install helm
+    ```
 <a id="3-2"></a>
 ### Cоздадим Docker образ приложения
 - Создадим папки для приложения 
-```
-mkdir -p docker/workspace-stage
-mkdir -p docker/workspace-prod
-```
+    ```
+    mkdir -p docker/workspace-stage
+    mkdir -p docker/workspace-prod
+    ```
 - Создадим `Dockerfile`
     - Создадим файл `docker/workspace-stage/Dockerfile` для stage
-    ```
-    FROM nginx:latest
-    RUN rm -rf /usr/share/nginx/html/*
-    RUN mkdir -p /usr/share/nginx/html/
-    COPY index.html /usr/share/nginx/html/
-    EXPOSE 80
-    ```
-    Команда скопируем файл веб приложения внутрь Docker образа  
-    ⚠![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile)  
+        ```
+        FROM nginx:latest
+        RUN rm -rf /usr/share/nginx/html/*
+        RUN mkdir -p /usr/share/nginx/html/
+        COPY index.html /usr/share/nginx/html/
+        EXPOSE 80
+        ```
+        Команда скопируем файл веб приложения внутрь Docker образа  
+        ⚠![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile)  
     - Создадим файл `docker/workspace-prod/Dockerfile` для prod  
-    Аналогично
+        Аналогично
 
 - Создадим статическую страницу веб приложения
     - Создадим файл `docker/workspace-stage/index.html` для stage
-    ```
-    <html>
-    <head>
-    Example page
-    </head>
-    <body>
-    <h1>stage-v0.1</h1>
-    </body>
-    </html>
-    ```
-    ⚠![docker/workspace-stage/index.html](docker/workspace-stage/index.html)  
+        ```
+        <html>
+        <head>
+        Example page
+        </head>
+        <body>
+        <h1>stage-v0.1</h1>
+        </body>
+        </html>
+        ```
+        ⚠![docker/workspace-stage/index.html](docker/workspace-stage/index.html)  
     - Создадим файл `docker/workspace-prod/index.html` для prod  
-    Аналогично
+        Аналогично
 
 - Построим образ Docker
     - Для stage
-    ```
-    cd docker/workspace-stage
-    docker build -t yuriartemiev/webapp-stage:v0.1 .
-    ```
-    ⚠![](img/11.png)  
-    Используем название DockerHub репозитория  
+        ```
+        cd docker/workspace-stage
+        docker build -t yuriartemiev/webapp-stage:v0.1 .
+        ```
+        ⚠![](img/11.png)  
+        Используем название DockerHub репозитория  
     - Для prod  
-    Аналогично
+        Аналогично
 
 <a id="3-3"></a>
 ### Отправим Docker образ в Docker Hub
 - Создадим репозиторий на DockerHub
     - Для stage  
         - Зайдём на Docker Hub
-        ```
-        https://hub.docker.com/u/yuriartemiev
-        ```
+            ```
+            https://hub.docker.com/u/yuriartemiev
+            ```
         - Выберем Create repository  
-        Укажем имя репозитория: webapp-stage  
-        ⚠![](img/12.png)
+            Укажем имя репозитория: webapp-stage  
+            ⚠![](img/12.png)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Отправим образ в Docker Hub
     - Для stage
-    ```
-    docker login -u yuriartemiev
-    docker push yuriartemiev/webapp-stage:v0.1
-    ```
+        ```
+        docker login -u yuriartemiev
+        docker push yuriartemiev/webapp-stage:v0.1
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Посмотрим образ на DockerHub
     - Для stage
-    ```
-    https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
-    ```
-    ⚠![](img/13.png)  
-    Увидим, что образ загрузился на Docker Hub.
+        ```
+        https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
+        ```
+        ⚠![](img/13.png)  
+        Увидим, что образ загрузился на Docker Hub.
     - Для prod  
-    Аналогично
+        Аналогично
 
 
 
@@ -948,71 +948,70 @@ mkdir -p docker/workspace-prod
 ### Развернём Kubernetes deployment для нашего приложения
 - Создадим файл `deployment.yaml` для развёртывания приложения в Kubernetes.
     - Создадим файл `docker/workspace-stage/deployment.yaml` для stage
-    ```
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: webapp-stage
-      labels:
-        app: webapp
-    spec:
-      replicas: 1
-      selector:
-        matchLabels:
-          app: webapp
-      template:
+        ```
+        ---
+        apiVersion: apps/v1
+        kind: Deployment
         metadata:
+          name: webapp-stage
           labels:
             app: webapp
         spec:
-          containers:
-          - name: webapp-container
-            image: yuriartemiev/webapp-stage
-            ports:
-            - containerPort: 80
-    ---
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: webapp-service
-    spec:
-      type: NodePort
-      selector:
-        app: webapp
-      ports:
-        - protocol: TCP
-          port: 80
-          nodePort: 31080
-    ```
-    Команда разворачивает контейнер и публикует его на порту 31080.  
-    ⚠![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml)
+          replicas: 1
+          selector:
+            matchLabels:
+              app: webapp
+          template:
+            metadata:
+              labels:
+                app: webapp
+            spec:
+              containers:
+              - name: webapp-container
+                image: yuriartemiev/webapp-stage
+                ports:
+                - containerPort: 80
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: webapp-service
+        spec:
+          type: NodePort
+          selector:
+            app: webapp
+          ports:
+            - protocol: TCP
+              port: 80
+              nodePort: 31080
+        ```
+        Команда разворачивает контейнер и публикует его на порту 31080.  
+        ⚠![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml)
     - Создадим файл `docker/workspace-prod/deployment.yaml` для prod  
-    Аналогично
+        Аналогично
 
 - Применим конфигурацию к Kubernetes кластеру
     - Для stage
-    ```
-    kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:v0.1
-
-    ```
-    ⚠![](img/14.png)  
+        ```
+        kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:v0.1
+        ```
+        ⚠![](img/14.png)  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`
-```
-http://158.160.118.254/:31080/
-```
-⚠![](img/15.png)  
-Увидим, что приложение доступно.  
+    ```
+    http://158.160.118.254/:31080/
+    ```
+    ⚠![](img/15.png)  
+    Увидим, что приложение доступно.  
 - Удалим развернутое приложение с Kubernetes кластера
     - Для stage
-    ```
-    kubectl delete deploy webapp-stage
-    ```
+        ```
+        kubectl delete deploy webapp-stage
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 
 
@@ -1022,11 +1021,11 @@ http://158.160.118.254/:31080/
 ### Развернём Helm чарт для нашего приложения
 - Создадим папку для чарта
     - Для stage
-    ```
-    mkdir -p docker/workspace-stage/helm/webapp-stage/templates
-    ```
+        ```
+        mkdir -p docker/workspace-stage/helm/webapp-stage/templates
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Заполним Helm чарт файлами
     - `docker/workspace-stage/helm/webapp-stage` для stage
@@ -1034,140 +1033,140 @@ http://158.160.118.254/:31080/
         - values.yaml
         - templates/deployment.yaml
     - `docker/workspace-prod/helm/webapp-prod` для prod  
-    Аналогично
+        Аналогично
 
 - Создадим файл `Chart.yaml`
     - `docker/workspace-stage/helm/webapp-stage/Chart.yaml` для stage
-    ```
-    ---
-    apiVersion: v2
-    name: webapp-chart
-    description: A Helm chart for Kubernetes
+        ```
+        ---
+        apiVersion: v2
+        name: webapp-chart
+        description: A Helm chart for Kubernetes
 
-    type: application
+        type: application
 
-    version: "0.1"
-    appVersion: "0.1"
-    ```
-    ⚠![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml)  
+        version: "0.1"
+        appVersion: "0.1"
+        ```
+        ⚠![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/Chart.yaml` для prod  
-    Аналогично
+        Аналогично
 
 - Создадим файл `values.yaml`
     - `docker/workspace-stage/helm/webapp-stage/values.yaml` для stage
-    ```
-    ---
-    replicaCount: 1
-    app:
-      name: webapp
-    image:
-      repository: yuriartemiev/webapp-stage
-      tag: latest
-    service:
-      type: NodePort
-      port: 80
-      nodePort: 31080
-    ```
-    ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml)  
+        ```
+        ---
+        replicaCount: 1
+        app:
+          name: webapp
+        image:
+          repository: yuriartemiev/webapp-stage
+          tag: latest
+        service:
+          type: NodePort
+          port: 80
+          nodePort: 31080
+        ```
+        ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/values.yaml` для prod  
-    Аналогично
+        Аналогично
 
 - Создадим файл `templates/deployment.yaml`
     - `docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml` для stage
-    ```
-    ---
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: webapp-stage
-      labels:
-        app: {{ .Values.app.name }}
-    spec:
-      replicas: {{ .Values.replicaCount }}
-      selector:
-        matchLabels:
-          app: {{ .Values.app.name }}
-      template:
+        ```
+        ---
+        apiVersion: apps/v1
+        kind: Deployment
         metadata:
+          name: webapp-stage
           labels:
             app: {{ .Values.app.name }}
         spec:
-          containers:
-          - name: webapp-container
-            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            ports:
-            - containerPort: 80
-    ---
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: webapp-service
-    spec:
-      type: {{ .Values.service.type }}
-      selector:
-        app: {{ .Values.app.name }}
-      ports:
-        - protocol: TCP
-          port: 80
-          nodePort: {{ .Values.service.nodePort }}
-    ```
-    ⚠![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  
+          replicas: {{ .Values.replicaCount }}
+          selector:
+            matchLabels:
+              app: {{ .Values.app.name }}
+          template:
+            metadata:
+              labels:
+                app: {{ .Values.app.name }}
+            spec:
+              containers:
+              - name: webapp-container
+                image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+                ports:
+                - containerPort: 80
+        ---
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: webapp-service
+        spec:
+          type: {{ .Values.service.type }}
+          selector:
+            app: {{ .Values.app.name }}
+          ports:
+            - protocol: TCP
+              port: 80
+              nodePort: {{ .Values.service.nodePort }}
+        ```
+        ⚠![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/templates/deployment.yaml` для prod  
-    Аналогично
+        Аналогично
 
 - Проверим конструктор Helm чарта
     - Для stage
-    ```
-    cd docker/workspace-stage/helm
-    helm template webapp-stage
-    ```
-    Увидим, что переменные из файла values.yaml применились к манифестам для Kubernetes.
+        ```
+        cd docker/workspace-stage/helm
+        helm template webapp-stage
+        ```
+        Увидим, что переменные из файла values.yaml применились к манифестам для Kubernetes.
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Проверим синтаксис Helm чарта 
     - Для stage
-    ```
-    helm lint webapp-stage
-    ```
-    ⚠![](img/16.png)  
+        ```
+        helm lint webapp-stage
+        ```
+        ⚠![](img/16.png)  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Запустим развёртывание Helm чарта 
     - Для stage
-    ```
-    helm upgrade --install webapp-stage webapp-stage --set image.tag=v0.1
-    ```
-    ⚠![](img/17.png)
+        ```
+        helm upgrade --install webapp-stage webapp-stage --set image.tag=v0.1
+        ```
+        ⚠![](img/17.png)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Проверим развёрнутые Helm ресурсы  
     - Для stage
-    ```
-    helm ls
-    kubectl get deployment
-    ```
-    ⚠![](img/18.png)  
-    Увидим, что helm релиз развернулся из Helm чарта.  
-    Увидим, что развернулись ресурсы на Kubernetes кластере.
+        ```
+        helm ls
+        kubectl get deployment
+        ```
+        ⚠![](img/18.png)  
+        Увидим, что helm релиз развернулся из Helm чарта.  
+        Увидим, что развернулись ресурсы на Kubernetes кластере.
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`
-```
-http://158.160.118.254:31080/
-```
-Увидим, что приложение доступно.  
-⚠![](img/19.png)
+    ```
+    http://158.160.118.254:31080/
+    ```
+    Увидим, что приложение доступно.  
+    ⚠![](img/19.png)
 - Удалим Helm релиз 
     - Для stage
-    ```
-    helm uninstall webapp-stage
-    ```
+        ```
+        helm uninstall webapp-stage
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 
 
@@ -1185,84 +1184,84 @@ http://158.160.118.254:31080/
 ### Развернём kube-prometheus на Kubernetes кластере
 - Создадим папку для `kube-prometheus`
     - Для stage
-    ```
-    mkdir -p helm/workspace-stage/kube-prometheus
-    ```
+        ```
+        mkdir -p helm/workspace-stage/kube-prometheus
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Подготовим значения переменных для kube-prometheus чарта Helm
     - Для stage
-    ```
-    cd helm/workspace-stage/kube-prometheus
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    helm repo update
-    helm show values prometheus-community/kube-prometheus-stack > values.yaml
-    ```
-    Получим файл `values.yml` со значениями переменных для Helm
+        ```
+        cd helm/workspace-stage/kube-prometheus
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+        helm show values prometheus-community/kube-prometheus-stack > values.yaml
+        ```
+        Получим файл `values.yml` со значениями переменных для Helm
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Отредактируем файл `values.yaml` изменив указанные значения
     - `helm/workspace-stage/kube-prometheus/values.yaml` для stage
-    ```
-    grafana:
-      service:
-        type: NodePort
-        nodePort: 30081
-    ```
-    Команда опубликует Grafana на порту `30081`  
-    ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
+        ```
+        grafana:
+          service:
+            type: NodePort
+            nodePort: 30081
+        ```
+        Команда опубликует Grafana на порту `30081`  
+        ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
     - `helm/workspace-prod/kube-prometheus/values.yaml` для prod  
-    Аналогично
+        Аналогично
 
 - Установим kube-prometheus с помощью Helm
     - Для stage
-    ```
-    helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --create-namespace -n monitoring -f values.yaml
-    ```
-    ⚠![](img/20.png)  
-    Укажем Helm релиз `monitoring`  
-    Укажем Kubernetes namespace `monitoring`  
-    Укажем файл с переменными Helm `values.yaml`
+        ```
+        helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --create-namespace -n monitoring -f values.yaml
+        ```
+        ⚠![](img/20.png)  
+        Укажем Helm релиз `monitoring`  
+        Укажем Kubernetes namespace `monitoring`  
+        Укажем файл с переменными Helm `values.yaml`
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Проверим установленный Helm релиз `monitoring`
     - Для stage
-    ```
-    kubectl --namespace monitoring get pods -l "release=monitoring"
-    ```
-    ⚠![](img/21.png)  
-    Увидим, что поды для мониторинга развернулись в Kubernetes кластере.
+        ```
+        kubectl --namespace monitoring get pods -l "release=monitoring"
+        ```
+        ⚠![](img/21.png)  
+        Увидим, что поды для мониторинга развернулись в Kubernetes кластере.
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Получим пароль от интерфейса Grafana
     - Для stage
-    ```
-    kubectl get secret monitoring-grafana -o jsonpath="{.data.admin-password}" -n monitoring | base64 --decode
-    ```
-    ⚠![](img/22.png)  
-    Укажем namespace `monitoring`, где был развёрнут kube-prometheus  
-    Grafana пароль также доступен в `helm/workspace-prod/kube-prometheus/values.yaml`:
-    ```
-    grafana:
-      adminPassword: prom-operator
-    ```
-    ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
+        ```
+        kubectl get secret monitoring-grafana -o jsonpath="{.data.admin-password}" -n monitoring | base64 --decode
+        ```
+        ⚠![](img/22.png)  
+        Укажем namespace `monitoring`, где был развёрнут kube-prometheus  
+        Grafana пароль также доступен в `helm/workspace-prod/kube-prometheus/values.yaml`:
+        ```
+        grafana:
+          adminPassword: prom-operator
+        ```
+        ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Зайдём на веб интерфейс Grafana  
-Откроем IP адрес любой ноды с портом 30081
-```
-http://158.160.118.254:30081/
-```
-Укажил логин `admin` и пароль, полученный ранее  
-Откроем Home / Dashboards / General / Kubernetes
-⚠![](img/23.png)  
-Увидим, что веб Grafana и dashboard Kubernetes кластера доступны
+    Откроем IP адрес любой ноды с портом 30081
+    ```
+    http://158.160.118.254:30081/
+    ```
+    Укажил логин `admin` и пароль, полученный ранее  
+    Откроем Home / Dashboards / General / Kubernetes
+    ⚠![](img/23.png)  
+    Увидим, что веб Grafana и dashboard Kubernetes кластера доступны
 
 
 
@@ -1283,77 +1282,77 @@ http://158.160.118.254:30081/
 <a id="5-1"></a>
 ### Подготовим GitHub
 - Зайдём на GitHub и создадим новый репозиторий
-```
-https://github.com/yuri-artemiev/
-```
+    ```
+    https://github.com/yuri-artemiev/
+    ```
 - Нажмём New repository
     - Для stage  
-    Укажем имя репозитория `webapp-stage`  
-    `yuri-artemiev/webapp-stage.git`  
-    ```
-    https://github.com/yuri-artemiev/webapp-stage
-    ```
-    ⚠![](img/24.png)
+        Укажем имя репозитория `webapp-stage`  
+        `yuri-artemiev/webapp-stage.git`  
+        ```
+        https://github.com/yuri-artemiev/webapp-stage
+        ```
+        ⚠![](img/24.png)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Изменим настройки GitHub репозитория
     - Добавим секреты для доступа в Docker Hub  
-    Settings / Secrets and variables / Actions / Secrets
+        Settings / Secrets and variables / Actions / Secrets
     - Нажмём на кнопку New repository secret в разделе Secrets
     - Укажем пользователя и пароль дла нашего Docker Hub репозитория
         - Name: DOCKERHUB_USERNAME  
-        Secret: yuriartemiev
+            Secret: yuriartemiev
         - Name: DOCKERHUB_PASSWORD  
-        Secret: пароль от Docker Hub репозитория  
+            Secret: пароль от Docker Hub репозитория  
     ⚠![](img/25.png)
 
 - Изменим настройки GitHub профиля
     - Добавим SSH публичный ключ из файла `~/.ssh/id_rsa.pub` на локальной машине  
-    Settings / SSH and GPG keys / New SSH key  
-    ⚠![](img/26.png)
+        Settings / SSH and GPG keys / New SSH key  
+        ⚠![](img/26.png)
 
 
 <a id="5-2"></a>
 ### Коммит в репозиторий создаёт Docker образ в Docker Hub
 - Создадим папку описания процесса развёртывания GitHub
     - Для stage
-    ```
-    mkdir -p docker/workspace-stage/.github/workflows
-    ```
+        ```
+        mkdir -p docker/workspace-stage/.github/workflows
+        ```
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Создадим файл для описания процесса развёртывания в GitHub
     - `docker/workspace-stage/.github/workflows/dockerimage.yml` для stage 
-    ```
-    name: Docker Image CI
-    on:
-      push:
-        branches: [ main ]
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v2
-        - name: Login to DockerHub
-          uses: docker/login-action@v1
-          with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
-       
-        - name: Build and push Docker image
-          uses: docker/build-push-action@v2
-          with:
-            context: .
-            push: true
-            tags: yuriartemiev/webapp-stage:latest
-    ```
-    ⚠![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml)   
-    Используем имя нашего Docker репозитория  
-    Команда по коммиту в GitHub построит Docker образ и отправит его в Docker Hub
+        ```
+        name: Docker Image CI
+        on:
+          push:
+            branches: [ main ]
+        jobs:
+          build:
+            runs-on: ubuntu-latest
+            steps:
+            - uses: actions/checkout@v2
+            - name: Login to DockerHub
+              uses: docker/login-action@v1
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}
+                password: ${{ secrets.DOCKERHUB_PASSWORD }}
+           
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v2
+              with:
+                context: .
+                push: true
+                tags: yuriartemiev/webapp-stage:latest
+        ```
+        ⚠![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml)   
+        Используем имя нашего Docker репозитория  
+        Команда по коммиту в GitHub построит Docker образ и отправит его в Docker Hub
     - `docker/workspace-prod/.github/workflows/dockerimage.yml` для prod  
-    Аналогично
+        Аналогично
 
 - В итоге в папке для GitHub репозитория должны быть следующие файлы:
     - Для stage:
@@ -1362,57 +1361,57 @@ https://github.com/yuri-artemiev/
         - index.html
         - .github/workflows/dockerimage.yml
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Загрузим файлы в GitHub
     - Для stage
-    ```
-    git init
-    git add .
-    git commit -m "Initial commit"
-    git branch -M main
-    git remote add origin git@github.com:yuri-artemiev/webapp-stage.git
-    git push -u origin main
-    ```
-    ⚠![](img/27.png)  
-    Укажем адрес нашего репозитория  
-    Аутентификация произойдёт с помощью  публичного SSH ключа из  ~/.ssh/id_rsa.pub
+        ```
+        git init
+        git add .
+        git commit -m "Initial commit"
+        git branch -M main
+        git remote add origin git@github.com:yuri-artemiev/webapp-stage.git
+        git push -u origin main
+        ```
+        ⚠![](img/27.png)  
+        Укажем адрес нашего репозитория  
+        Аутентификация произойдёт с помощью  публичного SSH ключа из  ~/.ssh/id_rsa.pub
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
-    `docker/workspace-prod/index.html`  
-    ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        `docker/workspace-prod/index.html`  
+        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Отправим изменения на GitHub
-```
-git add .
-git commit -m "changed index.html"
-git push -u origin main
-```
+    ```
+    git add .
+    git commit -m "changed index.html"
+    git push -u origin main
+    ```
 - Зайдём на GitHub
     - Для stage
-    Repository / Actions / Docker Image CI
-    ```
-    https://github.com/yuri-artemiev/webapp-stage/actions/workflows/dockerimage.yml
-    ```
-    ⚠![](img/28.png)  
-    Увидим, что коммит в репозиторий создал Docker образ и сохранил его в Docker Hub  
+        Repository / Actions / Docker Image CI
+        ```
+        https://github.com/yuri-artemiev/webapp-stage/actions/workflows/dockerimage.yml
+        ```
+        ⚠![](img/28.png)  
+        Увидим, что коммит в репозиторий создал Docker образ и сохранил его в Docker Hub  
     - Для prod  
-    Аналогично
+        Аналогично
 
 - Зайдём на Docker Hub
     - Для stage
-    ```
-    https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
-    ```
-    ⚠![](img/29.png)  
-    Увидим, что новый образ добавился в Docker Hub репозиторий  
+        ```
+        https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
+        ```
+        ⚠![](img/29.png)  
+        Увидим, что новый образ добавился в Docker Hub репозиторий  
     - Для prod  
-    Аналогично
+        Аналогично
 
 
 
