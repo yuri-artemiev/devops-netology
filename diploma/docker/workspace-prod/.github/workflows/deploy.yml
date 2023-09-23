@@ -1,0 +1,41 @@
+name: Deploy CI/CD
+on:
+  push:
+    tags:
+    - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: yuriartemiev/webapp-prod:${{ github.ref_name }}
+    
+    - name: Setup kubeconfig
+      run: echo '${{ secrets.KUBECONFIG_FILE }}' > kubeconfig
+    
+    - name: Install Kubernetes CLI
+      run: |
+        curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+    
+    - name: Delete old deployment
+      run: |
+        export KUBECONFIG=kubeconfig
+        kubectl delete deploy webapp-prod || true
+    
+    - name: Deploy to Kubernetes
+      run: |
+        export KUBECONFIG=kubeconfig
+        kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-prod webapp-container=yuriartemiev/webapp-prod:${{ github.ref_name }}

@@ -775,6 +775,118 @@
     - Для prod  
         Аналогично
 
+- Создадим задачи для Ansible по подготовке машины мастера
+    - Для stage
+        - Отредактируем файл `ansible/workspace-stage/prepare-master.yml` для stage
+            ```
+            ---
+            - name: Prepare Kuberspray
+              hosts: virtualmachine-master.ru-central1.internal
+              become_user: root
+              remote_user: ubuntu
+              tasks:
+                - name: apt-get update on virtualmachine-master
+                  become: yes
+                  ansible.builtin.apt:
+                    update_cache: yes
+                - name: Install OS packages
+                  become: yes
+                  ansible.builtin.apt:
+                    name:
+                      - git
+                      - python3-pip
+                    state: latest
+                - name: Get kubespray repostiory on virtualmachine-master
+                  ansible.builtin.git:
+                    repo: https://github.com/kubernetes-sigs/kubespray.git
+                    dest: /home/ubuntu/kubespray
+                - name: Install Python requirements on virtualmachine-master
+                  ansible.builtin.pip:
+                    requirements: /home/ubuntu/kubespray/requirements.txt
+                - name: Install more OS packages on virtualmachine-master
+                  become: yes
+                  ansible.builtin.apt:
+                    name:
+                      - python3
+                      - ansible
+                - name: Copy Ansible inventory sample for Kubespray on virtualmachine-master
+                  ansible.builtin.copy:
+                    src: /home/ubuntu/kubespray/inventory/sample/
+                    dest: /home/ubuntu/kubespray/inventory/mycluster/
+                    remote_src: yes
+                - name: Copy ansible-inventory-kubespray on virtualmachine-master
+                  ansible.builtin.copy:
+                    src: ansible-inventory-kubespray
+                    dest: /home/ubuntu/kubespray/inventory/mycluster/hosts.yaml
+                - name: Copy k8s-cluster.yml on virtualmachine-master
+                  ansible.builtin.copy:
+                    src: k8s-cluster.yml
+                    dest: /home/ubuntu/kubespray/inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
+                - name: Change ownership of a directory
+                  ansible.builtin.file:
+                    path: /home/ubuntu/kubespray
+                    state: directory
+                    recurse: yes
+                    owner: ubuntu
+                    group: ubuntu
+                - name: Copy ssh private key on virtualmachine-master
+                  ansible.builtin.copy:
+                    src:  ~/.ssh/id_rsa
+                    dest: /home/ubuntu/.ssh/id_rsa
+                    owner: ubuntu
+                    group: ubuntu
+                    mode: '0600'
+                - name: Execute task with extended PATH on virtualmachine-master
+                  shell: echo $PATH
+                  environment:
+                    PATH: "/home/ubuntu/.local/bin/:{{ ansible_env.PATH }}"
+            ```
+            ![ansible/workspace-stage/prepare-master.yml](ansible/workspace-stage/prepare-master.yml)  
+    - Для prod  
+        Аналогично
+
+- Создадим задачи для Ansible по получению kubeconfig на локальную машину
+    - Для stage
+        - Отредактируем файл `ansible/workspace-stage/get-kubeconfig.yml` для stage
+            ```
+            ---
+            - name: Get kuber config
+              hosts: virtualmachine-master.ru-central1.internal
+              become_user: root
+              remote_user: ubuntu
+              tasks:
+                - name: Create a directory if it does not exist on virtualmachine-master
+                  become: yes
+                  ansible.builtin.file:
+                    path: /home/ubuntu/.kube
+                    state: directory
+                    mode: '0755'
+                    owner: ubuntu
+                    group: ubuntu
+                - name: Copy kubeconfig on virtualmachine-master
+                  become: yes
+                  ansible.builtin.copy:
+                    src: /etc/kubernetes/admin.conf
+                    dest: /home/ubuntu/.kube/config
+                    mode: '0644'
+                    remote_src: yes
+                - name: Run kubectl command on virtualmachine-master
+                  ansible.builtin.shell: kubectl get nodes
+                  register: result
+                - name: Print command output
+                  ansible.builtin.debug:
+                    msg: "{{ result.stdout.split('\n') }}"
+                - name: Copy kubeconfig to local machine
+                  become: yes
+                  ansible.builtin.fetch:
+                    src: /home/ubuntu/.kube/config
+                    dest: ~/.kube/config
+                    flat: yes
+            ```
+            ![ansible/workspace-stage/get-kubeconfig.yml](ansible/workspace-stage/get-kubeconfig.yml)  
+    - Для prod  
+        Аналогично
+
 - Развернём инфраструктуру в Яндекс Облаке с помощью Terraform
     - Для stage
         ```
