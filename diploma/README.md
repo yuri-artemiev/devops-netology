@@ -478,8 +478,8 @@ https://app.terraform.io/app/yuri-artemiev/workspaces
     - Для stage
     ⚠![](img/05.png)  
     ⚠![](img/06.png)  
-    Увидим, что запуск выполнен    
-    Увидим, что состояние Terraform сохранено
+    Увидим, что запуск в Terraform Cloud выполнен    
+    Увидим, что состояние в Terraform Cloud сохранено
     - Для prod  
     Аналогично
 
@@ -784,7 +784,7 @@ apt install ansible
     export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
     ```
     ⚠![](img/07.png)  
-    По результатам команды у нас должно получится следующее:
+    По результатам команды у нас должно получится следующее:  
         - Созданные ресурсы в Яндекс Облаке  
         ```
         https://console.cloud.yandex.ru
