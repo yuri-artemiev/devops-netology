@@ -785,15 +785,15 @@ apt install ansible
     ```
     ⚠![](img/07.png)  
     По результатам команды у нас должно получится следующее:  
-        - Созданные ресурсы в Яндекс Облаке  
-        ```
-        https://console.cloud.yandex.ru
-        ```
-        ⚠![](img/08.png)
-        - Ansible инвернторий для Kuberspray ⚠![../../ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) на локальной машине  
-        - Ansible инвенторий для виртуальной машины мастера Kubernetes ⚠![../../ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) на локальной машине  
-        - Ansible инвернотрий для Kuberspray ⚠![../../ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) на локальной машине  
-        - Bash скрипт для установки Kubernetes с помощью Kuberspray ⚠![../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) на локальной машине  
+    - Созданные ресурсы в Яндекс Облаке  
+    ```
+    https://console.cloud.yandex.ru
+    ```
+    ⚠![](img/08.png)
+    - Ansible инвернторий для Kuberspray ⚠![../../ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) на локальной машине  
+    - Ansible инвенторий для виртуальной машины мастера Kubernetes ⚠![../../ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) на локальной машине  
+    - Ansible инвернотрий для Kuberspray ⚠![../../ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) на локальной машине  
+    - Bash скрипт для установки Kubernetes с помощью Kuberspray ⚠![../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) на локальной машине  
     - Для prod  
     Аналогично
 
