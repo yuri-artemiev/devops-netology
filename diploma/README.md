@@ -184,7 +184,7 @@
 
 
 
-** Оглавление **
+**Оглавление**
 
 - [Создание облачной инфраструктуры](#1)
     - [Подготовим инструменты для работы](#1-1)
@@ -1655,7 +1655,7 @@ https://github.com/yuri-artemiev/webapp-stage
 ```
 https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
 ```
-⚠![](картинка.png)
+⚠![](img/41.png)
     - ⚠![ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) - инвентарий для Ansible  
     - ⚠![ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) - инвентарий для Ansible  
     - ⚠![ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) - скрипт для установки Kubernetes с помощью Kubespray  
