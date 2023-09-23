@@ -1,0 +1,36 @@
+all:
+  hosts:
+    virtualmachine-master.ru-central1.internal:
+      ansible_host: 10.0.10.33
+      ip: 10.0.10.33
+      access_ip: 10.0.10.33
+    virtualmachine-worker-a.ru-central1.internal:
+      ansible_host: 10.0.10.27
+      ip: 10.0.10.27
+      access_ip: 10.0.10.27
+    virtualmachine-worker-b.ru-central1.internal:
+      ansible_host: 10.0.20.3
+      ip: 10.0.20.3
+      access_ip: 10.0.20.3
+    virtualmachine-worker-c.ru-central1.internal:
+      ansible_host: 10.0.30.33
+      ip: 10.0.30.33
+      access_ip: 10.0.30.33
+  children:
+    kube_control_plane:
+      hosts:
+        virtualmachine-master.ru-central1.internal:
+    kube_node:
+      hosts:
+        virtualmachine-worker-a.ru-central1.internal:
+        virtualmachine-worker-b.ru-central1.internal:
+        virtualmachine-worker-c.ru-central1.internal:
+    etcd:
+      hosts:
+        virtualmachine-master.ru-central1.internal:
+    k8s_cluster:
+      children:
+        kube_control_plane:
+        kube_node:
+    calico_rr:
+      hosts: {}

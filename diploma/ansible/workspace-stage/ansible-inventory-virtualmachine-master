@@ -1,0 +1,4 @@
+kuber:
+  hosts:
+    virtualmachine-master.ru-central1.internal:
+      ansible_host: 158.160.118.254
