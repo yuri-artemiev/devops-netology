@@ -359,7 +359,7 @@
           member    = "serviceAccount:${yandex_iam_service_account.serviceaccount-stage.id}"
         }
         ```
-        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terraform/workspace-prod/main.tf` для prod  
         Аналогично
 
@@ -376,10 +376,10 @@
         ```
         https://app.terraform.io/app/settings/tokens
         ```
-        ⚠![](img/01.png)
+        ![](img/01.png)
 
 - Создадим новую организацию на Terraform Cloud нажав Create new organization  
-    ⚠![](img/02.png)
+    ![](img/02.png)
 
 - Добавим Terraform Cloud организацию в Terraform
     - Отредактируем файл `terraform/workspace-stage/main.tf` для stage
@@ -417,13 +417,13 @@
     ```
     https://app.terraform.io/app/yuri-artemiev/workspaces
     ```
-    ⚠![](img/03.png)
+    ![](img/03.png)
 - Зайдём в каждый workspace в Terraform Cloud и настроем выполнение на локальной машине. Это нужно для того чтобы Terraform мог сохранять файлы на локальной машине. Состояние Terraform будет по прежнему синхронизироваться в Terraform Cloud.  
     Workspace Settings / General / Execution Mode / Local
     ```
     https://app.terraform.io/app/yuri-artemiev/workspaces
     ```
-    ⚠![](img/04.png)
+    ![](img/04.png)
 
 
 <a id="1-5"></a>
@@ -458,7 +458,7 @@
           network_id     = "${yandex_vpc_network.network-stage.id}"
         }
         ```
-        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terraform/workspace-prod/main.tf` для prod  
         Аналогично
 
@@ -476,8 +476,8 @@
 
 - Посмотрим сохранённую конфигурацию в Terraform Cloud
     - Для stage
-        ⚠![](img/05.png)  
-        ⚠![](img/06.png)  
+        ![](img/05.png)  
+        ![](img/06.png)  
         Увидим, что запуск в Terraform Cloud выполнен    
         Увидим, что состояние в Terraform Cloud сохранено
     - Для prod  
@@ -659,7 +659,7 @@
           }
         }
         ```
-        ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+        ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Отредактируем файл `terrafrom/workspace-prod/main.tf` для prod  
         Аналогично
 
@@ -738,7 +738,7 @@
               depends_on = [null_resource.ansible-kubespray-k8s-config]
             }
             ```
-            ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+            ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Для prod  
         Аналогично
 
@@ -771,7 +771,7 @@
               depends_on = [local_file.install-kubernetes-with-kubespray]
             }
             ```
-            ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
+            ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf)
     - Для prod  
         Аналогично
 
@@ -783,17 +783,17 @@
         terraform plan
         export TF_VAR_yc_token=$(yc iam create-token); terraform apply --auto-approve
         ```
-        ⚠![](img/07.png)  
+        ![](img/07.png)  
     По результатам команды у нас должно получится следующее:  
     - Созданные ресурсы в Яндекс Облаке  
         ```
         https://console.cloud.yandex.ru
         ```
-        ⚠![](img/08.png)
-    - Ansible инвернторий для Kuberspray ⚠![../../ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) на локальной машине  
-    - Ansible инвенторий для виртуальной машины мастера Kubernetes ⚠![../../ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) на локальной машине  
-    - Ansible инвернотрий для Kuberspray ⚠![../../ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) на локальной машине  
-    - Bash скрипт для установки Kubernetes с помощью Kuberspray ⚠![../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) на локальной машине  
+        ![](img/08.png)
+    - Ansible инвернторий для Kuberspray ![../../ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) на локальной машине  
+    - Ansible инвенторий для виртуальной машины мастера Kubernetes ![../../ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) на локальной машине  
+    - Ansible инвернотрий для Kuberspray ![../../ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) на локальной машине  
+    - Bash скрипт для установки Kubernetes с помощью Kuberspray ![../../ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) на локальной машине  
     - Для prod  
         Аналогично
 
@@ -803,7 +803,7 @@
         cd ansible/workspace-stage
         ./install-kubernetes-with-kubespray.sh
         ```
-        ⚠![](img/09.png)  
+        ![](img/09.png)  
         По результатам команды на виртуальных машинах развернётся Kubernetes кластер
     - Дла prod  
         Аналогично
@@ -812,7 +812,7 @@
     ```
     kubectl get pods --all-namespaces
     ```
-    ⚠![](img/10.png)  
+    ![](img/10.png)  
     Увидим, что Kubernetes кластер запущен и доступен с локальной машины.
 
 
@@ -876,7 +876,7 @@
         EXPOSE 80
         ```
         Команда скопируем файл веб приложения внутрь Docker образа  
-        ⚠![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile)  
+        ![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile)  
     - Создадим файл `docker/workspace-prod/Dockerfile` для prod  
         Аналогично
 
@@ -892,7 +892,7 @@
         </body>
         </html>
         ```
-        ⚠![docker/workspace-stage/index.html](docker/workspace-stage/index.html)  
+        ![docker/workspace-stage/index.html](docker/workspace-stage/index.html)  
     - Создадим файл `docker/workspace-prod/index.html` для prod  
         Аналогично
 
@@ -902,7 +902,7 @@
         cd docker/workspace-stage
         docker build -t yuriartemiev/webapp-stage:v0.1 .
         ```
-        ⚠![](img/11.png)  
+        ![](img/11.png)  
         Используем название DockerHub репозитория  
     - Для prod  
         Аналогично
@@ -917,7 +917,7 @@
             ```
         - Выберем Create repository  
             Укажем имя репозитория: webapp-stage  
-            ⚠![](img/12.png)
+            ![](img/12.png)
     - Для prod  
         Аналогично
 
@@ -935,7 +935,7 @@
         ```
         https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
         ```
-        ⚠![](img/13.png)  
+        ![](img/13.png)  
         Увидим, что образ загрузился на Docker Hub.
     - Для prod  
         Аналогично
@@ -986,7 +986,7 @@
               nodePort: 31080
         ```
         Команда разворачивает контейнер и публикует его на порту 31080.  
-        ⚠![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml)
+        ![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml)
     - Создадим файл `docker/workspace-prod/deployment.yaml` для prod  
         Аналогично
 
@@ -995,7 +995,7 @@
         ```
         kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:v0.1
         ```
-        ⚠![](img/14.png)  
+        ![](img/14.png)  
     - Для prod  
         Аналогично
 
@@ -1003,7 +1003,7 @@
     ```
     http://158.160.118.254/:31080/
     ```
-    ⚠![](img/15.png)  
+    ![](img/15.png)  
     Увидим, что приложение доступно.  
 - Удалим развернутое приложение с Kubernetes кластера
     - Для stage
@@ -1048,7 +1048,7 @@
         version: "0.1"
         appVersion: "0.1"
         ```
-        ⚠![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml)  
+        ![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/Chart.yaml` для prod  
         Аналогично
 
@@ -1067,7 +1067,7 @@
           port: 80
           nodePort: 31080
         ```
-        ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml)  
+        ![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/values.yaml` для prod  
         Аналогично
 
@@ -1110,7 +1110,7 @@
               port: 80
               nodePort: {{ .Values.service.nodePort }}
         ```
-        ⚠![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  
+        ![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  
     - `docker/workspace-prod/helm/webapp-prod/templates/deployment.yaml` для prod  
         Аналогично
 
@@ -1129,7 +1129,7 @@
         ```
         helm lint webapp-stage
         ```
-        ⚠![](img/16.png)  
+        ![](img/16.png)  
     - Для prod  
         Аналогично
 
@@ -1138,7 +1138,7 @@
         ```
         helm upgrade --install webapp-stage webapp-stage --set image.tag=v0.1
         ```
-        ⚠![](img/17.png)
+        ![](img/17.png)
     - Для prod  
         Аналогично
 
@@ -1148,7 +1148,7 @@
         helm ls
         kubectl get deployment
         ```
-        ⚠![](img/18.png)  
+        ![](img/18.png)  
         Увидим, что helm релиз развернулся из Helm чарта.  
         Увидим, что развернулись ресурсы на Kubernetes кластере.
     - Для prod  
@@ -1159,7 +1159,7 @@
     http://158.160.118.254:31080/
     ```
     Увидим, что приложение доступно.  
-    ⚠![](img/19.png)
+    ![](img/19.png)
 - Удалим Helm релиз 
     - Для stage
         ```
@@ -1211,7 +1211,7 @@
             nodePort: 30081
         ```
         Команда опубликует Grafana на порту `30081`  
-        ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
+        ![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
     - `helm/workspace-prod/kube-prometheus/values.yaml` для prod  
         Аналогично
 
@@ -1220,7 +1220,7 @@
         ```
         helm upgrade --install monitoring prometheus-community/kube-prometheus-stack --create-namespace -n monitoring -f values.yaml
         ```
-        ⚠![](img/20.png)  
+        ![](img/20.png)  
         Укажем Helm релиз `monitoring`  
         Укажем Kubernetes namespace `monitoring`  
         Укажем файл с переменными Helm `values.yaml`
@@ -1232,7 +1232,7 @@
         ```
         kubectl --namespace monitoring get pods -l "release=monitoring"
         ```
-        ⚠![](img/21.png)  
+        ![](img/21.png)  
         Увидим, что поды для мониторинга развернулись в Kubernetes кластере.
     - Для prod  
         Аналогично
@@ -1242,14 +1242,14 @@
         ```
         kubectl get secret monitoring-grafana -o jsonpath="{.data.admin-password}" -n monitoring | base64 --decode
         ```
-        ⚠![](img/22.png)  
+        ![](img/22.png)  
         Укажем namespace `monitoring`, где был развёрнут kube-prometheus  
         Grafana пароль также доступен в `helm/workspace-prod/kube-prometheus/values.yaml`:
         ```
         grafana:
           adminPassword: prom-operator
         ```
-        ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
+        ![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml)
     - Для prod  
         Аналогично
 
@@ -1260,7 +1260,7 @@
     ```
     Укажил логин `admin` и пароль, полученный ранее  
     Откроем Home / Dashboards / General / Kubernetes
-    ⚠![](img/23.png)  
+    ![](img/23.png)  
     Увидим, что веб Grafana и dashboard Kubernetes кластера доступны
 
 
@@ -1292,7 +1292,7 @@
         ```
         https://github.com/yuri-artemiev/webapp-stage
         ```
-        ⚠![](img/24.png)
+        ![](img/24.png)
     - Для prod  
         Аналогично
 
@@ -1305,12 +1305,12 @@
             Secret: yuriartemiev
         - Name: DOCKERHUB_PASSWORD  
             Secret: пароль от Docker Hub репозитория  
-    ⚠![](img/25.png)
+    ![](img/25.png)
 
 - Изменим настройки GitHub профиля
     - Добавим SSH публичный ключ из файла `~/.ssh/id_rsa.pub` на локальной машине  
         Settings / SSH and GPG keys / New SSH key  
-        ⚠![](img/26.png)
+        ![](img/26.png)
 
 
 <a id="5-2"></a>
@@ -1348,7 +1348,7 @@
                 push: true
                 tags: yuriartemiev/webapp-stage:latest
         ```
-        ⚠![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml)   
+        ![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml)   
         Используем имя нашего Docker репозитория  
         Команда по коммиту в GitHub построит Docker образ и отправит его в Docker Hub
     - `docker/workspace-prod/.github/workflows/dockerimage.yml` для prod  
@@ -1373,7 +1373,7 @@
         git remote add origin git@github.com:yuri-artemiev/webapp-stage.git
         git push -u origin main
         ```
-        ⚠![](img/27.png)  
+        ![](img/27.png)  
         Укажем адрес нашего репозитория  
         Аутентификация произойдёт с помощью  публичного SSH ключа из  ~/.ssh/id_rsa.pub
     - Для prod  
@@ -1382,7 +1382,7 @@
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
         `docker/workspace-prod/index.html`  
-        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        ![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
         Аналогично
 
@@ -1398,7 +1398,7 @@
         ```
         https://github.com/yuri-artemiev/webapp-stage/actions/workflows/dockerimage.yml
         ```
-        ⚠![](img/28.png)  
+        ![](img/28.png)  
         Увидим, что коммит в репозиторий создал Docker образ и сохранил его в Docker Hub  
     - Для prod  
         Аналогично
@@ -1408,7 +1408,7 @@
         ```
         https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
         ```
-        ⚠![](img/29.png)  
+        ![](img/29.png)  
         Увидим, что новый образ добавился в Docker Hub репозиторий  
     - Для prod  
         Аналогично
@@ -1421,7 +1421,7 @@
     Укажем содержание kubeconfig файла для подключения к Kubernetes кластеру
     - Name: KUBECONFIG_FILE  
         Secret: содержание файла `~/.kube/config` на локальной машине  
-        ⚠![](img/30.png) 
+        ![](img/30.png) 
 
 
 <a id="5-4"></a>
@@ -1462,7 +1462,7 @@
                 export KUBECONFIG=kubeconfig
                 kubectl apply -f deployment.yaml && kubectl set image deployment/webapp-stage webapp-container=yuriartemiev/webapp-stage:${{ github.ref_name }}
         ```
-        ⚠![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml)  
+        ![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml)  
         Используем имя нашего Docker репозитория  
         Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере
     - `docker/workspace-prod/deploy.yml` для prod  
@@ -1478,7 +1478,7 @@
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
         `docker/workspace-prod/index.html`  
-        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        ![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
         Аналогично
 
@@ -1493,14 +1493,14 @@
     git tag v0.3
     git push origin v0.3
     ```
-    ⚠![](img/31.png)  
+    ![](img/31.png)  
 - Зайдём на GitHub
     - Для stage
         Repository / Actions / Deploy CI/CD
         ```
         https://github.com/yuri-artemiev/webapp-stage/actions/workflows/deploy.yml
         ```
-        ⚠![](img/32.png)  
+        ![](img/32.png)  
         Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере  
     - Для prod  
         Аналогично
@@ -1511,7 +1511,7 @@
         https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
         ```
         Увидим, что новый образ добавился в Docker Hub репозиторий  
-        ⚠![](img/33.png)
+        ![](img/33.png)
     - Для prod  
         Аналогично
 
@@ -1519,14 +1519,14 @@
     ```
     kubectl get all
     ```
-    ⚠![](img/34.png)  
+    ![](img/34.png)  
     Увидим что развернулись ресурсы на Kubernetes кластере  
 
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`  
     ```
     http://158.160.118.254:31080/
     ```
-    ⚠![](img/35.png)  
+    ![](img/35.png)  
     Увидим, что приложение доступно
 
 - Создадим файл для описания процесса развёртывания в GitHub c помощью Helm
@@ -1562,7 +1562,7 @@
                 export KUBECONFIG=kubeconfig
                 helm upgrade --install webapp-stage ./helm/webapp-stage --set image.tag=${{ github.ref_name }}
         ```
-        ⚠![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml)  
+        ![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml)  
         Укажем путь до Helm чарта из корня репозитория  
         Используем имя нашего Docker репозитория  
         Команда по коммиту с тегом `v` построит Docker образ, отправит его в Dcoker Hub и развернёт его в Kubernetes кластере с помощью Helm  
@@ -1579,7 +1579,7 @@
 - Изменим файл веб приложения в GitHub репозитории
     - Для stage  
         `docker/workspace-prod/index.html`  
-        ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
+        ![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html)
     - Для prod  
         Аналогично
 
@@ -1600,7 +1600,7 @@
         ```
         https://github.com/yuri-artemiev/webapp-stage/actions/workflows/helm.yml
         ```
-        ⚠![](img/36.png)  
+        ![](img/36.png)  
         Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере c помощью Helm  
     - Для prod  
         Аналогично
@@ -1610,7 +1610,7 @@
         ```
         https://hub.docker.com/repository/docker/yuriartemiev/webapp-stage/general
         ```
-        ⚠![](img/37.png)  
+        ![](img/37.png)  
         Увидим, что новый образ добавился в Docker Hub репозиторий
     - Для prod  
         Аналогично
@@ -1619,13 +1619,13 @@
     ```
     kubectl get all
     ```
-    ⚠![](img/38.png)  
+    ![](img/38.png)  
     Увидим что развернулись ресурсы на Kubernetes кластере
 - Откроем веб браузер по адресу любой ноды кластера Kubernetes на порту `31080`  
     ```
     http://158.160.118.254:31080/
     ```
-    ⚠![](img/39.png)  
+    ![](img/39.png)  
     Увидим, что приложение доступно
 
 
@@ -1640,38 +1640,38 @@
     ```
     https://github.com/yuri-artemiev/webapp-stage
     ```
-    ⚠![](img/40.png)
-    - ⚠![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер  
-    - ⚠![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml) - GitHub Action для отправки образа в Docker Hub  
-    - ⚠![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер с помощью Helm  
-    - ⚠![deployment.yaml](https://github.com/yuri-artemiev/webapp-stage/blob/main/deployment.yaml) - файл задач для развёртывания приложения в Kubernetes кластер  
-    - ⚠![Dockerfile](https://github.com/yuri-artemiev/webapp-stage/blob/main/Dockerfile) - файл для создания образа Docker контейнера  
-    - ⚠![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html) - простое веб приложение  
+    ![](img/40.png)
+    - ![.github/workflows/deploy.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/deploy.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер  
+    - ![.github/workflows/dockerimage.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/dockerimage.yml) - GitHub Action для отправки образа в Docker Hub  
+    - ![.github/workflows/helm.yml](https://github.com/yuri-artemiev/webapp-stage/blob/main/.github/workflows/helm.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер с помощью Helm  
+    - ![deployment.yaml](https://github.com/yuri-artemiev/webapp-stage/blob/main/deployment.yaml) - файл задач для развёртывания приложения в Kubernetes кластер  
+    - ![Dockerfile](https://github.com/yuri-artemiev/webapp-stage/blob/main/Dockerfile) - файл для создания образа Docker контейнера  
+    - ![index.html](https://github.com/yuri-artemiev/webapp-stage/blob/main/index.html) - простое веб приложение  
 
 - Репозиторий рабочих файлов diploma
     ```
     https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
     ```
-    ⚠![](img/41.png)
-    - ⚠![ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) - инвентарий для Ansible  
-    - ⚠![ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) - инвентарий для Ansible  
-    - ⚠![ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) - скрипт для установки Kubernetes с помощью Kubespray  
-    - ⚠![ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) - файл переменных для Ansible  
-    - ⚠![ansible/workspace-stage/get-kubeconfig.yml](ansible/workspace-stage/get-kubeconfig.yml) - файл задач для Ansible  
-    - ⚠![ansible/workspace-stage/prepare-master.yml](ansible/workspace-stage/prepare-master.yml) - файл задач для Ansible  
-    - ⚠![ansible/workspace-stage/id_rsa.pub](ansible/workspace-stage/id_rsa.pub) - публичный ключ для SSH  
-    - ⚠![docker/workspace-stage/.github/workflows/deploy.yml](docker/workspace-stage/.github/workflows/deploy.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер  
-    - ⚠![docker/workspace-stage/.github/workflows/dockerimage.yml](docker/workspace-stage/.github/workflows/dockerimage.yml) - GitHub Action для отправки образа в Docker Hub  
-    - ⚠![docker/workspace-stage/.github/workflows/helm.yml](docker/workspace-stage/.github/workflows/helm.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер с помощью Helm  
-    - ⚠![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  - файл задач для развёртывания приложения в Kubernetes кластер с помощью Helm  
-    - ⚠![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml) - файл описание Helm chart  
-    - ⚠![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml) - файл переменных для Helm chart  
-    - ⚠![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml) - файл задач для развёртывания приложения в Kubernetes кластер  
-    - ⚠![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile) - файл для создания образа Docker контейнера  
-    - ⚠![docker/workspace-stage/index.html](docker/workspace-stage/index.html) - простое веб приложение  
-    - ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml) - файл переменных для Helm chart с `kube-prometheus`  
-    - ⚠![terraform/workspace-stage/id_rsa.pub](terraform/workspace-stage/id_rsa.pub) - публичный ключ для SSH
-    - ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf) - файл задач для Terraform  
+    ![](img/41.png)
+    - ![ansible/workspace-stage/ansible-inventory-kubespray](ansible/workspace-stage/ansible-inventory-kubespray) - инвентарий для Ansible  
+    - ![ansible/workspace-stage/ansible-inventory-virtualmachine-master](ansible/workspace-stage/ansible-inventory-virtualmachine-master) - инвентарий для Ansible  
+    - ![ansible/workspace-stage/install-kubernetes-with-kubespray.sh](ansible/workspace-stage/install-kubernetes-with-kubespray.sh) - скрипт для установки Kubernetes с помощью Kubespray  
+    - ![ansible/workspace-stage/k8s-cluster.yml](ansible/workspace-stage/k8s-cluster.yml) - файл переменных для Ansible  
+    - ![ansible/workspace-stage/get-kubeconfig.yml](ansible/workspace-stage/get-kubeconfig.yml) - файл задач для Ansible  
+    - ![ansible/workspace-stage/prepare-master.yml](ansible/workspace-stage/prepare-master.yml) - файл задач для Ansible  
+    - ![ansible/workspace-stage/id_rsa.pub](ansible/workspace-stage/id_rsa.pub) - публичный ключ для SSH  
+    - ![docker/workspace-stage/.github/workflows/deploy.yml](docker/workspace-stage/.github/workflows/deploy.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер  
+    - ![docker/workspace-stage/.github/workflows/dockerimage.yml](docker/workspace-stage/.github/workflows/dockerimage.yml) - GitHub Action для отправки образа в Docker Hub  
+    - ![docker/workspace-stage/.github/workflows/helm.yml](docker/workspace-stage/.github/workflows/helm.yml) - GitHub Action для отправки образа в Docker Hub и развёртывания приложения в Kubernetes кластер с помощью Helm  
+    - ![docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml](docker/workspace-stage/helm/webapp-stage/templates/deployment.yaml)  - файл задач для развёртывания приложения в Kubernetes кластер с помощью Helm  
+    - ![docker/workspace-stage/helm/webapp-stage/Chart.yaml](docker/workspace-stage/helm/webapp-stage/Chart.yaml) - файл описание Helm chart  
+    - ![docker/workspace-stage/helm/webapp-stage/values.yaml](docker/workspace-stage/helm/webapp-stage/values.yaml) - файл переменных для Helm chart  
+    - ![docker/workspace-stage/deployment.yaml](docker/workspace-stage/deployment.yaml) - файл задач для развёртывания приложения в Kubernetes кластер  
+    - ![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile) - файл для создания образа Docker контейнера  
+    - ![docker/workspace-stage/index.html](docker/workspace-stage/index.html) - простое веб приложение  
+    - ![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml) - файл переменных для Helm chart с `kube-prometheus`  
+    - ![terraform/workspace-stage/id_rsa.pub](terraform/workspace-stage/id_rsa.pub) - публичный ключ для SSH
+    - ![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf) - файл задач для Terraform  
 
 <a id="6-2"></a>
 ### Docker Hub 
@@ -1679,12 +1679,12 @@
     ```
     https://hub.docker.com/r/yuriartemiev/webapp-stage/tags
     ```
-    ⚠![](img/42.png)
+    ![](img/42.png)
 <a id="6-3"></a>
 ### Terraform Cloud 
 - Репозиторий приложения
     ```
     https://app.terraform.io/app/yuri-artemiev/workspaces
     ```
-    ⚠![](img/43.png)
+    ![](img/43.png)
 
