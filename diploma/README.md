@@ -183,8 +183,9 @@
 
 
 
+# Решение
 
-**Оглавление**
+## Оглавление
 
 - [Создание облачной инфраструктуры](#1)
     - [Подготовим инструменты для работы](#1-1)
@@ -218,14 +219,6 @@
 
 
 ---
-# Решение
-https://github.com/netology-code/devops-diplom-yandexcloud
-
-
-
-
-
-
 
 <a id="1"></a>
 ## Создание облачной инфраструктуры
@@ -349,7 +342,8 @@ provider "yandex" {
       name        = "folder-prod"
     }
     ```
-    Далее для workspace prod будут аналогичные действия в `terraform/workspace-prod`
+    Далее для workspace prod будут аналогичные действия в `terraform/workspace-prod`  
+
 - Добавим сервисный аккаунт в Яндекс Облаке
     - Отредактируем файл `terraform/workspace-stage/main.tf` для stage
     ```
@@ -1313,6 +1307,7 @@ https://github.com/yuri-artemiev/
         - Name: DOCKERHUB_PASSWORD  
         Secret: пароль от Docker Hub репозитория  
     ⚠![](img/25.png)
+
 - Изменим настройки GitHub профиля
     - Добавим SSH публичный ключ из файла `~/.ssh/id_rsa.pub` на локальной машине  
     Settings / SSH and GPG keys / New SSH key  
@@ -1408,6 +1403,7 @@ git push -u origin main
     Увидим, что коммит в репозиторий создал Docker образ и сохранил его в Docker Hub  
     - Для prod  
     Аналогично
+
 - Зайдём на Docker Hub
     - Для stage
     ```
@@ -1509,6 +1505,7 @@ git push origin v0.3
     Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере  
     - Для prod  
     Аналогично
+
 - Зайдём на Docker Hub
     - Для stage
     ```
@@ -1608,6 +1605,7 @@ git push origin v1.0
     Увидим, что коммит в репозиторий собрал Docker образ, отправил его в Docker Hub и развернул в Kubernetes кластере c помощью Helm  
     - Для prod  
     Аналогично
+
 - Зайдём на Docker Hub
     - Для stage
     ```
@@ -1673,7 +1671,7 @@ https://github.com/yuri-artemiev/devops-netology/tree/main/diploma
     - ⚠![docker/workspace-stage/Dockerfile](docker/workspace-stage/Dockerfile) - файл для создания образа Docker контейнера  
     - ⚠![docker/workspace-stage/index.html](docker/workspace-stage/index.html) - простое веб приложение  
     - ⚠![helm/workspace-stage/kube-prometheus/values.yaml](helm/workspace-stage/kube-prometheus/values.yaml) - файл переменных для Helm chart с `kube-prometheus`  
-    - ⚠![terraform/workspace-stage/id_rsa.pub](terraform/workspace-stage/id_rsa.pub) - публичный ключ для SSH  
+    - ⚠![terraform/workspace-stage/id_rsa.pub](terraform/workspace-stage/id_rsa.pub) - публичный ключ для SSH
     - ⚠![terraform/workspace-stage/main.tf](terraform/workspace-stage/main.tf) - файл задач для Terraform  
 
 <a id="6-2"></a>

@@ -1,7 +1,5 @@
 # Variables
-variable "yc_token" {
-  default = "t1.9euelZqTm82cipiJmonLl56MjZaYj-3rnpWax8yRlImYyYuVnc2Yzomcko7l8_c5WCJY-e9NYhR5_d3z93kGIFj5701iFHn9zef1656VmsjGncbGjpiRj82alIzHjImJ7_zF656VmsjGncbGjpiRj82alIzHjImJ.zh2M9k0cOkMoUtG61iXNTdSbIvKUCInQJUg6ueEeP8S6HMJTnRW5iXj-Pm15QBObNSu1cmpJmN19eLYEy_LXDw"
-}
+variable "yc_token" {}
 variable "yc_cloud_id" {
   default = "b1gjd8gta6ntpckrp97r"
 }
